@@ -23,13 +23,18 @@ Pages
 Login Page
 
 List View
-    • Main page, opens directly from login
+
+---- Main page, opens directly from login
 
 Project View
-    • Groups tasks by project
-    • Looks like Canvas Dashboard (block for each project, click to open)
-    • Has list and calendar view
-    • Shows percentages of not started, in progress, and completed in pie chart
+
+---- Groups tasks by project
+
+---- Looks like Canvas Dashboard (block for each project, click to open)
+
+---- Has list and calendar view
+
+---- Shows percentages of not started, in progress, and completed in pie chart
 
 Calander View
 
