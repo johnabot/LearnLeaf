@@ -21,56 +21,72 @@ Use Cases
 Pages
 ----------
 Login Page
+
 List View
-    Main page, opens directly from login
+    - Main page, opens directly from login
+
 Project View
-    Groups tasks by project
-    Looks like Canvas Dashboard (block for each project, click to open)
-    Has list and calendar view
-    Shows percentages of not started, in progress, and completed in pie chart
+    - Groups tasks by project
+    - Looks like Canvas Dashboard (block for each project, click to open)
+    - Has list and calendar view
+    - Shows percentages of not started, in progress, and completed in pie chart
+
 Calander View
+
 Subjects
-    Add
-    Delete
-    Edit
-    Customize colors (default gray)
+    - Add
+    - Delete
+    - Edit
+    - Customize colors (default gray)
+
 Archive Page?
-    View completed/archived tasks and projects
+    - View completed/archived tasks and projects
+
 User Profile
-    Settings
-    Notification preferences
-        Yes or No
-        Time
+    - Settings
+    - Notification preferences
+        -- Yes or No
+        -- Time
 
 Primary Functions
-Included in List, Calendar, and Project Views
+(Included in List, Calendar, and Project Views)
 ----------
 Search
+
 Filter
-    Topic
-    Deadline
-    Priority
-    Status
+    - Topic
+    - Deadline
+    - Priority
+    - Status
+
 Add Task
-    Subject (Required)
-    Name (Required)
-    Description
-    Status 
-        Not Started, In Progress, Completed
-    Start Date
-    Due Date
-    Time Due
-    Priority
+    - Subject (Required)
+    - Name (Required)
+    - Description
+    - Status 
+        -- Not Started, In Progress, Completed
+    - Start Date
+    - Due Date
+    - Time Due
+    - Priority
+
 Delete Task
+
 Edit Task
 
 
 Design Colors
 ----------
 Opal #B6CDC8
+
 Mineral Green #355147
+
 Leather #9F6C5B
+
 Hemp #907474
+
 Misty Blue #5B8E9F
+
 Orchid #8E5B9F
+
 Scarlet #F3161E
