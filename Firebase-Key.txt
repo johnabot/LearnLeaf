@@ -1,7 +1,0 @@
-// Connect Firebase
-var admin = require("firebase-admin");
-var serviceAccount = require("learnleaf-organizer-firebase-adminsdk-yyyj1-b1bfa59177.json");
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
