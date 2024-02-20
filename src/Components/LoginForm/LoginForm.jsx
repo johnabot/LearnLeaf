@@ -15,7 +15,7 @@ class LoginForm extends React.Component {
           <p>Helping you manage your everyday needs!</p>
           <form style={{ display: 'flex', flexDirection: 'column', width: '300px', alignItems: 'center' }}>
             
-            <input type="text" placeholder="Username" /> 
+            <input type="text" placeholder="Email" /> 
 
             <input type="password" placeholder="Password" /> 
             
