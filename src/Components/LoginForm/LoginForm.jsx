@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { loginUser } from '/src/LearnLeaf_JSFrontend.js'; // Import loginUser instead of registerUser
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import '/workspaces/Team6_3311/src/Components/FormUI.css';
@@ -8,15 +9,25 @@ function LoginForm() {
   // State for email and password fields only, as name is not required for login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Create the navigation function
 
   // Function to handle form submission for login
   const handleSubmit = (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
 
-    loginUser(email, password); // Call loginUser instead of registerUser
-
-    console.log('Logging in:', { email, password });
-    // Optionally reset form fields after submission
+    loginUser(email, password)
+      .then(function() {
+          console.log('Logging in:', { email, password });
+        })
+        .catch(function(error) {
+              // Error occurred. Inspect error.code.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // Error handling, like displaying a message to the user
+              alert("Error code: " + errorCode + "\n" + errorMessage);
+              throw error; // Throw the error so it can be caught where the function is called
+        });
+    
     setEmail('');
     setPassword('');
   };
@@ -50,8 +61,8 @@ function LoginForm() {
           />
         </div>
         <button type="submit">Login</button> {/* Changed button text to Login */}
-        <i><p>Forgot password</p></i>
-        <p>Don't have an account? <Link to="/register">Register</Link></p> {/* Add this line */}
+        <i><p><Link to="/resetPassword">Reset Password</Link></p></i>
+        <p>Don't have an account? <Link to="/register">Register</Link></p>
       </form>
     </div>
   );

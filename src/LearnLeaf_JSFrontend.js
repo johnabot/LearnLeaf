@@ -43,6 +43,23 @@ export function registerUser(email, password) {
         });
 }
 
+export function resetPassword(email) {
+    const auth = getAuth();
+    return sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent.
+        console.log('Password reset email sent.');
+      })
+      .catch((error) => {
+        // Handle errors here
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert("Error code: " + errorCode + "\n" + errorMessage);
+        // Optionally, throw the error to be caught by the calling code
+        throw error;
+      });
+  }
+
 // Function to handle user login
 export function loginUser(email, password) {
     signInWithEmailAndPassword(auth, email, password)

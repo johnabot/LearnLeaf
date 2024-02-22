@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { registerUser } from '/src/LearnLeaf_JSFrontend.js';
 
 function RegistrationForm() {
@@ -6,16 +7,25 @@ function RegistrationForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Create the navigation function
 
   // Function to handle form submission
   const handleSubmit = (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
 
-    registerUser(email, password);
-    
-
-    console.log('Registering:', { name, email, password });
-    // Reset form fields after submission for a better UX
+    registerUser(email, password)
+      .then(function() {
+          navigate('/'); // Navigate to the login page after successful reset
+        })
+        .catch(function(error) {
+              // Error occurred. Inspect error.code.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // Error handling, like displaying a message to the user
+              alert("Error code: " + errorCode + "\n" + errorMessage);
+              throw error; // Throw the error so it can be caught where the function is called
+        });
+        // Reset form fields after submission for a better UX
     setName('');
     setEmail('');
     setPassword('');
