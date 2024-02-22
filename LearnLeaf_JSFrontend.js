@@ -1,6 +1,3 @@
-// JavaScript Frontend for LearnLeaf Organizer
-
-// Connect Firebase
 var admin = require("firebase-admin");
 var serviceAccount = require("learnleaf-organizer-firebase-adminsdk-yyyj1-b1bfa59177.json");
 

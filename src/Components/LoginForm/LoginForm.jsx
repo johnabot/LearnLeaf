@@ -1,42 +1,60 @@
-import React from 'react'
-import './LoginForm.css';
+import React, { useState } from 'react';
+import { loginUser } from '/src/LearnLeaf_JSFrontend.js'; // Import loginUser instead of registerUser
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import '/workspaces/Team6_3311/src/Components/FormUI.css';
 
 
-// LoginForm is a React component class that renders a login form.
-class LoginForm extends React.Component {
-    render() {
-      return (
-        /*Centering the login form to the center of the page
-        */
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}> 
-      
-          <h1>LearnLeaf Task Organizer</h1> 
-        
-          <p>Helping you manage your everyday needs!</p>
-          <form style={{ display: 'flex', flexDirection: 'column', width: '300px', alignItems: 'center' }}>
-            
-            <input type="text" placeholder="Username" /> 
+function LoginForm() {
+  // State for email and password fields only, as name is not required for login
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-            <input type="password" placeholder="Password" /> 
-            
-            <label> 
-              
-              <input type="checkbox" /> Remember me
+  // Function to handle form submission for login
+  const handleSubmit = (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
 
-            </label>
+    loginUser(email, password); // Call loginUser instead of registerUser
 
-            <a href="/forgot-password">Forgot password?</a>
+    console.log('Logging in:', { email, password });
+    // Optionally reset form fields after submission
+    setEmail('');
+    setPassword('');
+  };
 
-            <button type="submit">Login</button>
-
-            <p>Don't have an account? <a href="/register">Register</a></p> 
-
-          </form> 
-            
+  return (
+    <div className="login-form-container"> {/* Changed class name to reflect login form */}
+      <h1>LearnLeaf Task Organizer</h1> {/* Changed heading to Login */}
+      <h2>Helping you manage your everyday needs!</h2>
+      <form onSubmit={handleSubmit}>
+        {/* Removed name field as it's not required for login */}
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
-        
-      );
-    }
-  }
-  
-  export default LoginForm;
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Login</button> {/* Changed button text to Login */}
+        <i><p>Forgot password</p></i>
+        <p>Don't have an account? <Link to="/register">Register</Link></p> {/* Add this line */}
+      </form>
+    </div>
+  );
+}
+
+export default LoginForm;
