@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { loginUser } from '/src/LearnLeaf_JSFrontend.js'; // Import loginUser instead of registerUser
+import { loginUser } from '/src/LearnLeaf_JSFrontend.js'; // Import loginUser function
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import '/workspaces/Team6_3311/src/Components/FormUI.css';
 
@@ -16,10 +16,10 @@ function LoginForm() {
     event.preventDefault(); // Prevent the default form submission behavior
 
     loginUser(email, password)
-      .then(function() {
-          console.log('Logging in:', { email, password });
+      .then(() => {
+          navigate('/tasks'); // Navigate to the Task View after successful login
         })
-        .catch(function(error) {
+        .catch((error) => {
               // Error occurred. Inspect error.code.
               var errorCode = error.code;
               var errorMessage = error.message;
@@ -34,7 +34,7 @@ function LoginForm() {
 
   return (
     <div className="login-form-container"> {/* Changed class name to reflect login form */}
-      <h1>LearnLeaf Task Organizer</h1> {/* Changed heading to Login */}
+      <h1>LearnLeaf Organizer</h1> {/* Changed heading to Login */}
       <h2>Helping you manage your everyday needs!</h2>
       <form onSubmit={handleSubmit}>
         {/* Removed name field as it's not required for login */}

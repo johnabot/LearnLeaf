@@ -28,7 +28,7 @@ const auth = getAuth(app);
 
 // Function to handle user registration
 export function registerUser(email, password) {
-    createUserWithEmailAndPassword(auth, email, password)
+    return createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in 
             var user = userCredential.user;
@@ -62,11 +62,10 @@ export function resetPassword(email) {
 
 // Function to handle user login
 export function loginUser(email, password) {
-    signInWithEmailAndPassword(auth, email, password)
+    return signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in
             var user = userCredential.user;
-            alert("Successful login!");
         })
         .catch((error) => {
             var errorCode = error.code;
@@ -95,7 +94,7 @@ function fetchTasks() {
         });
 }
 
-function displayTasks(tasks) {
+export function displayTasks(tasks) {
     const tasksList = document.getElementById('tasks-list');
     tasksList.innerHTML = '';  // Clear existing tasks
 
@@ -103,6 +102,7 @@ function displayTasks(tasks) {
         const row = tasksList.insertRow();
         row.innerHTML = `
             <td>${task.subject}</td>
+            ,td>${task.project}</td>
             <td>${task.assignment}</td>
             <td>
                 <select class="priority-dropdown ${'priority-' + task.priority.toLowerCase()}">
@@ -120,26 +120,31 @@ function displayTasks(tasks) {
             </td>
             <td>${task.startDate}</td>
             <td>${task.dueDate}</td>
-            <td>${task.time}</td>
+            <td>${task.timeDue}</td>
         `;
     });
 };
 
 
 // Function to create a new task
-function createTask() {
+export function createTask() {
     // Get task details from form inputs
     const taskSubject = document.getElementById('task-subject').value;
+    const taskProject = document.getElementById('task-project').value;
     const taskAssignment = document.getElementById('task-assignment').value;
     const taskPriority = document.getElementById('task-priority').value;
     const taskStatus = document.getElementById('task-status').value;
     const taskStartDate = document.getElementById('task-start-date').value;
     const taskDueDate = document.getElementById('task-due-date').value;
     const taskDueTime = document.getElementById('task-due-time').value;
+    const taskId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+
 
     // Create a task object
     const taskData = {
+        taskId,
         subject: taskSubject,
+        project: tastProject,
         assignment: taskAssignment,
         priority: taskPriority,
         status: taskStatus,
@@ -149,29 +154,30 @@ function createTask() {
     };
 
     // Send a POST request to the server
-    fetch('/api/tasks')
+    fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new TypeError('Received non-JSON response');
-        }
         return response.json();
     })
     .then(tasks => {
-        displayTasks(tasks);
+        displayTasks(tasks); // Assuming displayTasks updates the UI with the new task list
     })
     .catch(error => {
-        console.error('Error fetching tasks:', error);
+        console.error('Error creating task:', error);
     });
-
 }
 
 
 // Function to update a task
-function editTask(taskId) {
+export function editTask(taskId) {
     // Get updated task details from form inputs or inline editing fields
     const taskSubject = document.getElementById(`task-subject-${taskId}`).value;
     const taskAssignment = document.getElementById(`task-assignment-${taskId}`).value;
@@ -214,7 +220,7 @@ function editTask(taskId) {
 
 
 // Function to delete a task
-function deleteTask(taskId) {
+export function deleteTask(taskId) {
     if (confirm('Are you sure you want to delete this task?')) {
         fetch(`/api/tasks/${taskId}`, {
             method: 'DELETE',

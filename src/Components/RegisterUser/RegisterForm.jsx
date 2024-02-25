@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { registerUser } from '/src/LearnLeaf_JSFrontend.js';
+import { registerUser } from '/src/LearnLeaf_JSFrontend.js'; // Import registerUser function
 
 function RegistrationForm() {
   // State for each input field

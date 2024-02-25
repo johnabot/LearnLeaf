@@ -1,0 +1,21 @@
+#tasksTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  #tasksTable thead {
+    background-color: #5B8E9F;
+    color: white;
+  }
+  
+  #tasksTable th, #tasksTable td {
+    padding: 15px;
+    border: 1px solid #545454;
+    text-align: left;
+  }
+  
+  #tasksTable tbody tr:nth-child(even) {
+    background-color: #f3f2f2;
+  }
+
+  
