@@ -3,18 +3,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     margin: 0;
     background-color: #f5f5f5;
   }
   
   .login-container {
     text-align: center;
+    padding-left: 300px;
+    padding-right: 300px;
+    
   }
 
   .login-form {
     background: #fff;
-    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }

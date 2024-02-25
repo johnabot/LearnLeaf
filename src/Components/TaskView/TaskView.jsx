@@ -16,7 +16,7 @@ const TaskList = () => {
         const fetchedTasks = [
             {
                 subject: 'CIS-330',
-                assignment: 'Chapter 2 Review',
+                assignment: 'Chapter 2 Review - Create Shell in C',
                 priority: 'Low',
                 status: 'In Progress',
                 startDate: '01-Jan-2021',
@@ -228,14 +228,14 @@ const TaskList = () => {
     return (
         <div className="task-view-container">
             <div className="top-bar">
-                <img src="src/logo.svg" alt="Logo" className="logo" />
+                <img src="src\LearnLeaf_Logo_Circle.png" alt="Logo" className="logo" />
                 <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
                 <nav className="nav-links">
                     <a href="/calendar">Calendar</a>
                     <a href="/projects">Projects</a>
                     <a href="/subjects">Subjects</a>
                     <a href="/archives">Archives</a>
-                    <a href="/user-profile">User Profile</a>
+                    <a href="/profile">User Profile</a>
                 </nav>
             </div>
 

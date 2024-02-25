@@ -1,9 +1,14 @@
 #root {
   width: 90%;
-  height: 100%;
-  margin: 0 auto;
+  height: auto;
+  margin: 10px;
   padding: 20px;
   text-align: center;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
 }
 
 .logo {

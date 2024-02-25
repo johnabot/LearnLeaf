@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { loginUser } from '/src/LearnLeaf_JSFrontend.js'; // Import loginUser function
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import '/workspaces/Team6_3311/src/Components/FormUI.css';
+import '/src/Components/FormUI.css';
 
 
 function LoginForm() {
