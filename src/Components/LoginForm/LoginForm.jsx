@@ -1,33 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { loginUser } from '/src/LearnLeaf_JSFrontend.js'; // Import loginUser function
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '/src/LearnLeaf_JSFrontend.js';
+import { useUser } from '../../UserState';
+import { Link } from 'react-router-dom';
 import '/src/Components/FormUI.css';
 
-
 function LoginForm() {
-  // State for email and password fields only, as name is not required for login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Create the navigation function
+  const { updateUser } = useUser(); // Assuming useUser is a hook to access UserContext
 
-  // Function to handle form submission for login
-  const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
+  const navigate = useNavigate(); // Instantiate navigate
 
-    loginUser(email, password)
-      .then(() => {
-          navigate('/tasks'); // Navigate to the Task View after successful login
-        })
-        .catch((error) => {
-              // Error occurred. Inspect error.code.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-              // Error handling, like displaying a message to the user
-              alert("Error code: " + errorCode + "\n" + errorMessage);
-              throw error; // Throw the error so it can be caught where the function is called
-        });
-    
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const { userID, userName } = await loginUser(email, password);
+      updateUser({ id: userID, name: userName });
+      // Navigate to another route upon successful login, if necessary
+      navigate('/tasks'); // Redirect user to the tasks page or another appropriate route
+    } catch (error) {
+      alert(`Error code: ${error.code}\n${error.message}`);
+    }
+
     setEmail('');
     setPassword('');
   };
@@ -37,7 +33,6 @@ function LoginForm() {
       <h1>LearnLeaf Organizer</h1> {/* Changed heading to Login */}
       <h2>Helping you manage your everyday needs!</h2>
       <form onSubmit={handleSubmit}>
-        {/* Removed name field as it's not required for login */}
         <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input

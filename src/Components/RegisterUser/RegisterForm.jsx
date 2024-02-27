@@ -13,7 +13,7 @@ function RegistrationForm() {
   const handleSubmit = (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
 
-    registerUser(email, password)
+    registerUser(email, password, name)
       .then(function() {
           navigate('/'); // Navigate to the login page after successful reset
         })

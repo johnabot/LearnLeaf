@@ -1,7 +1,9 @@
-import {initializeApp} from 'firebase/app';
-import 'firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+// Firebase App (the core Firebase SDK) is always required and must be listed first
+import { initializeApp } from "firebase/app";
+// Add the Firebase products that you want to use
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
+// Optional: Import Firebase Analytics
 import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -25,13 +27,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
+const db = getFirestore();
 
 // Function to handle user registration
-export function registerUser(email, password) {
+export function registerUser(email, password, name) {
     return createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             // Signed in 
-            var user = userCredential.user;
+            const user = userCredential.user;
+            // Store the user's name in Firestore
+            
+            await setDoc(doc(db, "users", user.uid), {
+                name: name,
+                email: email
+            });
             // Additional user info or redirection can be handled here
         })
         .catch((error) => {
@@ -63,19 +72,26 @@ export function resetPassword(email) {
 // Function to handle user login
 export function loginUser(email, password) {
     return signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             // Signed in
-            var user = userCredential.user;
+            const userID = userCredential.user.uid; // Use uid for user ID
+            // Fetch user's name from Firestore using the db instance
+            const userDoc = await getDoc(doc(db, "users", userID));
+            if (!userDoc.exists()) {
+                throw new Error('User does not exist');
+            }
+            const userName = userDoc.data().name; // Assuming 'name' field holds the user's name
+            return { userID, userName };
         })
         .catch((error) => {
+            // Error handling
             var errorCode = error.code;
             var errorMessage = error.message;
             alert("Error code: " + errorCode + "\n" + errorMessage);
-
-            // Error handling
             throw error; // Throw the error so it can be caught where the function is called
         });
 }
+
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -144,7 +160,7 @@ export function createTask() {
     const taskData = {
         taskId,
         subject: taskSubject,
-        project: tastProject,
+        project: taskProject,
         assignment: taskAssignment,
         priority: taskPriority,
         status: taskStatus,
@@ -245,8 +261,8 @@ export function deleteTask(taskId) {
 // Event listeners for form submissions and button clicks
 // Example: document.getElementById('register-form').addEventListener('submit', registerUser);
 // Monitor auth state
-onAuthStateChanged(auth, (user) => {
-    if (user) {
+onAuthStateChanged(auth, (userID) => {
+    if (userID) {
         // User is signed in
         // Update UI or redirect
         // ...
