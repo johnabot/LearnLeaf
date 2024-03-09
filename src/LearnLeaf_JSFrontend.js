@@ -118,7 +118,7 @@ export function displayTasks(tasks) {
         const row = tasksList.insertRow();
         row.innerHTML = `
             <td>${task.subject}</td>
-            ,td>${task.project}</td>
+            <td>${task.project}</td>
             <td>${task.assignment}</td>
             <td>
                 <select class="priority-dropdown ${'priority-' + task.priority.toLowerCase()}">
@@ -143,53 +143,43 @@ export function displayTasks(tasks) {
 
 
 // Function to create a new task
-export function createTask() {
-    // Get task details from form inputs
+export async function createTask(userId) {
     const taskSubject = document.getElementById('task-subject').value;
     const taskProject = document.getElementById('task-project').value;
     const taskAssignment = document.getElementById('task-assignment').value;
     const taskPriority = document.getElementById('task-priority').value;
     const taskStatus = document.getElementById('task-status').value;
-    const taskStartDate = document.getElementById('task-start-date').value;
-    const taskDueDate = document.getElementById('task-due-date').value;
-    const taskDueTime = document.getElementById('task-due-time').value;
-    const taskId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    const taskStartDateInput = document.getElementById('task-start-date').value;
+    const taskDueDateInput = document.getElementById('task-due-date').value;
+    const taskDueTimeInput = document.getElementById('task-due-time').value;
 
+    // Convert date strings and due time to Timestamps
+    const startDate = Timestamp.fromDate(new Date(taskStartDateInput + "T00:00:00"));
+    const dueDate = Timestamp.fromDate(new Date(taskDueDateInput + "T00:00:00"));
+    // Combine dueDate's date with dueTime's time
+    const dueDateTime = Timestamp.fromDate(new Date(taskDueDateInput + "T" + taskDueTimeInput));
 
-    // Create a task object
     const taskData = {
-        taskId,
+        userId, // Include userId in task data
         subject: taskSubject,
         project: taskProject,
         assignment: taskAssignment,
         priority: taskPriority,
         status: taskStatus,
-        startDate: taskStartDate,
-        dueDate: taskDueDate,
-        dueTime: taskDueTime
+        startDate, // Use the Timestamp for startDate
+        dueDate, // Use the Timestamp for dueDate, assuming time is irrelevant and set to 00:00
+        dueTime: dueDateTime, // Use the combined Timestamp for dueTime
     };
 
-    // Send a POST request to the server
-    fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(taskData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(tasks => {
-        displayTasks(tasks); // Assuming displayTasks updates the UI with the new task list
-    })
-    .catch(error => {
-        console.error('Error creating task:', error);
-    });
-}
+    // Assuming tasks are stored in a 'tasks' collection
+    try {
+        await setDoc(doc(db, "tasks", Date.now().toString()), taskData);
+        console.log("Task added successfully");
+        // Optionally, update the UI here or navigate to another page
+    } catch (error) {
+        console.error("Error adding task:", error);
+    }
+} 
 
 
 // Function to update a task
@@ -272,6 +262,3 @@ onAuthStateChanged(auth, (userID) => {
         // ...
     }
 });
-// Additional functions for project management and other features can be added here
-
-// Additional utility functions for handling DOM manipulations, API calls, etc., can be added here

@@ -38,6 +38,25 @@
   text-decoration: underline;
 }
 
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #007bff; /* Bootstrap primary blue, for example */
+  color: white;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.fab:hover {
+  background-color: #0056b3; /* Darker blue */
+}
+
 #tasksTable {
     border-collapse: collapse;
     width: 100%;
@@ -63,4 +82,7 @@
   #tasksTable td {
     word-wrap: break-word; /* Enable text wrapping inside cells */
 }
+
+
+
   

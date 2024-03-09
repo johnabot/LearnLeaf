@@ -4,8 +4,16 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import TasksTable from './TaskTable';
 import { useUser } from '/src/UserState.jsx'; // Adjust the path based on your file structure
+import { PopupForm } from './AddTaskForm.jsx';
 
-
+function FloatingActionButton({ onClick }) {
+    return (
+      <button className="fab" onClick={onClick}>
+        +
+      </button>
+    );
+}
+  
 const TaskList = () => {
     const [tasks, setTasks] = useState([]);
     const { user } = useUser();
@@ -48,12 +56,9 @@ const TaskList = () => {
 
     return (
         <div className="task-view-container">
+            <FloatingActionButton onClick={() => console.log("FAB Clicked!")} />
             <div className="top-bar">
-<<<<<<< HEAD
-                <img src="src/LearnLeaf_Logo_Circle.png" alt="Logo" className="logo" />
-=======
                 <img src="src\LearnLeaf_Logo_Circle.png" alt="Logo" className="logo" />
->>>>>>> 34bd2b2823c910240b92b28c350c82616060e954
                 <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
                 <nav className="nav-links">
                     <a href="/calendar">Calendar</a>
@@ -63,11 +68,11 @@ const TaskList = () => {
                     <a href="/profile">User Profile</a>
                 </nav>
             </div>
-
             <div>
                 <h1 style={{color: '#907474'}}>{user.name}'s Upcoming Tasks</h1>
                 <TasksTable tasks={tasks} />
             </div>
+            
         </div>
     );
 };
