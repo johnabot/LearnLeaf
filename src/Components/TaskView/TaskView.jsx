@@ -49,7 +49,11 @@ const TaskList = () => {
     return (
         <div className="task-view-container">
             <div className="top-bar">
+<<<<<<< HEAD
+                <img src="src/LearnLeaf_Logo_Circle.png" alt="Logo" className="logo" />
+=======
                 <img src="src\LearnLeaf_Logo_Circle.png" alt="Logo" className="logo" />
+>>>>>>> 34bd2b2823c910240b92b28c350c82616060e954
                 <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
                 <nav className="nav-links">
                     <a href="/calendar">Calendar</a>
