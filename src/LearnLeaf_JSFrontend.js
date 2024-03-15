@@ -1,19 +1,99 @@
-// JavaScript Frontend for LearnLeaf Organizer
+// Firebase App (the core Firebase SDK) is always required and must be listed first
+import { initializeApp } from "firebase/app";
+// Add the Firebase products that you want to use
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
+// Optional: Import Firebase Analytics
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Connect Firebase
-var admin = require("firebase-admin");
-var serviceAccount = require("learnleaf-organizer-firebase-adminsdk-yyyj1-b1bfa59177.json");
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA8rr1TEUUZ9b_PqR475mszkoC0aMoHeTE",
+  authDomain: "learnleaf-organizer.firebaseapp.com",
+  projectId: "learnleaf-organizer",
+  storageBucket: "learnleaf-organizer.appspot.com",
+  messagingSenderId: "998389863314",
+  appId: "1:998389863314:web:3da40aae1598c7904c674b",
+  measurementId: "G-8XX0HRFBCX"
+};
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
+//var admin = require("firebase-admin");
+//var serviceAccount = require("learnleaf-organizer-firebase-adminsdk-yyyj1-b1bfa59177.json");
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Functions for handling UI interactions and API requests
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore();
 
-    
-/* JavaScript code to handle fetching and displaying tasks */
+// Function to handle user registration
+export function registerUser(email, password, name) {
+    return createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+            // Signed in 
+            const user = userCredential.user;
+            // Store the user's name in Firestore
+            
+            await setDoc(doc(db, "users", user.uid), {
+                name: name,
+                email: email
+            });
+            // Additional user info or redirection can be handled here
+        })
+        .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // Error handling, like displaying a message to the user
+            alert("Error code: " + errorCode + "\n" + errorMessage);
+            throw error; // Throw the error so it can be caught where the function is called
+        });
+}
+
+export function resetPassword(email) {
+    const auth = getAuth();
+    return sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent.
+        console.log('Password reset email sent.');
+      })
+      .catch((error) => {
+        // Handle errors here
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert("Error code: " + errorCode + "\n" + errorMessage);
+        // Optionally, throw the error to be caught by the calling code
+        throw error;
+      });
+  }
+
+// Function to handle user login
+export function loginUser(email, password) {
+    return signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+            // Signed in
+            const userID = userCredential.user.uid; // Use uid for user ID
+            // Fetch user's name from Firestore using the db instance
+            const userDoc = await getDoc(doc(db, "users", userID));
+            if (!userDoc.exists()) {
+                throw new Error('User does not exist');
+            }
+            const userName = userDoc.data().name; // Assuming 'name' field holds the user's name
+            return { userID, userName };
+        })
+        .catch((error) => {
+            // Error handling
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            alert("Error code: " + errorCode + "\n" + errorMessage);
+            throw error; // Throw the error so it can be caught where the function is called
+        });
+}
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
     fetchTasks();
 });
@@ -30,7 +110,7 @@ function fetchTasks() {
         });
 }
 
-function displayTasks(tasks) {
+export function displayTasks(tasks) {
     const tasksList = document.getElementById('tasks-list');
     tasksList.innerHTML = '';  // Clear existing tasks
 
@@ -38,6 +118,7 @@ function displayTasks(tasks) {
         const row = tasksList.insertRow();
         row.innerHTML = `
             <td>${task.subject}</td>
+            <td>${task.project}</td>
             <td>${task.assignment}</td>
             <td>
                 <select class="priority-dropdown ${'priority-' + task.priority.toLowerCase()}">
@@ -55,121 +136,83 @@ function displayTasks(tasks) {
             </td>
             <td>${task.startDate}</td>
             <td>${task.dueDate}</td>
-            <td>${task.time}</td>
+            <td>${task.timeDue}</td>
         `;
     });
-}
+};
 
 
-    // Function to handle user registration
-    function registerUser() {
-        // Implement registration logic
+// Function to create a new task
+export async function createTask(userId) {
+    const taskSubject = document.getElementById('task-subject').value;
+    const taskProject = document.getElementById('task-project').value;
+    const taskAssignment = document.getElementById('task-assignment').value;
+    const taskPriority = document.getElementById('task-priority').value;
+    const taskStatus = document.getElementById('task-status').value;
+    const taskStartDateInput = document.getElementById('task-start-date').value;
+    const taskDueDateInput = document.getElementById('task-due-date').value;
+    const taskDueTimeInput = document.getElementById('task-due-time').value;
 
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Signed in 
-                var user = userCredential.user;
-                // ...
-            })
-            .catch((error) => {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                // ...
-            });
+    // Convert date strings and due time to Timestamps
+    const startDate = Timestamp.fromDate(new Date(taskStartDateInput + "T00:00:00"));
+    const dueDate = Timestamp.fromDate(new Date(taskDueDateInput + "T00:00:00"));
+    // Combine dueDate's date with dueTime's time
+    const dueDateTime = Timestamp.fromDate(new Date(taskDueDateInput + "T" + taskDueTimeInput));
+
+    const taskData = {
+        userId, // Include userId in task data
+        subject: taskSubject,
+        project: taskProject,
+        assignment: taskAssignment,
+        priority: taskPriority,
+        status: taskStatus,
+        startDate, // Use the Timestamp for startDate
+        dueDate, // Use the Timestamp for dueDate, assuming time is irrelevant and set to 00:00
+        dueTime: dueDateTime, // Use the combined Timestamp for dueTime
+    };
+
+    // Assuming tasks are stored in a 'tasks' collection
+    try {
+        await setDoc(doc(db, "tasks", Date.now().toString()), taskData);
+        console.log("Task added successfully");
+        // Optionally, update the UI here or navigate to another page
+    } catch (error) {
+        console.error("Error adding task:", error);
     }
+} 
 
-    // Function to handle user login
-    function loginUser() {
-        // Implement login logic
 
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Signed in
-                var user = userCredential.user;
-                // ...
-            })
-            .catch((error) => {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                // ...
-            });
+// Function to update a task
+export function editTask(taskId) {
+    // Get updated task details from form inputs or inline editing fields
+    const taskSubject = document.getElementById(`task-subject-${taskId}`).value;
+    const taskAssignment = document.getElementById(`task-assignment-${taskId}`).value;
+    const taskPriority = document.getElementById(`task-priority-${taskId}`).value;
+    const taskStatus = document.getElementById(`task-status-${taskId}`).value;
+    const taskStartDate = document.getElementById(`task-start-date-${taskId}`).value;
+    const taskDueDate = document.getElementById(`task-due-date-${taskId}`).value;
+    const taskDueTime = document.getElementById(`task-due-time-${taskId}`).value;
 
-    }
+    // Create a task object with the updated details
+    const taskData = {
+        subject: taskSubject,
+        assignment: taskAssignment,
+        priority: taskPriority,
+        status: taskStatus,
+        startDate: taskStartDate,
+        dueDate: taskDueDate,
+        dueTime: taskDueTime
+    };
 
-    // Function to create a new task
-    function createTask() {
-        // Get task details from form inputs
-        const taskSubject = document.getElementById('task-subject').value;
-        const taskAssignment = document.getElementById('task-assignment').value;
-        const taskPriority = document.getElementById('task-priority').value;
-        const taskStatus = document.getElementById('task-status').value;
-        const taskStartDate = document.getElementById('task-start-date').value;
-        const taskDueDate = document.getElementById('task-due-date').value;
-        const taskDueTime = document.getElementById('task-due-time').value;
-    
-        // Create a task object
-        const taskData = {
-            subject: taskSubject,
-            assignment: taskAssignment,
-            priority: taskPriority,
-            status: taskStatus,
-            startDate: taskStartDate,
-            dueDate: taskDueDate,
-            dueTime: taskDueTime
-        };
-    
-        // Send a POST request to the server
-        fetch('/api/tasks', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Include authentication token if needed
-            },
-            body: JSON.stringify(taskData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle response data
-            console.log('Task created:', data);
-            // Optionally clear the form or give user feedback
-        })
-        .catch(error => {
-            console.error('Error creating task:', error);
-        });
-    }
-    
-
-    // Function to update a task
-    function editTask(taskId) {
-        // Get updated task details from form inputs or inline editing fields
-        const taskSubject = document.getElementById(`task-subject-${taskId}`).value;
-        const taskAssignment = document.getElementById(`task-assignment-${taskId}`).value;
-        const taskPriority = document.getElementById(`task-priority-${taskId}`).value;
-        const taskStatus = document.getElementById(`task-status-${taskId}`).value;
-        const taskStartDate = document.getElementById(`task-start-date-${taskId}`).value;
-        const taskDueDate = document.getElementById(`task-due-date-${taskId}`).value;
-        const taskDueTime = document.getElementById(`task-due-time-${taskId}`).value;
-    
-        // Create a task object with the updated details
-        const taskData = {
-            subject: taskSubject,
-            assignment: taskAssignment,
-            priority: taskPriority,
-            status: taskStatus,
-            startDate: taskStartDate,
-            dueDate: taskDueDate,
-            dueTime: taskDueTime
-        };
-    
-        // Send a PUT request to the server to update the task
-        fetch(`/api/tasks/${taskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                // Include authentication token if needed
-            },
-            body: JSON.stringify(taskData)
-        })
+    // Send a PUT request to the server to update the task
+    fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            // Include authentication token if needed
+        },
+        body: JSON.stringify(taskData)
+    })
         .then(response => response.json())
         .then(data => {
             // Handle response data
@@ -179,19 +222,19 @@ function displayTasks(tasks) {
         .catch(error => {
             console.error('Error updating task:', error);
         });
-    }
-    
+}
 
-    // Function to delete a task
-    function deleteTask(taskId) {
-        if (confirm('Are you sure you want to delete this task?')) {
-            fetch(`/api/tasks/${taskId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Include authentication token if needed
-                }
-            })
+
+// Function to delete a task
+export function deleteTask(taskId) {
+    if (confirm('Are you sure you want to delete this task?')) {
+        fetch(`/api/tasks/${taskId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include authentication token if needed
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 console.log('Task deleted:', data);
@@ -201,26 +244,21 @@ function displayTasks(tasks) {
             .catch(error => {
                 console.error('Error deleting task:', error);
             });
-        }
     }
-    
+}
 
-    // Event listeners for form submissions and button clicks
-    // Example: document.getElementById('register-form').addEventListener('submit', registerUser);
-    // Monitor auth state
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            // User is signed in
-            // Update UI or redirect
-            // ...
-        } else {
-            // User is signed out
-            // Update UI
-            // ...
-        }
-    });
 
-    // Additional functions for project management and other features can be added here
+// Event listeners for form submissions and button clicks
+// Example: document.getElementById('register-form').addEventListener('submit', registerUser);
+// Monitor auth state
+onAuthStateChanged(auth, (userID) => {
+    if (userID) {
+        // User is signed in
+        // Update UI or redirect
+        // ...
+    } else {
+        // User is signed out
+        // Update UI
+        // ...
+    }
 });
-
-// Additional utility functions for handling DOM manipulations, API calls, etc., can be added here

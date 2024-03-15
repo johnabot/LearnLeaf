@@ -1,0 +1,88 @@
+.task-view-container {
+  width: 100%;
+  padding-bottom: 20px;
+  justify-content: center;
+}
+
+.top-bar {
+  display: flex;
+  height: 80px;
+  align-items: center; /* Align items vertically in the center */
+  background-color: #B6CDC8;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 10px;
+}
+
+.app-name {
+  color: #355147; /* Adjust color as needed */
+  margin-right: auto; /* Pushes everything else in the flex container to the right */
+  font-style: bold;
+  font-size: 20px;
+  padding-left: 0%;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px; /* Space between links */
+  padding-right: 10px;
+}
+
+.nav-links a {
+  color: #9F6C5B;
+  text-decoration: none;
+  font-style: italic;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #007bff; /* Bootstrap primary blue, for example */
+  color: white;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.fab:hover {
+  background-color: #0056b3; /* Darker blue */
+}
+
+#tasksTable {
+    border-collapse: collapse;
+    width: 100%;
+    padding-top: 20px;
+    margin-top: 10px;
+  }
+  
+  #tasksTable thead {
+    background-color: #5B8E9F;
+    color: white;
+  }
+  
+  #tasksTable th, #tasksTable td {
+    padding: 15px;
+    border: 1px solid #545454;
+    text-align: left;
+  }
+  
+  #tasksTable tbody tr:nth-child(even) {
+    background-color: #f3f2f2;
+  }
+
+  #tasksTable td {
+    word-wrap: break-word; /* Enable text wrapping inside cells */
+}
+
+
+
+  

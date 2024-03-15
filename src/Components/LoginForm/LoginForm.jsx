@@ -1,42 +1,66 @@
-import React from 'react'
-import './LoginForm.css';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '/src/LearnLeaf_JSFrontend.js';
+import { useUser } from '../../UserState';
+import { Link } from 'react-router-dom';
+import '/src/Components/FormUI.css';
 
+function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { updateUser } = useUser(); // Assuming useUser is a hook to access UserContext
 
-// LoginForm is a React component class that renders a login form.
-class LoginForm extends React.Component {
-    render() {
-      return (
-        /*Centering the login form to the center of the page
-        */
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}> 
-      
-          <h1>LearnLeaf Task Organizer</h1> 
-        
-          <p>Helping you manage your everyday needs!</p>
-          <form style={{ display: 'flex', flexDirection: 'column', width: '300px', alignItems: 'center' }}>
-            
-            <input type="text" placeholder="Email" /> 
+  const navigate = useNavigate(); // Instantiate navigate
 
-            <input type="password" placeholder="Password" /> 
-            
-            <label> 
-              
-              <input type="checkbox" /> Remember me
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-            </label>
-
-            <a href="/forgot-password">Forgot password?</a>
-
-            <button type="submit">Login</button>
-
-            <p>Don't have an account? <a href="/register">Register</a></p> 
-
-          </form> 
-            
-        </div>
-        
-      );
+    try {
+      const { userID, userName } = await loginUser(email, password);
+      updateUser({ id: userID, name: userName });
+      // Navigate to another route upon successful login, if necessary
+      navigate('/tasks'); // Redirect user to the tasks page or another appropriate route
+    } catch (error) {
+      alert(`Error code: ${error.code}\n${error.message}`);
     }
-  }
-  
-  export default LoginForm;
+
+    setEmail('');
+    setPassword('');
+  };
+
+  return (
+    <div className="login-form-container"> {/* Changed class name to reflect login form */}
+      <h1>LearnLeaf Organizer</h1> {/* Changed heading to Login */}
+      <h2>Helping you manage your everyday needs!</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Login</button> {/* Changed button text to Login */}
+        <i><p><Link to="/resetPassword">Reset Password</Link></p></i>
+        <p>Don't have an account? <Link to="/register">Register</Link></p>
+      </form>
+    </div>
+  );
+}
+
+export default LoginForm;
