@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loginUser, displayTasks, createTask, editTask, deleteTask } from '../../LearnLeaf_JSFrontend';
+import { loginUser, displayTasks, createTask, editTask, deleteTask } from '../../LearnLeaf_Functions.js';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import TasksTable from './TaskTable';

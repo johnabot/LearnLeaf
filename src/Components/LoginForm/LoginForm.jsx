@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '/src/LearnLeaf_JSFrontend.js';
+import { loginUser } from '/src/LearnLeaf_Functions.js';
 import { useUser } from '../../UserState';
 import { Link } from 'react-router-dom';
 import '/src/Components/FormUI.css';
