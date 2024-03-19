@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export function PopupForm ({ subjects, projects, onSubmit }) {
+export function PopupForm ({ subjects, projects, onSubmit, closeForm }) {
   const [isVisible, setIsVisible] = useState(false);
   const [taskDetails, setTaskDetails] = useState({
     subject: '',
