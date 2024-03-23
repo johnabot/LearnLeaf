@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import TasksTable from './TaskTable';
 import { useUser } from '/src/UserState.jsx';
 import { fetchTasks } from '/src/LearnLeaf_Functions.jsx'
-import { PopupForm } from './AddTaskForm.jsx';
+import { AddTaskForm } from './AddTaskForm.jsx';
 import '/src/Components/FormUI.css';
 
 const TaskList = () => {
@@ -56,19 +56,21 @@ const TaskList = () => {
         <div className="task-view-container">
             <div className="top-bar">
                 <img src="/src/LearnLeaf_Logo_Circle.svg" alt="Logo" className="logo" />
-                <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
-                <nav className="nav-links">
-                    <a href="/calendar">Calendar</a>
-                    <a href="/projects">Projects</a>
-                    <a href="/subjects">Subjects</a>
-                    <a href="/archives">Archives</a>
-                    <a href="/profile">User Profile</a>
-                </nav>
+                <div className="name-links">
+                    <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
+                    <nav className="nav-links">
+                        <a href="/calendar">Calendar</a>
+                        <a href="/subjects">Subjects</a>
+                        <a href="/projects">Projects</a>
+                        <a href="/archives">Archives</a>
+                        <a href="/profile">User Profile</a>
+                    </nav>
+                </div>
             </div>
             <button className="fab" onClick={toggleFormVisibility}>
                 +
             </button>
-            {showForm && <PopupForm closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
+            {showForm && <AddTaskForm closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
 
             <div>
                 <h1 style={{ color: '#907474' }}>{user.name}'s Upcoming Tasks</h1>

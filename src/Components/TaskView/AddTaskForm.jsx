@@ -1,33 +1,31 @@
 import React, { useState } from 'react';
 import { addTask } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '/src/UserState.jsx';
-import './taskView.css';
+import '/src/Components/FormUI.css';
+import '/src/Components/PageFormat.css'
 
-export function PopupForm({ closeForm, refreshTasks }) {
-    console.log('Rendering PopupForm');
+export function AddTaskForm({ initialSubject, initialProject, closeForm, refreshTasks }) {
     const { user } = useUser();
+    // Initialize taskDetails with initialSubject if provided
     const [taskDetails, setTaskDetails] = useState({
         userId: user.id,
-        subject: '',
+        subject: initialSubject || '', // Use initialSubject as the default value, or '' if not provided
         assignment: '',
         priority: '',
         status: '',
-        startDateInput: '',
-        dueDateInput: '',
-        dueTimeInput: '',
-        project: ''
+        startDate: '',
+        dueDate: '',
+        dueTime: '',
+        project: initialProject || '', // Use initialProject as the default value, or '' if not provided
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        console.log(`Input change: ${name} = ${value}`); // Add this line to debug
         setTaskDetails(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(`onSubmit\ndueDateInput: ${taskDetails.dueDateInput}, dueTimeInput: ${taskDetails.dueTimeInput}`);
-
         await addTask(taskDetails);
         closeForm();
         refreshTasks();
@@ -35,7 +33,7 @@ export function PopupForm({ closeForm, refreshTasks }) {
 
     return (
         <div className="modal">
-            <div className="task-form-container">
+            <div className="add-form-container">
                 <form onSubmit={handleSubmit}>
                     <h2 className="form-header">Add a New Task</h2>
                     <input type="text" id="subject" name="subject" value={taskDetails.subject} onChange={handleInputChange} placeholder="Subject" />
