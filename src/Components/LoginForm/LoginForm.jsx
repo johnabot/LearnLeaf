@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '/src/LearnLeaf_Functions.js'; // Adjust the import path as needed
-import { useUser } from '../../UserState'; // Adjust the import path as needed
+import { loginUser } from '/src/LearnLeaf_Functions.jsx';
+import { useUser } from '../../UserState';
 import { Link } from 'react-router-dom';
-import '/src/Components/FormUI.css'; // Adjust the import path as needed
+import '/src/Components/FormUI.css';
 
 function LoginForm() {
     const [email, setEmail] = useState(''); // State for the email input

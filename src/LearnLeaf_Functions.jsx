@@ -1,23 +1,18 @@
-// Firebase App (the core Firebase SDK) is always required and must be listed first
 import { initializeApp } from "firebase/app";
-// Add the Firebase products that you want to use
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy } from "firebase/firestore";
-// Optional: Import Firebase Analytics
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA8rr1TEUUZ9b_PqR475mszkoC0aMoHeTE",
-  authDomain: "learnleaf-organizer.firebaseapp.com",
-  projectId: "learnleaf-organizer",
-  storageBucket: "learnleaf-organizer.appspot.com",
-  messagingSenderId: "998389863314",
-  appId: "1:998389863314:web:3da40aae1598c7904c674b",
-  measurementId: "G-8XX0HRFBCX"
+    apiKey: "AIzaSyA8rr1TEUUZ9b_PqR475mszkoC0aMoHeTE",
+    authDomain: "learnleaf-organizer.firebaseapp.com",
+    projectId: "learnleaf-organizer",
+    storageBucket: "learnleaf-organizer.appspot.com",
+    messagingSenderId: "998389863314",
+    appId: "1:998389863314:web:3da40aae1598c7904c674b",
+    measurementId: "G-8XX0HRFBCX"
 };
 
 //var admin = require("firebase-admin");
@@ -36,7 +31,7 @@ export function registerUser(email, password, name) {
             // Signed in 
             const user = userCredential.user;
             // Store the user's name in Firestore
-            
+
             await setDoc(doc(db, "users", user.uid), {
                 name: name,
                 email: email
@@ -55,19 +50,19 @@ export function registerUser(email, password, name) {
 export function resetPassword(email) {
     const auth = getAuth();
     return sendPasswordResetEmail(auth, email)
-      .then(() => {
-        // Password reset email sent.
-        console.log('Password reset email sent.');
-      })
-      .catch((error) => {
-        // Handle errors here
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        alert("Error code: " + errorCode + "\n" + errorMessage);
-        // Optionally, throw the error to be caught by the calling code
-        throw error;
-      });
-  }
+        .then(() => {
+            // Password reset email sent.
+            console.log('Password reset email sent.');
+        })
+        .catch((error) => {
+            // Handle errors here
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert("Error code: " + errorCode + "\n" + errorMessage);
+            // Optionally, throw the error to be caught by the calling code
+            throw error;
+        });
+}
 
 // Function to handle user login
 export async function loginUser(email, password) {
@@ -92,12 +87,31 @@ export async function loginUser(email, password) {
         });
 }
 
-
-
-
 document.addEventListener('DOMContentLoaded', function () {
     fetchTasks();
 });
+
+// Helper function to format Firestore Timestamp to "day month, year"
+function formatDate(timestamp) {
+    if (!timestamp) {
+        return ''; // Return empty string if timestamp is undefined, null, etc.
+    }
+
+    const date = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date object
+    const options = { day: 'numeric', month: 'long', year: 'numeric' }; // Format options
+    return date.toLocaleDateString(undefined, options); // Format the date
+}
+
+// Helper function to format Firestore Timestamp to "HH:MM AM/PM"
+function formatTime(timestamp) {
+    if (!timestamp) {
+        return ''; // Return empty string if timestamp is undefined, null, etc.
+    }
+
+    const date = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date object
+    const options = { hour: '2-digit', minute: '2-digit' }; // Format options
+    return date.toLocaleTimeString(undefined, options); // Format the time according to user's browser settings
+}
 
 export async function fetchTasks(userId) {
     const db = getFirestore(); // Initialize Firestore
@@ -112,9 +126,16 @@ export async function fetchTasks(userId) {
     );
 
     const querySnapshot = await getDocs(q);
-    const tasks = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const tasks = querySnapshot.docs.map(doc => {
+        const taskData = doc.data();
+        // Format the date and time fields
+        taskData.startDate = formatDate(taskData.startDate);
+        taskData.dueDate = formatDate(taskData.dueDate);
+        taskData.dueTime = formatTime(taskData.dueTime);
+        return { id: doc.id, ...taskData };
+    });
 
-    return tasks; // Returns an array of tasks
+    return tasks;
 }
 
 export function displayTasks(tasks) {
@@ -148,11 +169,16 @@ export function displayTasks(tasks) {
     });
 };
 
-
 // Function to create a new task
 export async function addTask(taskDetails) {
-    console.log("Entering addTask");
-    const { userId, subject, project, assignment, priority, status, startDate, dueDate, dueTime } = taskDetails;
+    const { userId, subject, project, assignment, priority, status, startDateInput, dueDateInput, dueTimeInput } = taskDetails;
+    console.log(`addTask\ndueDateInput: ${dueDateInput}, dueTimeInput: ${dueTimeInput}`);
+
+    const startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+    const dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
+    const dateTimeString = `${dueDateInput}T${dueTimeInput}`;
+    const dueTime = Timestamp.fromDate(new Date(dateTimeString));
+
 
     const taskData = {
         userId,
@@ -163,7 +189,7 @@ export async function addTask(taskDetails) {
         status,
         startDate,
         dueDate,
-        dueTime, 
+        dueTime,
     };
 
     // Assuming tasks are stored in a 'tasks' collection
@@ -173,7 +199,7 @@ export async function addTask(taskDetails) {
     } catch (error) {
         console.error("Error adding task:", error);
     }
-} 
+};
 
 
 // Function to update a task

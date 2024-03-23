@@ -1,60 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Correct imports based on your file structure
-import { getFirestore, doc, setDoc, getDocs, collection, addDoc, updateDoc, deleteDoc, query, where } from "firebase/firestore";
 import TasksTable from './TaskTable';
-import { useUser } from '/src/UserState.jsx'; // Adjust the path based on your file structure
-import { fetchTasks, addTask } from '/src/LearnLeaf_Functions.js'
+import { useUser } from '/src/UserState.jsx';
+import { fetchTasks } from '/src/LearnLeaf_Functions.jsx'
 import { PopupForm } from './AddTaskForm.jsx';
+import '/src/Components/FormUI.css';
 
-function FloatingActionButton({ onClick }) {
-    return (
-        <button className="fab" onClick={onClick}>+</button>
-    );
-}
 
 const TaskList = () => {
     const [showForm, setShowForm] = useState(false);
     const [tasks, setTasks] = useState([]);
-    const [updateTrigger, setUpdateTrigger] = useState(false); // Add a state to trigger updates
     const { user } = useUser();
 
     useEffect(() => {
+        // Fetch tasks when the component mounts or the user id changes
         if (user?.id) {
             fetchTasks(user.id)
                 .then(fetchedTasks => setTasks(fetchedTasks))
                 .catch(error => console.error("Error fetching tasks:", error));
         }
-    }, [user?.id, updateTrigger]); // Depend on updateTrigger to refetch tasks
+    }, [user?.id]); // Re-fetch tasks when the user id changes
 
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        // Destructure the form's input values directly if possible or retrieve them from the state
-        const { subject, assignment, priority, status, startDate, dueDate, dueTime, project } = event.target.elements;
-
-        const taskDetails = {
-            userId: user.id, // Assuming 'user' contains the logged-in user's ID
-            subject: subject.value,
-            assignment: assignment.value,
-            priority: priority.value,
-            status: status.value,
-            startDate: startDate.value,
-            dueDate: dueDate.value,
-            dueTime: dueTime.value,
-            project: project.value,
-        };
-
-        try {
-            await addTask(taskDetails); // Pass the task details
-            setUpdateTrigger(!updateTrigger); // Toggle the trigger to refetch tasks
-            setShowForm(false); // Close the form
-        } catch (error) {
-            console.error("Error adding task:", error);
-            // Handle errors or provide user feedback here
-        }
+    const toggleFormVisibility = () => {
+        console.log("Current showForm state:", showForm);
+        setShowForm(!showForm);
+        console.log("Toggled showForm state:", !showForm);
     };
 
+
+    const refreshTasks = async () => {
+        // Implement the logic to fetch tasks from the database and update state
+        const updatedTasks = await fetchTasks(user.id);
+        setTasks(updatedTasks);
+    };
 
     return (
         <div className="task-view-container">
@@ -69,33 +46,10 @@ const TaskList = () => {
                     <a href="/profile">User Profile</a>
                 </nav>
             </div>
-            <FloatingActionButton onClick={() => setShowForm(true)} />
-            {showForm && <PopupForm closeForm={() => setShowForm(false)} />}
-
-            {showForm && (
-                <div className="task-form-container">
-                    <form onSubmit={handleSubmit} className="task-form">
-                        <input type="text" name="subject" placeholder="Subject" />
-                        <input type="text" name="assignment" placeholder="Assignment" required />
-                        <select name="priority">
-                            <option value="High">High</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Low">Low</option>
-                        </select>
-                        <select name="status">
-                            <option value="Not Started">Not Started</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Completed">Completed</option>
-                        </select>
-                        <input type="date" name="startDate" />
-                        <input type="date" name="dueDate" />
-                        <input type="time" name="dueTime" />
-                        <input type="text" name="project" placeholder="Project Name" />
-                        <button type="submit">Add Task</button>
-                        <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
-                    </form>
-                </div>
-            )}
+            <button className="fab" onClick={toggleFormVisibility}>
+                +
+            </button>
+            {showForm && <PopupForm closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
 
             <div>
                 <h1 style={{ color: '#907474' }}>{user.name}'s Upcoming Tasks</h1>
