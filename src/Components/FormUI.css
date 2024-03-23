@@ -1,35 +1,34 @@
-  body {
+body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 0;
     background-color: #f5f5f5;
-  }
-  
-  .login-container {
+}
+
+.login-container {
     text-align: center;
     padding-left: 300px;
     padding-right: 300px;
-    
-  }
+}
 
-  .login-form {
+.login-form {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
+}
 
-  input[type=email], input[type=password], input[type=text] {
+input[type=email], input[type=password], input[type=text] {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
-  }
+}
 
-  button {
+button {
     background-color: #4CAF50; /* Green */
     color: white;
     padding: 10px 20px;
@@ -37,21 +36,137 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
+}
 
-  button:hover {
-    opacity: 0.8;
-  }
+    button:hover {
+        opacity: 0.8;
+    }
 
-  .login-links {
+.login-links {
     margin-top: 10px;
-  }
+}
 
-  .login-links a {
-    color: #6c63ff;
-    text-decoration: none;
-  }
+    .login-links a {
+        color: #6c63ff;
+        text-decoration: none;
+    }
 
-  .login-links a:hover {
-    text-decoration: underline;
-  }
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+
+.form-header {
+    color: #8E5B9F; /* Set the color */
+    font-size: 24px; /* Set the font size */
+    margin-bottom: 20px; /* Add some space below the header */
+    margin-top: 10px;
+    text-align: center; /* Center the header text */
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(178 178 178 / 51%);
+    z-index: 1000;
+}
+
+.modal .task-form-container {
+    position: fixed;
+    left: 25%;
+    top: 25%;
+    width: 50%;
+    height: 50%;
+    background-color: #f3f2f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    padding: 20px;
+    z-index: 1001;
+}
+
+    .task-form-container .form-control {
+        margin-bottom: 10px;
+    }
+
+        .task-form-container .form-control label {
+            display: block; /* Makes label take the full width and places it above the input/select */
+            margin-bottom: 5px;
+            font-size: 14px; /* Adjust label text size as needed */
+        }
+
+    .task-form-container .form-row {
+        padding-left: 50px;
+        padding-right: 50px;
+        display: flex;
+        justify-content: center;
+        gap: 20px; /* Adjusts the space between controls within the same row */
+    }
+
+        .task-form-container .form-row .form-control {
+            flex: 1; /* Makes each form control take equal space within a row */
+        }
+
+    /* Adjust the button styling as needed */
+    .task-form-container button {
+        margin-top: 10px;
+        background-color: #B6CDC8;
+        color: #355147;
+        font-weight: bold;
+        margin-left: 10px;
+        margin-right: 10px;
+        /* Additional button styles */
+    }
+
+    .task-form-container label {
+        font-size: 18px; /* Adjust the size as needed */
+    }
+
+.task-form input {
+    width: 100%; /* Make input fields take up the full container width */
+    padding: 8px; /* Add some padding inside the input fields for better readability */
+    margin: 5px 0 15px; /* Add some margin for spacing between input fields */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    border: 1px solid #ccc; /* Add a border to the input fields */
+    border-radius: 4px; /* Optionally add rounded corners */
+}
+
+    .task-form input[type="date"],
+    .task-form input[type="time"] {
+        background-color: #f8f8f8; /* Slightly different background to distinguish date/time fields */
+        border: 1px solid #ddd; /* Lighter border color */
+    }
+
+    .task-form input::placeholder {
+        color: #999; /* Lighter text color for placeholders */
+        opacity: 1; /* Ensure the placeholder is fully visible */
+    }
+
+    .task-form input:focus {
+        border-color: #5B8E9F; /* Highlight color when input is focused */
+        outline: none; /* Removing the default outline to use only the border color change */
+    }
+
+.task-form select {
+    background-color: #f0f0f0; /* Light grey background */
+    border: 1px solid #ccc; /* Light grey border */
+    padding: 8px 10px; /* Padding inside the dropdown */
+    font-size: 14px; /* Text size */
+    align-content: center;
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+    outline: none; /* Remove the default focus outline */
+    margin-bottom: 15px; /* Space below each dropdown */
+    width: 100%; /* Full width */
+}
+
+    .task-form select:focus {
+        border-color: #5B8E9F; /* Highlight color when input is focused */
+        outline: none; /* Removing the default outline to use only the border color change */
+    }

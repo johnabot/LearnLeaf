@@ -1,23 +1,18 @@
-// Firebase App (the core Firebase SDK) is always required and must be listed first
 import { initializeApp } from "firebase/app";
-// Add the Firebase products that you want to use
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
-// Optional: Import Firebase Analytics
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA8rr1TEUUZ9b_PqR475mszkoC0aMoHeTE",
-  authDomain: "learnleaf-organizer.firebaseapp.com",
-  projectId: "learnleaf-organizer",
-  storageBucket: "learnleaf-organizer.appspot.com",
-  messagingSenderId: "998389863314",
-  appId: "1:998389863314:web:3da40aae1598c7904c674b",
-  measurementId: "G-8XX0HRFBCX"
+    apiKey: "AIzaSyA8rr1TEUUZ9b_PqR475mszkoC0aMoHeTE",
+    authDomain: "learnleaf-organizer.firebaseapp.com",
+    projectId: "learnleaf-organizer",
+    storageBucket: "learnleaf-organizer.appspot.com",
+    messagingSenderId: "998389863314",
+    appId: "1:998389863314:web:3da40aae1598c7904c674b",
+    measurementId: "G-8XX0HRFBCX"
 };
 
 //var admin = require("firebase-admin");
@@ -36,7 +31,7 @@ export function registerUser(email, password, name) {
             // Signed in 
             const user = userCredential.user;
             // Store the user's name in Firestore
-            
+
             await setDoc(doc(db, "users", user.uid), {
                 name: name,
                 email: email
@@ -55,59 +50,92 @@ export function registerUser(email, password, name) {
 export function resetPassword(email) {
     const auth = getAuth();
     return sendPasswordResetEmail(auth, email)
-      .then(() => {
-        // Password reset email sent.
-        console.log('Password reset email sent.');
-      })
-      .catch((error) => {
-        // Handle errors here
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        alert("Error code: " + errorCode + "\n" + errorMessage);
-        // Optionally, throw the error to be caught by the calling code
-        throw error;
-      });
-  }
-
-// Function to handle user login
-export function loginUser(email, password) {
-    return signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-            // Signed in
-            const userID = userCredential.user.uid; // Use uid for user ID
-            // Fetch user's name from Firestore using the db instance
-            const userDoc = await getDoc(doc(db, "users", userID));
-            if (!userDoc.exists()) {
-                throw new Error('User does not exist');
-            }
-            const userName = userDoc.data().name; // Assuming 'name' field holds the user's name
-            return { userID, userName };
+        .then(() => {
+            // Password reset email sent.
+            console.log('Password reset email sent.');
         })
         .catch((error) => {
-            // Error handling
-            var errorCode = error.code;
-            var errorMessage = error.message;
+            // Handle errors here
+            const errorCode = error.code;
+            const errorMessage = error.message;
             alert("Error code: " + errorCode + "\n" + errorMessage);
-            throw error; // Throw the error so it can be caught where the function is called
+            // Optionally, throw the error to be caught by the calling code
+            throw error;
         });
 }
 
-
+// Function to handle user login
+export async function loginUser(email, password) {
+    return signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            // Fetch user's details from Firestore using the db instance
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (!userDoc.exists()) {
+                throw new Error('User does not exist');
+            }
+            // Assuming the user's document contains a name field
+            const userName = userDoc.data().name;
+            const userEmail = user.email; // Directly from auth user object
+            return { id: user.uid, name: userName, email: userEmail };
+        })
+        .catch((error) => {
+            // Error handling
+            console.error("Login error", error);
+            throw error; // Propagate the error
+        });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     fetchTasks();
 });
 
-function fetchTasks() {
-    // Replace with the actual API endpoint
-    fetch('/api/tasks')
-        .then(response => response.json())
-        .then(tasks => {
-            displayTasks(tasks);
-        })
-        .catch(error => {
-            console.error('Error fetching tasks:', error);
-        });
+// Helper function to format Firestore Timestamp to "day month, year"
+function formatDate(timestamp) {
+    if (!timestamp) {
+        return ''; // Return empty string if timestamp is undefined, null, etc.
+    }
+
+    const date = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date object
+    const options = { day: 'numeric', month: 'long', year: 'numeric' }; // Format options
+    return date.toLocaleDateString(undefined, options); // Format the date
+}
+
+// Helper function to format Firestore Timestamp to "HH:MM AM/PM"
+function formatTime(timestamp) {
+    if (!timestamp) {
+        return ''; // Return empty string if timestamp is undefined, null, etc.
+    }
+
+    const date = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date object
+    const options = { hour: '2-digit', minute: '2-digit' }; // Format options
+    return date.toLocaleTimeString(undefined, options); // Format the time according to user's browser settings
+}
+
+export async function fetchTasks(userId) {
+    const db = getFirestore(); // Initialize Firestore
+    const tasksCollectionRef = collection(db, "tasks"); // Reference to the tasks collection
+
+    // Create a query against the collection.
+    const q = query(
+        tasksCollectionRef,
+        where("userId", "==", userId, "&&", "status", "!=", "Complete"),
+        orderBy("dueDate", "asc"),  // First sort by dueDate
+        orderBy("dueTime", "asc")   // Then sort by dueTime
+    );
+
+    const querySnapshot = await getDocs(q);
+    const tasks = querySnapshot.docs.map(doc => {
+        const taskData = doc.data();
+        // Format the date and time fields
+        taskData.startDate = formatDate(taskData.startDate);
+        taskData.dueDate = formatDate(taskData.dueDate);
+        taskData.dueTime = formatTime(taskData.dueTime);
+        return { id: doc.id, ...taskData };
+    });
+
+    return tasks;
 }
 
 export function displayTasks(tasks) {
@@ -141,45 +169,37 @@ export function displayTasks(tasks) {
     });
 };
 
-
 // Function to create a new task
-export async function createTask(userId) {
-    const taskSubject = document.getElementById('task-subject').value;
-    const taskProject = document.getElementById('task-project').value;
-    const taskAssignment = document.getElementById('task-assignment').value;
-    const taskPriority = document.getElementById('task-priority').value;
-    const taskStatus = document.getElementById('task-status').value;
-    const taskStartDateInput = document.getElementById('task-start-date').value;
-    const taskDueDateInput = document.getElementById('task-due-date').value;
-    const taskDueTimeInput = document.getElementById('task-due-time').value;
+export async function addTask(taskDetails) {
+    const { userId, subject, project, assignment, priority, status, startDateInput, dueDateInput, dueTimeInput } = taskDetails;
+    console.log(`addTask\ndueDateInput: ${dueDateInput}, dueTimeInput: ${dueTimeInput}`);
 
-    // Convert date strings and due time to Timestamps
-    const startDate = Timestamp.fromDate(new Date(taskStartDateInput + "T00:00:00"));
-    const dueDate = Timestamp.fromDate(new Date(taskDueDateInput + "T00:00:00"));
-    // Combine dueDate's date with dueTime's time
-    const dueDateTime = Timestamp.fromDate(new Date(taskDueDateInput + "T" + taskDueTimeInput));
+    const startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+    const dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
+    const dateTimeString = `${dueDateInput}T${dueTimeInput}`;
+    const dueTime = Timestamp.fromDate(new Date(dateTimeString));
+
 
     const taskData = {
-        userId, // Include userId in task data
-        subject: taskSubject,
-        project: taskProject,
-        assignment: taskAssignment,
-        priority: taskPriority,
-        status: taskStatus,
-        startDate, // Use the Timestamp for startDate
-        dueDate, // Use the Timestamp for dueDate, assuming time is irrelevant and set to 00:00
-        dueTime: dueDateTime, // Use the combined Timestamp for dueTime
+        userId,
+        subject,
+        project,
+        assignment,
+        priority,
+        status,
+        startDate,
+        dueDate,
+        dueTime,
     };
 
     // Assuming tasks are stored in a 'tasks' collection
     try {
-        await setDoc(doc(db, "tasks", Date.now().toString()), taskData);
+        await setDoc(doc(db, "tasks", `${userId}_${Date.now()}`), taskData); // Consider using Firestore auto-generated IDs instead
         console.log("Task added successfully");
-        // Optionally, update the UI here or navigate to another page
     } catch (error) {
         console.error("Error adding task:", error);
     }
-} 
+};
 
 
 // Function to update a task

@@ -1,32 +1,32 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '/src/LearnLeaf_JSFrontend.js';
+import { loginUser } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '../../UserState';
 import { Link } from 'react-router-dom';
 import '/src/Components/FormUI.css';
 
 function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { updateUser } = useUser(); // Assuming useUser is a hook to access UserContext
+    const [email, setEmail] = useState(''); // State for the email input
+    const [password, setPassword] = useState(''); // State for the password input
+    const { updateUser } = useUser(); // Use the updateUser function from the context
+    const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Instantiate navigate
+    const handleSubmit = async (event) => {
+        event.preventDefault(); // Prevent the default form submission
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+        try {
+            // Use the email and password from the component's state
+            const userInfo = await loginUser(email, password);
+            updateUser({ id: userInfo.id, name: userInfo.name, email: userInfo.email }); // Update global user state
+            navigate('/tasks'); // Navigate to tasks page upon successful login
+        } catch (error) {
+            alert(`Login Error: ${error.message}`);
+        }
 
-    try {
-      const { userID, userName } = await loginUser(email, password);
-      updateUser({ id: userID, name: userName });
-      // Navigate to another route upon successful login, if necessary
-      navigate('/tasks'); // Redirect user to the tasks page or another appropriate route
-    } catch (error) {
-      alert(`Error code: ${error.code}\n${error.message}`);
-    }
-
-    setEmail('');
-    setPassword('');
-  };
+        // Reset form fields
+        setEmail('');
+        setPassword('');
+    };
 
   return (
     <div className="login-form-container"> {/* Changed class name to reflect login form */}
