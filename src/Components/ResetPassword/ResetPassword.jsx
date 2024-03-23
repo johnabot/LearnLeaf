@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { resetPassword } from '/src/LearnLeaf_JSFrontend.js'; // Import resetPassword
+import { resetPassword } from '/src/LearnLeaf_Functions.js'; // Import resetPassword
 
 function ResetPassword() {
   // State for each input field

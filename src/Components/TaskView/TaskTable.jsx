@@ -39,7 +39,7 @@ const TasksTable = ({ tasks }) => {
             </td>
             <td>{task.startDate}</td>
             <td>{task.dueDate}</td>
-            <td>{task.timeDue}</td>
+            <td>{task.dueTime}</td>
             <td>{task.project}</td>
           </tr>
         ))}

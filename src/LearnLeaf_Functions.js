@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 // Add the Firebase products that you want to use
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy } from "firebase/firestore";
 // Optional: Import Firebase Analytics
 import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -70,27 +70,28 @@ export function resetPassword(email) {
   }
 
 // Function to handle user login
-export function loginUser(email, password) {
+export async function loginUser(email, password) {
     return signInWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
             // Signed in
-            const userID = userCredential.user.uid; // Use uid for user ID
-            // Fetch user's name from Firestore using the db instance
-            const userDoc = await getDoc(doc(db, "users", userID));
+            const user = userCredential.user;
+            // Fetch user's details from Firestore using the db instance
+            const userDoc = await getDoc(doc(db, "users", user.uid));
             if (!userDoc.exists()) {
                 throw new Error('User does not exist');
             }
-            const userName = userDoc.data().name; // Assuming 'name' field holds the user's name
-            return { userID, userName };
+            // Assuming the user's document contains a name field
+            const userName = userDoc.data().name;
+            const userEmail = user.email; // Directly from auth user object
+            return { id: user.uid, name: userName, email: userEmail };
         })
         .catch((error) => {
             // Error handling
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            alert("Error code: " + errorCode + "\n" + errorMessage);
-            throw error; // Throw the error so it can be caught where the function is called
+            console.error("Login error", error);
+            throw error; // Propagate the error
         });
 }
+
 
 
 
@@ -98,16 +99,22 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchTasks();
 });
 
-function fetchTasks() {
-    // Replace with the actual API endpoint
-    fetch('/api/tasks')
-        .then(response => response.json())
-        .then(tasks => {
-            displayTasks(tasks);
-        })
-        .catch(error => {
-            console.error('Error fetching tasks:', error);
-        });
+export async function fetchTasks(userId) {
+    const db = getFirestore(); // Initialize Firestore
+    const tasksCollectionRef = collection(db, "tasks"); // Reference to the tasks collection
+
+    // Create a query against the collection.
+    const q = query(
+        tasksCollectionRef,
+        where("userId", "==", userId, "&&", "status", "!=", "Complete"),
+        orderBy("dueDate", "asc"),  // First sort by dueDate
+        orderBy("dueTime", "asc")   // Then sort by dueTime
+    );
+
+    const querySnapshot = await getDocs(q);
+    const tasks = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    return tasks; // Returns an array of tasks
 }
 
 export function displayTasks(tasks) {
@@ -143,39 +150,26 @@ export function displayTasks(tasks) {
 
 
 // Function to create a new task
-export async function createTask(userId) {
-    const taskSubject = document.getElementById('task-subject').value;
-    const taskProject = document.getElementById('task-project').value;
-    const taskAssignment = document.getElementById('task-assignment').value;
-    const taskPriority = document.getElementById('task-priority').value;
-    const taskStatus = document.getElementById('task-status').value;
-    const taskStartDateInput = document.getElementById('task-start-date').value;
-    const taskDueDateInput = document.getElementById('task-due-date').value;
-    const taskDueTimeInput = document.getElementById('task-due-time').value;
-
-    // Convert date strings and due time to Timestamps
-    const startDate = Timestamp.fromDate(new Date(taskStartDateInput + "T00:00:00"));
-    const dueDate = Timestamp.fromDate(new Date(taskDueDateInput + "T00:00:00"));
-    // Combine dueDate's date with dueTime's time
-    const dueDateTime = Timestamp.fromDate(new Date(taskDueDateInput + "T" + taskDueTimeInput));
+export async function addTask(taskDetails) {
+    console.log("Entering addTask");
+    const { userId, subject, project, assignment, priority, status, startDate, dueDate, dueTime } = taskDetails;
 
     const taskData = {
-        userId, // Include userId in task data
-        subject: taskSubject,
-        project: taskProject,
-        assignment: taskAssignment,
-        priority: taskPriority,
-        status: taskStatus,
-        startDate, // Use the Timestamp for startDate
-        dueDate, // Use the Timestamp for dueDate, assuming time is irrelevant and set to 00:00
-        dueTime: dueDateTime, // Use the combined Timestamp for dueTime
+        userId,
+        subject,
+        project,
+        assignment,
+        priority,
+        status,
+        startDate,
+        dueDate,
+        dueTime, 
     };
 
     // Assuming tasks are stored in a 'tasks' collection
     try {
-        await setDoc(doc(db, "tasks", Date.now().toString()), taskData);
+        await setDoc(doc(db, "tasks", `${userId}_${Date.now()}`), taskData); // Consider using Firestore auto-generated IDs instead
         console.log("Task added successfully");
-        // Optionally, update the UI here or navigate to another page
     } catch (error) {
         console.error("Error adding task:", error);
     }
