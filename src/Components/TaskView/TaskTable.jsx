@@ -25,6 +25,7 @@ const TasksTable = ({ tasks }) => {
             <td>{task.assignment}</td>
             <td>
               <select className={`priority-dropdown priority-${task.priority.toLowerCase()}`}>
+                <option value="None" selected={task.priority === ''}>Select Priority</option>
                 <option value="High" selected={task.priority === 'High'}>High</option>
                 <option value="Medium" selected={task.priority === 'Medium'}>Medium</option>
                 <option value="Low" selected={task.priority === 'Low'}>Low</option>
@@ -32,6 +33,7 @@ const TasksTable = ({ tasks }) => {
             </td>
             <td>
               <select className={`status-dropdown status-${task.status.toLowerCase().replace(' ', '-')}`}>
+                <option value="None" selected={task.status === ''}>Select Status</option>
                 <option value="Not Started" selected={task.status === 'Not Started'}>Not Started</option>
                 <option value="In Progress" selected={task.status === 'In Progress'}>In Progress</option>
                 <option value="Completed" selected={task.status === 'Completed'}>Completed</option>
@@ -39,7 +41,7 @@ const TasksTable = ({ tasks }) => {
             </td>
             <td>{task.startDate}</td>
             <td>{task.dueDate}</td>
-            <td>{task.timeDue}</td>
+            <td>{task.dueTime}</td>
             <td>{task.project}</td>
           </tr>
         ))}
