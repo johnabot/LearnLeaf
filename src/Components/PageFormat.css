@@ -1,0 +1,74 @@
+.top-bar {
+    display: flex;
+    height: 5%;
+    width: 100%;
+    align-items: center; /* Align items vertically in the center */
+    justify-content: center;
+    background-color: #B6CDC8;
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+.logo {
+    height: 7em;
+    will-change: filter;
+    transition: filter 300ms;
+}
+
+.name-links {
+    display: flex;
+    position: center;
+    flex-direction: column;
+    align-items: center; /* Center items vertically */
+    width: 85%;
+    height: fit-content;
+
+}
+
+.app-name {
+    color: #355147; /* Adjust color as needed */
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.links {
+    justify-content: center;
+    align-content: center;
+    margin-top: 0%;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px; /* Space between links */
+    padding-right: 10px;
+}
+
+    .nav-links a {
+        color: #9F6C5B;
+        text-decoration: none;
+        font-style: italic;
+    }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #5B8E9F;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+    cursor: pointer;
+    font-size: 24px;
+}
+
+    .fab:hover {
+        background-color: #0056b3; /* Darker blue */
+    }

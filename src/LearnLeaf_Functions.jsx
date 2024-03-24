@@ -113,30 +113,43 @@ function formatTime(timestamp) {
     return date.toLocaleTimeString(undefined, options); // Format the time according to user's browser settings
 }
 
-export async function fetchTasks(userId) {
-    const db = getFirestore(); // Initialize Firestore
-    const tasksCollectionRef = collection(db, "tasks"); // Reference to the tasks collection
+export async function fetchTasks(userId, subject = null) {
+    const db = getFirestore();
+    let q;
 
-    // Create a query against the collection.
-    const q = query(
-        tasksCollectionRef,
-        where("userId", "==", userId, "&&", "status", "!=", "Complete"),
-        orderBy("dueDate", "asc"),  // First sort by dueDate
-        orderBy("dueTime", "asc")   // Then sort by dueTime
-    );
+    if (subject) {
+        q = query(
+            collection(db, "tasks"),
+            where("userId", "==", userId),
+            where("subject", "==", subject),
+            where("status", "!=", "Completed"),
+            orderBy("dueDate", "asc"),
+            orderBy("dueTime", "asc")
+        );
+    } else {
+        q = query(
+            collection(db, "tasks"),
+            where("userId", "==", userId),
+            where("status", "!=", "Completed"),
+            orderBy("dueDate", "asc"),
+            orderBy("dueTime", "asc")
+        );
+    }
 
     const querySnapshot = await getDocs(q);
     const tasks = querySnapshot.docs.map(doc => {
-        const taskData = doc.data();
-        // Format the date and time fields
-        taskData.startDate = formatDate(taskData.startDate);
-        taskData.dueDate = formatDate(taskData.dueDate);
-        taskData.dueTime = formatTime(taskData.dueTime);
-        return { id: doc.id, ...taskData };
+        const data = doc.data();
+        return {
+            ...data,
+            startDate: formatDate(data.startDate),
+            dueDate: formatDate(data.dueDate),
+            dueTime: formatTime(data.dueTime),
+        };
     });
 
     return tasks;
 }
+
 
 export function displayTasks(tasks) {
     const tasksList = document.getElementById('tasks-list');
@@ -172,14 +185,13 @@ export function displayTasks(tasks) {
 // Function to create a new task
 export async function addTask(taskDetails) {
     const { userId, subject, project, assignment, priority, status, startDateInput, dueDateInput, dueTimeInput } = taskDetails;
-    console.log(`addTask\ndueDateInput: ${dueDateInput}, dueTimeInput: ${dueTimeInput}`);
 
-    const startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+    // Convert dueDate and dueTime to Timestamps
     const dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
-    const dateTimeString = `${dueDateInput}T${dueTimeInput}`;
+    const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
     const dueTime = Timestamp.fromDate(new Date(dateTimeString));
 
-
+    // Initialize taskData with fields that are always present
     const taskData = {
         userId,
         subject,
@@ -187,10 +199,14 @@ export async function addTask(taskDetails) {
         assignment,
         priority,
         status,
-        startDate,
         dueDate,
         dueTime,
     };
+
+    // Conditionally add startDate if provided
+    if (startDateInput) {
+        taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+    }
 
     // Assuming tasks are stored in a 'tasks' collection
     try {
@@ -264,6 +280,38 @@ export function deleteTask(taskId) {
             .catch(error => {
                 console.error('Error deleting task:', error);
             });
+    }
+}
+
+export async function fetchSubjects(userId) {
+    const db = getFirestore();
+    const subjectsRef = collection(db, "subjects");
+    const q = query(subjectsRef, where("userId", "==", userId), where("status", "==", "Active"));
+
+    const querySnapshot = await getDocs(q);
+    const subjects = [];
+    querySnapshot.forEach((doc) => {
+        subjects.push({ id: doc.id, ...doc.data() });
+    });
+
+    return subjects;
+}
+
+export async function addSubject({ userId, subjectName, semester }) {
+    const db = getFirestore(); // Initialize Firestore
+    const subjectData = {
+        userId,
+        subjectName,
+        semester,
+        status: 'Active', // Assuming new subjects are active by default
+    };
+
+    try {
+        // Assuming 'subjects' is the name of your collection
+        const docRef = await setDoc(doc(db, "subjects", `${userId}_${subjectName}`), subjectData);
+        console.log("Subject added successfully");
+    } catch (error) {
+        console.error("Error adding subject:", error);
     }
 }
 
