@@ -25,7 +25,7 @@ export function AddSubjectForm({ closeForm }) {
 
     return (
         <div className="modal">
-            <div className="add-form-container">
+            <div className="task-form-container">
                 <form onSubmit={handleSubmit}>
                     <h2 className="form-header">Add a New Subject</h2>
                     <div className="form-control">

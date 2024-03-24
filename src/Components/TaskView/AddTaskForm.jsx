@@ -33,7 +33,7 @@ export function AddTaskForm({ initialSubject, initialProject, closeForm, refresh
 
     return (
         <div className="modal">
-            <div className="add-form-container">
+            <div className="task-form-container">
                 <form onSubmit={handleSubmit}>
                     <h2 className="form-header">Add a New Task</h2>
                     <input type="text" id="subject" name="subject" value={taskDetails.subject} onChange={handleInputChange} placeholder="Subject" />

@@ -60,7 +60,7 @@ const SubjectTasks = () => {
 
             <div>
                 <h1 style={{ color: '#907474' }}>Upcoming Tasks for {subjectName}</h1>
-                <TasksTable tasks={tasks} />
+                <TasksTable tasks={tasks} refreshTasks={refreshTasks} />
             </div>
         </div>
     );

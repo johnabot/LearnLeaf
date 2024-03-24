@@ -1,12 +1,12 @@
 .top-bar {
     display: flex;
     height: 5%;
-    width: 100%;
+    width: 90;
     align-items: center; /* Align items vertically in the center */
     justify-content: center;
     background-color: #B6CDC8;
     padding: 5px;
-    margin-top: 10px;
+    margin: 10px 5px 0px 5px;
     border-radius: 8px;
 }
 

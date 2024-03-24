@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useUser } from '/src/UserState.jsx';
 import { fetchSubjects } from '/src/LearnLeaf_Functions.jsx';
 import { AddSubjectForm } from './AddSubjectForm.jsx';
+import SubjectWidget from './SubjectWidget.jsx';
 import './SubjectDashboard.css';
 import '/src/Components/PageFormat.css'
 
@@ -47,23 +47,8 @@ const SubjectsDashboard = () => {
                 </div>
             </div>
             <div className="subjects-grid">
-                {subjects.map(({ subjectName, semester, status }) => (
-                    <div key={subjectName} className="subject-widget">
-                        <a
-                            href={`/subjects/${subjectName}`}
-                            className="subject-name-link"
-                            onMouseEnter={() => {/* Tooltip logic here */ }}
-                            onMouseLeave={() => {/* Tooltip logic here */ }}
-                        >
-                            {subjectName}
-                        </a>
-                        <div className="semester">{semester}</div>
-                        {status === "Active" && (
-                            <button className="archive-button" onClick={() => {/* Archive logic here */ }}>
-                                Archive
-                            </button>
-                        )}
-                    </div>
+                {subjects.map(subject => (
+                    <SubjectWidget key={subject.id} subject={subject} />
                 ))}
             </div>
             <button className="fab" onClick={toggleFormVisibility}>

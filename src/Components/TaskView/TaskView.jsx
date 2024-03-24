@@ -74,7 +74,7 @@ const TaskList = () => {
 
             <div>
                 <h1 style={{ color: '#907474' }}>{user.name}'s Upcoming Tasks</h1>
-                <TasksTable tasks={tasks} />
+                <TasksTable tasks={tasks} refreshTasks={refreshTasks} />
             </div>
         </div>
     );
