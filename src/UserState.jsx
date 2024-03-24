@@ -5,40 +5,51 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
     const auth = getAuth();
     const db = getFirestore();
 
-    // Correctly define updateUser function outside of useEffect
+    // Initialize user state from localStorage
+    const [user, setUser] = useState(() => {
+        const storedUserData = localStorage.getItem('user');
+        return storedUserData ? JSON.parse(storedUserData) : null;
+    });
+
+    // Enhanced setUser to manage localStorage
     const updateUser = (newUserData) => {
-        setUser(newUserData);
+        if (newUserData) {
+            // Update user state and localStorage
+            setUser(newUserData);
+            localStorage.setItem('user', JSON.stringify(newUserData));
+        } else {
+            // Clear user state and localStorage
+            setUser(null);
+            localStorage.removeItem('user');
+        }
     };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                // User is signed in, fetch additional details from Firestore
                 const userDocRef = doc(db, "users", firebaseUser.uid);
                 const userDoc = await getDoc(userDocRef);
-
                 if (userDoc.exists()) {
-                    setUser({
-                        id: firebaseUser.uid, // Include the user's ID
+                    const userData = {
+                        id: firebaseUser.uid,
                         name: userDoc.data().name,
                         email: userDoc.data().email
-                    });
+                    };
+                    updateUser(userData);
                 } else {
-                    // Handle case where user is authenticated but doesn't have a Firestore document
                     console.error("No user document found!");
+                    updateUser(null); // Ensure state and localStorage are cleared if Firestore doc is missing
                 }
             } else {
-                // User is signed out
-                setUser(null);
+                updateUser(null); // Clear state and localStorage on sign-out
             }
         });
 
-        return () => unsubscribe(); // Cleanup subscription on unmount
-    }, [auth, db]);
+        return () => unsubscribe(); // Cleanup on unmount
+    }, [auth, db]); // Removed updateUser from the dependency array to avoid re-creating the effect unnecessarily
 
     return (
         <UserContext.Provider value={{ user, updateUser }}>
