@@ -20,9 +20,13 @@
     "recharts": "^2.12.3"
   },
   "devDependencies": {
+    "@babel/cli": "^7.24.1",
+    "@babel/core": "^7.24.3",
+    "@babel/preset-flow": "^7.24.1",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
+    "babel-plugin-syntax-hermes-parser": "^0.20.1",
     "vite": "^4.1.0"
   }
 }
