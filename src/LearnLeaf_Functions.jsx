@@ -1,3 +1,4 @@
+// @flow
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc } from "firebase/firestore";
@@ -124,7 +125,8 @@ export async function fetchTasks(userId, subject = null, project = null) {
             where("subject", "==", subject),
             where("status", "!=", "Completed"),
             orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc")
+            orderBy("dueTime", "asc"),
+            orderBy("assignment","asc")
         );
     } else if (project) {
         q = query(
@@ -133,7 +135,8 @@ export async function fetchTasks(userId, subject = null, project = null) {
             where("project", "==", project),
             where("status", "!=", "Completed"),
             orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc")
+            orderBy("dueTime", "asc"),
+            orderBy("assignment", "asc")
         );
     } else {
         q = query(
@@ -141,7 +144,8 @@ export async function fetchTasks(userId, subject = null, project = null) {
             where("userId", "==", userId),
             where("status", "!=", "Completed"),
             orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc")
+            orderBy("dueTime", "asc"),
+            orderBy("assignment", "asc")
         );
     }
 

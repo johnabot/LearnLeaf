@@ -1,3 +1,4 @@
+// @flow
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginForm from './Components/LoginForm/LoginForm.jsx';
 import RegistrationForm from './Components/RegisterUser/RegisterForm.jsx';

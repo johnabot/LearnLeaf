@@ -1,3 +1,4 @@
+// @flow
 import React, { useState, useEffect } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { fetchSubjects } from '/src/LearnLeaf_Functions.jsx';
@@ -27,16 +28,17 @@ const SubjectsDashboard = () => {
 
     const refreshSubjects = async () => {
         // Implement the logic to fetch tasks from the database and update state
+        console.log("Refreshing subjects...");
         const updatedSubjects = await fetchSubjects(user.id);
+        console.log("Sucessfully refreshed subjects");
+
         setSubjects(updatedSubjects);
     };
 
     return (
         <div className="subjects-dashboard">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Logo_Circle.svg" alt="Logo" className="logo" />
-                <div className="name-links">
-                    <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
+                <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
                     <nav className="nav-links">
                         <a href="/tasks">All Tasks</a>
                         <a href="/calendar">Calendar</a>
@@ -44,7 +46,6 @@ const SubjectsDashboard = () => {
                         <a href="/archives">Archives</a>
                         <a href="/profile">User Profile</a>
                     </nav>
-                </div>
             </div>
             <div className="subjects-grid">
                 {subjects.map(subject => (

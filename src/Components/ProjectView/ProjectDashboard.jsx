@@ -1,3 +1,4 @@
+// @flow
 import React, { useEffect, useState } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { fetchProjects } from '/src/LearnLeaf_Functions.jsx';
@@ -34,9 +35,8 @@ const ProjectsDashboard = () => {
     return (
         <div className="projects-dashboard">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Logo_Circle.svg" alt="Logo" className="logo" />
+                <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
                 <div className="name-links">
-                    <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
                     <nav className="nav-links">
                         <a href="/tasks">All Tasks</a>
                         <a href="/calendar">Calendar</a>

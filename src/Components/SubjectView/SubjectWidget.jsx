@@ -1,3 +1,4 @@
+// @flow
 import './SubjectDashboard.css';
 
 const SubjectWidget = ({ subject }) => {

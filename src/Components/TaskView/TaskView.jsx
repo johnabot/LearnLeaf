@@ -1,3 +1,4 @@
+// @flow
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import TasksTable from './TaskTable';
@@ -55,9 +56,7 @@ const TaskList = () => {
     return (
         <div className="task-view-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Logo_Circle.svg" alt="Logo" className="logo" />
-                <div className="name-links">
-                    <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
+                    <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
                     <nav className="nav-links">
                         <a href="/calendar">Calendar</a>
                         <a href="/subjects">Subjects</a>
@@ -65,14 +64,13 @@ const TaskList = () => {
                         <a href="/archives">Archives</a>
                         <a href="/profile">User Profile</a>
                     </nav>
-                </div>
             </div>
             <button className="fab" onClick={toggleFormVisibility}>
                 +
             </button>
             {showForm && <AddTaskForm closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
 
-            <div>
+            <div className="task-list">
                 <h1 style={{ color: '#907474' }}>{user.name}'s Upcoming Tasks</h1>
                 <TasksTable tasks={tasks} refreshTasks={refreshTasks} />
             </div>

@@ -1,12 +1,15 @@
 {
   "name": "learnleaf",
+  "main": "lib/index.js",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "babel src/ -d lib/",
+    "prepublish": "npm run build",
+    "preview": "vite preview",
+    "flow": "flow"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -27,6 +30,14 @@
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
     "babel-plugin-syntax-hermes-parser": "^0.20.1",
+    "flow-bin": "^0.231.0",
     "vite": "^4.1.0"
+  },
+  "flow": {
+    "name": "my-flow-project",
+    "version": "1.0.0",
+    "devDependencies": {
+      "flow-bin": "^0.231.0"
+    }
   }
 }
