@@ -14,15 +14,18 @@ export function AddTaskForm({ initialSubject, initialProject, closeForm, refresh
         assignment: '',
         priority: '',
         status: '',
-        startDate: '',
-        dueDate: '',
-        dueTime: '',
+        startDateInput: '',
+        dueDateInput: '',
+        dueTimeInput: '',
         project: initialProject || '', // Use initialProject as the default value, or '' if not provided
     });
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setTaskDetails(prev => ({ ...prev, [name]: value }));
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setTaskDetails((prevDetails) => ({
+            ...prevDetails,
+            [name]: value || '', // Ensures inputs remain controlled
+        }));
     };
 
     const handleSubmit = async (e) => {
