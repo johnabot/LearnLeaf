@@ -27,9 +27,7 @@ const SubjectTasks = () => {
 
 
     const toggleFormVisibility = () => {
-        console.log("Current showForm state:", showForm);
         setShowForm(!showForm);
-        console.log("Toggled showForm state:", !showForm);
     };
 
     const refreshTasks = async () => {
