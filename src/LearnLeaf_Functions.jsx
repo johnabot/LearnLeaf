@@ -93,26 +93,58 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Helper function to format Firestore Timestamp to "day month, year"
-function formatDate(timestamp) {
-    if (!timestamp) {
-        return ''; // Return empty string if timestamp is undefined, null, etc.
+function formatDate(input) {
+    if (!input) {
+        return ''; // Return empty string if input is undefined, null, etc.
     }
 
-    const date = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date object
+    let date;
+    if (input instanceof Date) {
+        // Input is already a JavaScript Date object
+        date = input;
+    } else if (input.toDate && typeof input.toDate === 'function') {
+        // Input is a Firestore Timestamp object
+        date = input.toDate();
+    } else if (typeof input === 'string' || typeof input === 'number') {
+        // Input is a string or a number (timestamp), attempt to parse it
+        date = new Date(input);
+    } else {
+        // Unsupported type, return empty string
+        console.error('Unsupported date type:', input);
+        return '';
+    }
+
     const options = { day: 'numeric', month: 'long', year: 'numeric' }; // Format options
     return date.toLocaleDateString(undefined, options); // Format the date
 }
 
+
 // Helper function to format Firestore Timestamp to "HH:MM AM/PM"
-function formatTime(timestamp) {
-    if (!timestamp) {
-        return ''; // Return empty string if timestamp is undefined, null, etc.
+function formatTime(input) {
+    if (!input) {
+        return ''; // Return empty string if input is undefined, null, etc.
     }
 
-    const date = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date object
-    const options = { hour: '2-digit', minute: '2-digit' }; // Format options
+    let date;
+    if (input instanceof Date) {
+        // Input is already a JavaScript Date object
+        date = input;
+    } else if (input.toDate && typeof input.toDate === 'function') {
+        // Input is a Firestore Timestamp object
+        date = input.toDate();
+    } else if (typeof input === 'string' || typeof input === 'number') {
+        // Input is a string or a number (timestamp), attempt to parse it
+        date = new Date(input);
+    } else {
+        // Unsupported type, return empty string
+        console.error('Unsupported time type:', input);
+        return '';
+    }
+
+    const options = { hour: '2-digit', minute: '2-digit', hour12: true }; // Use hour12: true for AM/PM format
     return date.toLocaleTimeString(undefined, options); // Format the time according to user's browser settings
 }
+
 
 export async function fetchTasks(userId, subject = null, project = null) {
     const db = getFirestore();
@@ -165,36 +197,52 @@ export async function fetchTasks(userId, subject = null, project = null) {
 }
 
 
-export function displayTasks(tasks) {
-    const tasksList = document.getElementById('tasks-list');
-    tasksList.innerHTML = '';  // Clear existing tasks
+export async function fetchAllTasks(userId, subject = null, project = null) {
+    const db = getFirestore();
+    let q;
 
-    tasks.forEach(task => {
-        const row = tasksList.insertRow();
-        row.innerHTML = `
-            <td>${task.subject}</td>
-            <td>${task.project}</td>
-            <td>${task.assignment}</td>
-            <td>
-                <select class="priority-dropdown ${'priority-' + task.priority.toLowerCase()}">
-                    <option value="High" ${task.priority === 'High' ? 'selected' : ''}>High</option>
-                    <option value="Medium" ${task.priority === 'Medium' ? 'selected' : ''}>Medium</option>
-                    <option value="Low" ${task.priority === 'Low' ? 'selected' : ''}>Low</option>
-                </select>
-            </td>
-            <td>
-                <select class="status-dropdown ${'status-' + task.status.toLowerCase().replace(' ', '-')}" >
-                    <option value="Not Started" ${task.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
-                    <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                    <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                </select>
-            </td>
-            <td>${task.startDate}</td>
-            <td>${task.dueDate}</td>
-            <td>${task.timeDue}</td>
-        `;
+    if (subject) {
+        q = query(
+            collection(db, "tasks"),
+            where("userId", "==", userId),
+            where("subject", "==", subject),
+            orderBy("dueDate", "asc"),
+            orderBy("dueTime", "asc"),
+            orderBy("assignment", "asc")
+        );
+    } else if (project) {
+        q = query(
+            collection(db, "tasks"),
+            where("userId", "==", userId),
+            where("project", "==", project),
+            orderBy("dueDate", "asc"),
+            orderBy("dueTime", "asc"),
+            orderBy("assignment", "asc")
+        );
+    } else {
+        q = query(
+            collection(db, "tasks"),
+            where("userId", "==", userId),
+            orderBy("dueDate", "asc"),
+            orderBy("dueTime", "asc"),
+            orderBy("assignment", "asc")
+        );
+    }
+
+    const querySnapshot = await getDocs(q);
+    const tasksAll = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            ...data,
+            taskId: doc.id,
+            startDate: formatDate(data.startDate),
+            dueDate: formatDate(data.dueDate),
+            dueTime: formatTime(data.dueTime),
+        };
     });
-};
+
+    return tasksAll;
+}
 
 // Function to create a new task
 export async function addTask(taskDetails) {
@@ -318,27 +366,49 @@ export async function addSubject({ userId, subjectName, semester }) {
 
 export async function fetchProjects(userId) {
     const db = getFirestore();
-    console.log("Fetching projects");
+    console.log("Fetching projects for user:", userId);
     const projectsRef = collection(db, "projects");
-    const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Active"), orderBy("projectDueDate","asc"), orderBy("projectName","asc"));
+    const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Active"), orderBy("projectDueDate", "asc"), orderBy("projectName", "asc"));
 
     const querySnapshot = await getDocs(q);
-    const projects = querySnapshot.docs.map(doc => {
+    const projectsPromises = querySnapshot.docs.map(async (doc) => {
         const data = doc.data();
+        const tasksAll = await fetchAllTasks(userId, null, data.projectName); // Fetches all tasks assigned to a project - used for collecting data for pie chart
+        const tasksShow = await fetchTasks(userId, null, data.projectName); // Fetches active tasks assigned to a project - used to find next task due
+
+        // Count the statuses
+        const statusCounts = tasksAll.reduce((acc, task) => {
+            acc[task.status] = (acc[task.status] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Find the next upcoming task
+        const sortedTasks = tasksShow.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+        const nextTask = sortedTasks[0]; // The task with the closest due date, regardless of its relation to today
+
+
         return {
             ...data,
             projectId: doc.id,
             projectDueDate: formatDate(data.projectDueDate),
-            nextTaskDueDate: formatDate(data.nextTaskDueDate),
             projectDueTime: formatTime(data.projectDueTime),
-            nextTaskDueTime: formatTime(data.nextTaskDueTime),
-        }
+            nextTaskName: nextTask?.assignment, // Direct use if already formatted
+            nextTaskDueDate: nextTask?.dueDate, // Direct use if already formatted
+            nextTaskDueTime: nextTask?.dueTime, // Direct use if already formatted
+            statusCounts: {
+                Completed: statusCounts['Completed'] || 0,
+                InProgress: statusCounts['In Progress'] || 0,
+                NotStarted: statusCounts['Not Started'] || 0,
+            }
+        };
     });
 
-    console.log(projects);
+    const projectsWithDetails = await Promise.all(projectsPromises);
+    console.log(projectsWithDetails);
 
-    return projects;
+    return projectsWithDetails;
 }
+
 
 export async function addProject({ userId, projectDueDateInput, projectDueTimeInput, projectName, subject }) {
     const db = getFirestore(); // Initialize Firestore

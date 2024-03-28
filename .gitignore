@@ -1,1 +1,6 @@
 clear
+.vs
+dist
+lib
+public
+src/assets

@@ -17,13 +17,13 @@ const ProjectTasks = () => {
 
     useEffect(() => {
         if (user?.id && projectName) {
-            fetchTasks(user.id, projectName)
+            fetchTasks(user.id, null, projectName) // Ensuring subject is null
                 .then(fetchedTasks => {
                     setTasks(fetchedTasks);
                 })
                 .catch(error => console.error("Error fetching tasks for project:", error));
         }
-    }, [user?.id, projectName]); // Add selectedProjects to dependency array
+    }, [user?.id, projectName]);
 
 
     const toggleFormVisibility = () => {
@@ -34,7 +34,7 @@ const ProjectTasks = () => {
 
     const refreshTasks = async () => {
         // Refetch tasks when a new task is added
-        const updatedTasks = await fetchTasks(user.id, projectName);
+        const updatedTasks = await fetchTasks(user.id, null, projectName);
         setTasks(updatedTasks);
     };
 
