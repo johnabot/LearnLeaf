@@ -69,7 +69,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
     };
 
     const getFilteredTasks = (tasks, filterCriteria) => {
-        return tasks.filter((task) => {
+        const filteredTasks = tasks.filter((task) => {
             // Check for priority and status filters
             const matchesPriority = !filterCriteria.priority || task.priority === filterCriteria.priority;
             const matchesStatus = !filterCriteria.status || task.status === filterCriteria.status;
@@ -95,7 +95,13 @@ const TasksTable = ({ tasks, refreshTasks }) => {
             // Return true if task matches all criteria
             return matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
         });
+
+        // Debugging statement to log the filtered tasks and check if 'id' field is present
+        console.log("Filtered tasks:", filteredTasks.map(task => ({ ...task, hasId: task.hasOwnProperty('id') })));
+
+        return filteredTasks;
     };
+
 
 
     const clearFilters = () => {
@@ -121,6 +127,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
     };
 
     const handleDeleteClick = async (taskId) => {
+        console.log("Attempting to delete task with ID:", taskId);
         const confirmation = window.confirm("Are you sure you want to delete this task?");
         if (confirmation) {
             try {
@@ -253,7 +260,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                                 </IconButton>
                             </td>
                             <td>
-                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.id)}>
+                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
                                     <DeleteIcon />
                                 </IconButton>
                             </td>
