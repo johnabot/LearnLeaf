@@ -76,32 +76,43 @@ button {
     z-index: 1000;
 }
 
-    .modal .add-form-container {
+    .modal .task-form-container {
         position: fixed;
-        left: 25%;
-        top: 25%;
-        width: 50%;
+        width: 40%;
         height: 50%;
         background-color: #f3f2f2;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 15px;
-        padding: 20px;
+        padding: 25px 5px 25px 5px;
         z-index: 1001;
     }
 
-.add-form-container .form-control {
+    .modal .subject-form-container {
+        position: fixed;
+        width: fit-content;
+        height: fit-content;
+        background-color: #f3f2f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        padding: 20px 35px 20px 35px;
+        z-index: 1001;
+    }
+
+.task-form-container .form-control {
     margin-bottom: 10px;
 }
 
-    .add-form-container .form-control label {
-        display: block; /* Makes label take the full width and places it above the input/select */
-        margin-bottom: 5px;
-        font-size: 14px; /* Adjust label text size as needed */
-    }
+.task-form-container .form-control label {
+    display: block; /* Makes label take the full width and places it above the input/select */
+    margin-bottom: 5px;
+    font-size: 14px; /* Adjust label text size as needed */
+}
 
-.add-form-container .form-row {
+.task-form-container .form-row {
     padding-left: 50px;
     padding-right: 50px;
     display: flex;
@@ -109,12 +120,11 @@ button {
     gap: 20px; /* Adjusts the space between controls within the same row */
 }
 
-.task-form-container .form-row .form-control {
-    flex: 1; /* Makes each form control take equal space within a row */
-}
+    .task-form-container .form-row .form-control {
+        flex: 1; /* Makes each form control take equal space within a row */
+    }
 
-/* Adjust the button styling as needed */
-.add-form-container button {
+.task-form-container button {
     margin-top: 10px;
     background-color: #B6CDC8;
     color: #355147;
@@ -124,14 +134,20 @@ button {
     /* Additional button styles */
 }
 
-.add-form-container label {
-    font-size: 18px; /* Adjust the size as needed */
+.subject-form-container button {
+    margin-top: 10px;
+    background-color: #B6CDC8;
+    color: #355147;
+    font-weight: bold;
+    margin-left: 10px;
+    margin-right: 10px;
+    /* Additional button styles */
 }
 
 .add-form input {
-    width: 100%; /* Make input fields take up the full container width */
+    width: 90%; /* Make input fields take up the full container width */
     padding: 8px; /* Add some padding inside the input fields for better readability */
-    margin: 5px 0 15px; /* Add some margin for spacing between input fields */
+    margin: 5px 5px 15px 5px; /* Add some margin for spacing between input fields */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
     border: 1px solid #ccc; /* Add a border to the input fields */
     border-radius: 4px; /* Optionally add rounded corners */
@@ -140,7 +156,8 @@ button {
     .add-form input[type="date"],
     .add-form input[type="time"] {
         background-color: #f8f8f8; /* Slightly different background to distinguish date/time fields */
-        border: 1px solid #ddd; /* Lighter border color */
+        border-radius: 4px;
+        border: 1px solid #ccc;
     }
 
     .add-form input::placeholder {

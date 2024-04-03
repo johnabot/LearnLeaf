@@ -1,3 +1,4 @@
+// @flow
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '/src/UserState.jsx';
@@ -26,9 +27,7 @@ const SubjectTasks = () => {
 
 
     const toggleFormVisibility = () => {
-        console.log("Current showForm state:", showForm);
         setShowForm(!showForm);
-        console.log("Toggled showForm state:", !showForm);
     };
 
     const refreshTasks = async () => {
@@ -40,9 +39,8 @@ const SubjectTasks = () => {
     return (
         <div className="task-view-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Logo_Circle.svg" alt="Logo" className="logo" />
+                <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
                 <div className="name-links">
-                    <div className="app-name"><h1>LearnLeaf Organizer</h1></div>
                     <nav className="nav-links">
                         <a href="/tasks">All Tasks</a>
                         <a href="/calendar">Calendar</a>
@@ -60,7 +58,7 @@ const SubjectTasks = () => {
 
             <div>
                 <h1 style={{ color: '#907474' }}>Upcoming Tasks for {subjectName}</h1>
-                <TasksTable tasks={tasks} />
+                <TasksTable tasks={tasks} refreshTasks={refreshTasks} />
             </div>
         </div>
     );

@@ -1,7 +1,14 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\src",
+    "\\src\\Components",
+    "\\src\\Components\\LoginForm",
+    "\\src\\Components\\ProjectView",
+    "\\src\\Components\\RegisterUser",
+    "\\src\\Components\\SubjectView",
+    "\\src\\Components\\TaskView"
   ],
-  "SelectedNode": "\\C:\\Users\\stock\\OneDrive\\Semesters\\2024 Spring\\CSE-3311 Object-Oriented Software Engineering\\LearnLeaf_Organizer\\Code",
+  "SelectedNode": "\\src\\index.css",
   "PreviewInSolutionExplorer": false
 }

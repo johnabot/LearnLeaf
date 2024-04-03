@@ -1,3 +1,4 @@
+// @flow
 import React, { useState } from 'react';
 import { addTask } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '/src/UserState.jsx';
@@ -13,15 +14,18 @@ export function AddTaskForm({ initialSubject, initialProject, closeForm, refresh
         assignment: '',
         priority: '',
         status: '',
-        startDate: '',
-        dueDate: '',
-        dueTime: '',
+        startDateInput: '',
+        dueDateInput: '',
+        dueTimeInput: '',
         project: initialProject || '', // Use initialProject as the default value, or '' if not provided
     });
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setTaskDetails(prev => ({ ...prev, [name]: value }));
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setTaskDetails((prevDetails) => ({
+            ...prevDetails,
+            [name]: value || '', // Ensures inputs remain controlled
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -33,7 +37,7 @@ export function AddTaskForm({ initialSubject, initialProject, closeForm, refresh
 
     return (
         <div className="modal">
-            <div className="add-form-container">
+            <div className="task-form-container">
                 <form onSubmit={handleSubmit}>
                     <h2 className="form-header">Add a New Task</h2>
                     <input type="text" id="subject" name="subject" value={taskDetails.subject} onChange={handleInputChange} placeholder="Subject" />
