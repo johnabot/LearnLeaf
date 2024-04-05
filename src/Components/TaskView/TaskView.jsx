@@ -1,11 +1,11 @@
 // @flow
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import TasksTable from './TaskTable';
 import { useUser } from '/src/UserState.jsx';
 import { fetchTasks } from '/src/LearnLeaf_Functions.jsx'
 import { AddTaskForm } from './AddTaskForm.jsx';
 import '/src/Components/FormUI.css';
+
 
 const TaskList = () => {
     const [showForm, setShowForm] = useState(false);
@@ -34,25 +34,6 @@ const TaskList = () => {
         setTasks(updatedTasks);
     };
 
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const { subject, assignment, priority, status, startDate, dueDate, timeDue, project } = event.target.elements;
-  
-      const newTask = {
-          subject: subject.value,
-          assignment: assignment.value, // Corrected from 'name' to 'assignment' for consistency
-          priority: priority.value,
-          status: status.value,
-          startDate: startDate.value,
-          dueDate: dueDate.value,
-          timeDue: timeDue.value,
-          project: project.value
-      };
-  
-      setTasks([...tasks, newTask]);
-      setShowForm(false);
-  };
-
     return (
         <div className="task-view-container">
             <div className="top-bar">
@@ -78,4 +59,3 @@ const TaskList = () => {
     );
 };
 export default TaskList;
-

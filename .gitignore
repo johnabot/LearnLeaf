@@ -4,3 +4,4 @@ dist
 lib
 public
 src/assets
+node_modules/
