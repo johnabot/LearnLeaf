@@ -17,49 +17,51 @@ import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
 };
 const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
   const [formValues, setFormValues] = useState(task);
 
   useEffect(() => {
-    setFormValues({ ...task });
+      setFormValues({ ...task });
   }, [task]);
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormValues({ ...formValues, [name]: value });
+      const { name, value } = event.target;
+      setFormValues({ ...formValues, [name]: value });
   };
+
   const handleSave = async () => {
-    try {
-      const updatedTaskData = {
-        taskId: formValues.taskId,
-        userId: formValues.userId,
-        subject: formValues.subject,
-        project: formValues.project,
-        assignment: formValues.assignment,
-        priority: formValues.priority,
-        status: formValues.status,
-        startDate: formValues.startDate,
-        dueDate: formValues.dueDate,
-        dueTime: formValues.dueTime,
-      };
+      try {
+          const updatedTaskData = {
+              taskId: formValues.taskId,
+              userId: formValues.userId,
+              subject: formValues.subject,
+              project: formValues.project,
+              assignment: formValues.assignment,
+              priority: formValues.priority,
+              status: formValues.status,
+              startDate: formValues.startDate,
+              dueDate: formValues.dueDate,
+              dueTime: formValues.dueTime,
+          };
   
-      await editTask(updatedTaskData);
-      onSave(updatedTaskData);
-      console.log('Task has been updated successfully.');
-      onClose();
-    } catch (error) {
-      console.error('Failed to update task:', error);
-    }
+          await editTask(updatedTaskData);
+          onSave(updatedTaskData);
+          console.log('Task has been updated successfully.');
+          onClose();
+      } catch (error) {
+          console.error('Failed to update task:', error);
+      }
   };
+
   
   
    return (
@@ -167,10 +169,10 @@ const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
 
 
 const CustomIconButton = styled(IconButton)({
-  border: '1px solid rgba(0, 0, 0, 0.23)',
-  '&:hover': {
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  },
+    border: '1px solid rgba(0, 0, 0, 0.23)',
+    '&:hover': {
+        backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    },
 });
 
 const TasksTable = ({ tasks, refreshTasks }) => {
@@ -185,110 +187,110 @@ const TasksTable = ({ tasks, refreshTasks }) => {
         dueDate: '',
         dueDateComparison: '',
     });
-    const handleEditClick = (task, index) => {
-      setIsEditing(index);
-      setEditedTask({...task});
-      setEditModalOpen(true); // Open the edit modal
+
+    // Helper function to determine color based on the due date
+    const getDateColor = (dueDateStr) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Remove time components
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dueDate = new Date(dueDateStr);
+        dueDate.setHours(0, 0, 0, 0); // Match comparison
+
+        if (dueDate < today) return 'red'; // Overdue
+        if (dueDate.getTime() === today.getTime()) return 'orange'; // Due today
+        if (dueDate.getTime() === tomorrow.getTime()) return '#01ba01'; // Due tomorrow
+        return 'black'; // Default color
     };
 
-  // Helper function to determine color based on the due date
-  const getDateColor = (dueDateStr) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Remove time components
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const filterByDate = (taskDateStr, filterDateStr, comparisonType) => {
+        let taskDate = new Date(taskDateStr);
+        taskDate = new Date(taskDate.getTime() - taskDate.getTimezoneOffset() * 60000).setHours(0, 0, 0, 0);
 
-    const dueDate = new Date(dueDateStr);
-    dueDate.setHours(0, 0, 0, 0); // Match comparison
-
-    if (dueDate < today) return 'red'; // Overdue
-    if (dueDate.getTime() === today.getTime()) return 'orange'; // Due today
-    if (dueDate.getTime() === tomorrow.getTime()) return '#01ba01'; // Due tomorrow
-    return 'black'; // Default color
-};
-
-const filterByDate = (taskDateStr, filterDateStr, comparisonType) => {
-    let taskDate = new Date(taskDateStr);
-    taskDate = new Date(taskDate.getTime() - taskDate.getTimezoneOffset() * 60000).setHours(0, 0, 0, 0);
-
-    let filterDate = new Date(filterDateStr);
-    filterDate = new Date(filterDate.getTime() - filterDate.getTimezoneOffset() * 60000).setHours(0, 0, 0, 0);
+        let filterDate = new Date(filterDateStr);
+        filterDate = new Date(filterDate.getTime() - filterDate.getTimezoneOffset() * 60000).setHours(0, 0, 0, 0);
 
 
-    switch (comparisonType) {
-        case 'before':
-            return taskDate < filterDate;
-        case 'before-equal':
-            return taskDate <= filterDate;
-        case 'equal':
-            return taskDate.toDateString() === filterDate.toDateString();
-        case 'after':
-            return taskDate > filterDate;
-        case 'after-equal':
-            return taskDate >= filterDate;
-        default:
-            return true;
-    }
-};
-
-const getFilteredTasks = (tasks, filterCriteria) => {
-    const filteredTasks = tasks.filter((task) => {
-        // Check for priority and status filters
-        const matchesPriority = !filterCriteria.priority || task.priority === filterCriteria.priority;
-        const matchesStatus = !filterCriteria.status || task.status === filterCriteria.status;
-
-        // Start Date filtering
-        let matchesStartDate = true;
-        if (filterCriteria.startDateComparison === "none") {
-            matchesStartDate = !task.startDate; // Match tasks with no start date
-        } else if (filterCriteria.startDate) {
-            // Apply date comparison logic if startDate is provided and comparison isn't "none"
-            matchesStartDate = filterByDate(task.startDate, filterCriteria.startDate, filterCriteria.startDateComparison);
+        switch (comparisonType) {
+            case 'before':
+                return taskDate < filterDate;
+            case 'before-equal':
+                return taskDate <= filterDate;
+            case 'equal':
+                return taskDate.toDateString() === filterDate.toDateString();
+            case 'after':
+                return taskDate > filterDate;
+            case 'after-equal':
+                return taskDate >= filterDate;
+            default:
+                return true;
         }
+    };
 
-        // Due Date filtering
-        let matchesDueDate = true;
-        if (filterCriteria.dueDateComparison === "none") {
-            matchesDueDate = !task.dueDate; // Match tasks with no due date
-        } else if (filterCriteria.dueDate) {
-            // Apply date comparison logic if dueDate is provided and comparison isn't "none"
-            matchesDueDate = filterByDate(task.dueDate, filterCriteria.dueDate, filterCriteria.dueDateComparison);
-        }
+    const getFilteredTasks = (tasks, filterCriteria) => {
+        const filteredTasks = tasks.filter((task) => {
+            // Check for priority and status filters
+            const matchesPriority = !filterCriteria.priority || task.priority === filterCriteria.priority;
+            const matchesStatus = !filterCriteria.status || task.status === filterCriteria.status;
 
-        // Return true if task matches all criteria
-        return matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
-    });
+            // Start Date filtering
+            let matchesStartDate = true;
+            if (filterCriteria.startDateComparison === "none") {
+                matchesStartDate = !task.startDate; // Match tasks with no start date
+            } else if (filterCriteria.startDate) {
+                // Apply date comparison logic if startDate is provided and comparison isn't "none"
+                matchesStartDate = filterByDate(task.startDate, filterCriteria.startDate, filterCriteria.startDateComparison);
+            }
 
-    // Debugging statement to log the filtered tasks and check if 'id' field is present
-    console.log("Filtered tasks:", filteredTasks.map(task => ({ ...task, hasId: task.hasOwnProperty('id') })));
+            // Due Date filtering
+            let matchesDueDate = true;
+            if (filterCriteria.dueDateComparison === "none") {
+                matchesDueDate = !task.dueDate; // Match tasks with no due date
+            } else if (filterCriteria.dueDate) {
+                // Apply date comparison logic if dueDate is provided and comparison isn't "none"
+                matchesDueDate = filterByDate(task.dueDate, filterCriteria.dueDate, filterCriteria.dueDateComparison);
+            }
 
-    return filteredTasks;
-};
+            // Return true if task matches all criteria
+            return matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
+        });
+
+        // Debugging statement to log the filtered tasks and check if 'id' field is present
+        console.log("Filtered tasks:", filteredTasks.map(task => ({ ...task, hasId: task.hasOwnProperty('id') })));
+
+        return filteredTasks;
+    };
 
 
 
-const clearFilters = () => {
-    setFilterCriteria({
-        priority: '',
-        status: '',
-        startDate: '',
-        startDateComparison: '',
-        dueDate: '',
-        dueDateComparison: '',
-    });
-};
+    const clearFilters = () => {
+        setFilterCriteria({
+            priority: '',
+            status: '',
+            startDate: '',
+            startDateComparison: '',
+            dueDate: '',
+            dueDateComparison: '',
+        });
+    };
 
-const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilterCriteria(prev => ({ ...prev, [name]: value }));
-};
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilterCriteria(prev => ({ ...prev, [name]: value }));
+    };
 
-  
-  // Placeholder for setTasks function
-  const setTasks = (updatedTasks) => {
-    console.log(updatedTasks); // Implement your state update logic here
+
+    // Placeholder for setTasks function
+    const setTasks = (updatedTasks) => {
+        console.log(updatedTasks); // Implement your state update logic here
+    };
+
+  const handleEditClick = (task, index) => {
+    setIsEditing(index);
+    setEditedTask({...task});
+    setEditModalOpen(true); // Open the edit modal
   };
-
   const handleDeleteClick = async (taskId) => {
     console.log("Attempting to delete task with ID:", taskId);
     const confirmation = window.confirm("Are you sure you want to delete this task?");
@@ -302,143 +304,139 @@ const handleFilterChange = (e) => {
     }
 }
 
-  return (
-    <>
-      <div className="filter-bar">
-        <div className="filter-item">
+return (
+  <>
+    <div className="filter-bar">
+      <div className="filter-item">
         <label htmlFor="priorityFilter">Priority:</label>
-          <select
-            id="priorityFilter"
-            value={filterCriteria.priority}
-            onChange={(e) => setFilterCriteria({ ...filterCriteria, priority: e.target.value })}
-          >
-            <option value="">Show All</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-        </div>
-
-        {/* Filter for Status */}
-        <div className="filter-item">
-          <label htmlFor="statusFilter">Status:</label>
-          <select
-            id="statusFilter"
-            value={filterCriteria.status}
-            onChange={(e) => setFilterCriteria({ ...filterCriteria, status: e.target.value })}
-          >
-            <option value="">Show All</option>
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
-
-        {/* Filter for Start Date */}
-        <div className="filter-item">
-          <label htmlFor="startDateFilter">Start Date:</label>
-          <select
-            id="startDateFilter"
-            value={filterCriteria.startDateComparison}
-            onChange={(e) => setFilterCriteria({ ...filterCriteria, startDateComparison: e.target.value })}
-          >
-            <option value="">Show All</option>
-            <option value="before">Before</option>
-            <option value="before-equal">Before or Equal to</option>
-            <option value="equal">Equal to</option>
-            <option value="after">After</option>
-            <option value="after-equal">After or Equal to</option>
-            <option value="none">None Set</option>
-          </select>
-          <input
-            type="date"
-            value={filterCriteria.startDate}
-            onChange={(e) => setFilterCriteria({ ...filterCriteria, startDate: e.target.value })}
-          />
-        </div>
-
-        {/* Filter for Due Date */}
-        <div className="filter-item">
-          <label htmlFor="dueDateFilter">Due Date:</label>
-          <select
-            id="dueDateFilter"
-            value={filterCriteria.dueDateComparison}
-            onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDateComparison: e.target.value })}
-          >
-            <option value="">Show All</option>
-            <option value="before">Before</option>
-            <option value="before-equal">Before or Equal to</option>
-            <option value="equal">Equal to</option>
-            <option value="after">After</option>
-            <option value="after-equal">After or Equal to</option>
-            <option value="none">None Set</option>
-          </select>
-          <input
-            type="date"
-            value={filterCriteria.dueDate}
-            onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDate: e.target.value })}
-          />
-        </div>
-
-        {/* Clear Filters Button */}
-        <button onClick={clearFilters}>Clear Filters</button>
+        <select
+          id="priorityFilter"
+          value={filterCriteria.priority}
+          onChange={(e) => setFilterCriteria({ ...filterCriteria, priority: e.target.value })}
+        >
+          <option value="">Show All</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
       </div>
 
-      {/* Task Edit Form */}
-      <TaskEditForm
-        task={editedTask}
-        isOpen={isEditModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onSave={(updatedTask) => {
-          const updatedTasks = tasks.map((task) => task.taskId === updatedTask.taskId ? updatedTask : task);
-          setTasks(updatedTasks);
-          setEditModalOpen(false);
-        }}
-      />
+      <div className="filter-item">
+        <label htmlFor="statusFilter">Status:</label>
+        <select
+          id="statusFilter"
+          value={filterCriteria.status}
+          onChange={(e) => setFilterCriteria({ ...filterCriteria, status: e.target.value })}
+        >
+          <option value="">Show All</option>
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
 
-      {/* Tasks Table */}
-      <table id="tasksTable">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Assignment</th>
-            <th>Priority</th>
-            <th>Status</th>
-            <th>Start Date</th>
-            <th>Due Date</th>
-            <th>Time Due</th>
-            <th>Project</th>
-            <th>Edit</th>
-            <th>Delete</th>
+      <div className="filter-item">
+        <label htmlFor="startDateFilter">Start Date:</label>
+        <select
+          id="startDateFilter"
+          value={filterCriteria.startDateComparison}
+          onChange={(e) => setFilterCriteria({ ...filterCriteria, startDateComparison: e.target.value })}
+        >
+          <option value="">Show All</option>
+          <option value="before">Before</option>
+          <option value="before-equal">Before or Equal to</option>
+          <option value="equal">Equal to</option>
+          <option value="after">After</option>
+          <option value="after-equal">After or Equal to</option>
+          <option value="none">None Set</option>
+        </select>
+        <input
+          type="date"
+          value={filterCriteria.startDate}
+          onChange={(e) => setFilterCriteria({ ...filterCriteria, startDate: e.target.value })}
+        />
+      </div>
+
+      <div className="filter-item">
+        <label htmlFor="dueDateFilter">Due Date:</label>
+        <select
+          id="dueDateFilter"
+          value={filterCriteria.dueDateComparison}
+          onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDateComparison: e.target.value })}
+        >
+          <option value="">Show All</option>
+          <option value="before">Before</option>
+          <option value="before-equal">Before or Equal to</option>
+          <option value="equal">Equal to</option>
+          <option value="after">After</option>
+          <option value="after-equal">After or Equal to</option>
+          <option value="none">None Set</option>
+        </select>
+        <input
+          type="date"
+          value={filterCriteria.dueDate}
+          onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDate: e.target.value })}
+        />
+      </div>
+
+      <button onClick={clearFilters}>Clear Filters</button>
+    </div>
+
+    <TaskEditForm
+      task={editedTask}
+      isOpen={isEditModalOpen}
+      onClose={() => setEditModalOpen(false)}
+      onSave={(updatedTask) => {
+        const updatedTasks = tasks.map((task) =>
+          task.taskId === updatedTask.taskId ? updatedTask : task
+        );
+        setTasks(updatedTasks);
+        setEditModalOpen(false);
+      }}
+    />
+
+    <table id="tasksTable">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Assignment</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Start Date</th>
+          <th>Due Date</th>
+          <th>Time Due</th>
+          <th>Project</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
+          <tr key={task.id || index}>
+            <td>{task.subject}</td>
+            <td>{task.assignment}</td>
+            <td>{task.priority}</td>
+            <td>{task.status}</td>
+            <td style={{ color: getDateColor(task.startDate) }}>{task.startDate}</td>
+            <td style={{ color: getDateColor(task.dueDate) }}>{task.dueDate}</td>
+            <td>{task.dueTime}</td>
+            <td>{task.project}</td>
+            <td>
+              
+              <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task, index)}>
+                <EditIcon />
+              </CustomIconButton>
+            </td>
+            <td>
+              <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
+                <DeleteIcon />
+              </IconButton>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
-            <tr key={task.id || index}>
-              <td>{task.subject}</td>
-              <td>{task.assignment}</td>
-              <td>{task.priority}</td>
-              <td>{task.status}</td>
-              <td style={{ color: getDateColor(task.startDate) }}>{task.startDate}</td>
-              <td style={{ color: getDateColor(task.dueDate) }}>{task.dueDate}</td>
-              <td>{task.dueTime}</td>
-              <td>{task.project}</td>
-              <td>
-                <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task)}>
-                  <EditIcon />
-                </CustomIconButton>
-              </td>
-              <td>
-                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
-                  <DeleteIcon />
-                </IconButton>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
-  );
-};
-
+        ))}
+      </tbody>
+    </table>
+  </>
+);
+        }
 export default TasksTable;
