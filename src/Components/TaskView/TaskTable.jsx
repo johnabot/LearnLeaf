@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { editTask, deleteTask, fetchTasks } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '/src/UserState.jsx';
 import './TaskView.css';
-import { editTask } from '../../LearnLeaf_Functions.jsx';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
@@ -63,7 +62,7 @@ const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
   };
   
   
-   (
+   return (
     <Modal open={isOpen} onClose={onClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box sx={style}>
         <h2 id="modal-modal-title">Edit Task</h2>
@@ -177,6 +176,7 @@ const CustomIconButton = styled(IconButton)({
 const TasksTable = ({ tasks, refreshTasks }) => {
     const [isEditing, setIsEditing] = useState(null);
     const [editedTask, setEditedTask] = useState({});
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [filterCriteria, setFilterCriteria] = useState({
         priority: '',
         status: '',
@@ -185,6 +185,11 @@ const TasksTable = ({ tasks, refreshTasks }) => {
         dueDate: '',
         dueDateComparison: '',
     });
+    const handleEditClick = (task, index) => {
+      setIsEditing(index);
+      setEditedTask({...task});
+      setEditModalOpen(true); // Open the edit modal
+    };
 
   // Helper function to determine color based on the due date
   const getDateColor = (dueDateStr) => {
@@ -284,11 +289,6 @@ const handleFilterChange = (e) => {
     console.log(updatedTasks); // Implement your state update logic here
   };
 
-  const handleEditClick = (task, index) => {
-    setIsEditing(index);
-    setEditedTask({...task});
-    setEditModalOpen(true); // Open the edit modal
-  };
   const handleDeleteClick = async (taskId) => {
     console.log("Attempting to delete task with ID:", taskId);
     const confirmation = window.confirm("Are you sure you want to delete this task?");
@@ -301,96 +301,102 @@ const handleFilterChange = (e) => {
         }
     }
 }
-  const handleSaveClick = (index) => {
-      const updatedTasks = [...tasks];
-      updatedTasks[index] = editedTask;
-      alert(`Saving changes for: ${updatedTasks[index].subject}`);
-      setTasks(updatedTasks);
-      setIsEditing(null); // Exit edit mode
-  };
 
-  return(
-        <>
-        <div className="filter-bar">
-            <div className="filter-item">
-                <label htmlFor="priorityFilter">Priority:</label>
-                <select value={filterCriteria.priority} onChange={e => setFilterCriteria({ ...filterCriteria, priority: e.target.value })}>
-                    <option value="">Show All</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                </select>
-            </div>
-
-            <div className="filter-item">
-                <label htmlFor="statusFilter">Status:</label>
-                <select value={filterCriteria.status} onChange={e => setFilterCriteria({ ...filterCriteria, status: e.target.value })}>
-                    <option value="">Show All</option>
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                </select>
-            </div>
-            {/* Start Date Filter */}
-            <div className="filter-item">
-                <label htmlFor="startDateFilter">Start Date:</label>
-                <select
-                    value={filterCriteria.startDateComparison}
-                    onChange={e => setFilterCriteria({ ...filterCriteria, startDateComparison: e.target.value })}
-                >
-                    <option value="">Show All</option>
-                    <option value="before">Before</option>
-                    <option value="before-equal">Before or Equal to</option>
-                    <option value="equal">Equal to</option>
-                    <option value="after">After</option>
-                    <option value="after-equal">After or Equal to</option>
-                    <option value="none">None Set</option>
-                </select>
-                <input
-                    type="date"
-                    value={filterCriteria.startDate}
-                    onChange={e => setFilterCriteria({ ...filterCriteria, startDate: e.target.value })}
-                />
-            </div>
-
-            {/* Due Date Filter */}
-            <div className="filter-item">
-                <label htmlFor="dueDateFilter">Due Date:</label>
-                <select
-                    value={filterCriteria.dueDateComparison}
-                    onChange={e => setFilterCriteria({ ...filterCriteria, dueDateComparison: e.target.value })}
-                >
-                    <option value="">Show All</option>
-                    <option value="before">Before</option>
-                    <option value="before-equal">Before or Equal to</option>
-                    <option value="equal">Equal to</option>
-                    <option value="after">After</option>
-                    <option value="after-equal">After or Equal to</option>
-                    <option value="none">None Set</option>
-                </select>
-                <input
-                    type="date"
-                    value={filterCriteria.dueDate}
-                    onChange={e => setFilterCriteria({ ...filterCriteria, dueDate: e.target.value })}
-                />
-            </div>
-            {/* Clear Filters Button */}
-            <button onClick={clearFilters}>Clear Filters</button>
+  return (
+    <>
+      <div className="filter-bar">
+        <div className="filter-item">
+        <label htmlFor="priorityFilter">Priority:</label>
+          <select
+            id="priorityFilter"
+            value={filterCriteria.priority}
+            onChange={(e) => setFilterCriteria({ ...filterCriteria, priority: e.target.value })}
+          >
+            <option value="">Show All</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
         </div>
-    <div>
+
+        {/* Filter for Status */}
+        <div className="filter-item">
+          <label htmlFor="statusFilter">Status:</label>
+          <select
+            id="statusFilter"
+            value={filterCriteria.status}
+            onChange={(e) => setFilterCriteria({ ...filterCriteria, status: e.target.value })}
+          >
+            <option value="">Show All</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+
+        {/* Filter for Start Date */}
+        <div className="filter-item">
+          <label htmlFor="startDateFilter">Start Date:</label>
+          <select
+            id="startDateFilter"
+            value={filterCriteria.startDateComparison}
+            onChange={(e) => setFilterCriteria({ ...filterCriteria, startDateComparison: e.target.value })}
+          >
+            <option value="">Show All</option>
+            <option value="before">Before</option>
+            <option value="before-equal">Before or Equal to</option>
+            <option value="equal">Equal to</option>
+            <option value="after">After</option>
+            <option value="after-equal">After or Equal to</option>
+            <option value="none">None Set</option>
+          </select>
+          <input
+            type="date"
+            value={filterCriteria.startDate}
+            onChange={(e) => setFilterCriteria({ ...filterCriteria, startDate: e.target.value })}
+          />
+        </div>
+
+        {/* Filter for Due Date */}
+        <div className="filter-item">
+          <label htmlFor="dueDateFilter">Due Date:</label>
+          <select
+            id="dueDateFilter"
+            value={filterCriteria.dueDateComparison}
+            onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDateComparison: e.target.value })}
+          >
+            <option value="">Show All</option>
+            <option value="before">Before</option>
+            <option value="before-equal">Before or Equal to</option>
+            <option value="equal">Equal to</option>
+            <option value="after">After</option>
+            <option value="after-equal">After or Equal to</option>
+            <option value="none">None Set</option>
+          </select>
+          <input
+            type="date"
+            value={filterCriteria.dueDate}
+            onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDate: e.target.value })}
+          />
+        </div>
+
+        {/* Clear Filters Button */}
+        <button onClick={clearFilters}>Clear Filters</button>
+      </div>
+
+      {/* Task Edit Form */}
       <TaskEditForm
         task={editedTask}
         isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         onSave={(updatedTask) => {
-          const updatedTasks = tasks.map((task) =>
-            task.taskId === updatedTask.taskId ? updatedTask : task
-          );
-          setTasks(updatedTasks); // Update your state here
-          setEditModalOpen(false); // Close the edit modal
+          const updatedTasks = tasks.map((task) => task.taskId === updatedTask.taskId ? updatedTask : task);
+          setTasks(updatedTasks);
+          setEditModalOpen(false);
         }}
-        
       />
-  
+
+      {/* Tasks Table */}
       <table id="tasksTable">
         <thead>
           <tr>
@@ -407,49 +413,32 @@ const handleFilterChange = (e) => {
           </tr>
         </thead>
         <tbody>
-        {getFilteredTasks(tasks, filterCriteria).map((task) => (
-                        <tr key={task.id}>
-                            <td>{task.subject}</td>
-                            <td>{task.assignment}</td>
-                            <td>
-                <select className={`priority-dropdown priority-${task.priority.toLowerCase()}`}>
-                  <option value="High" selected={task.priority === 'High'}>High</option>
-                  <option value="Medium" selected={task.priority === 'Medium'}>Medium</option>
-                  <option value="Low" selected={task.priority === 'Low'}>Low</option>
-                </select>
-              </td>
-              <td>
-                <select className={`status-dropdown status-${task.status.toLowerCase().replace(' ', '-')}`}>
-                  <option value="Not Started" selected={task.status === 'Not Started'}>Not Started</option>
-                  <option value="In Progress" selected={task.status === 'In Progress'}>In Progress</option>
-                  <option value="Completed" selected={task.status === 'Completed'}>Completed</option>
-                </select>
-              </td>
+          {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
+            <tr key={task.id || index}>
+              <td>{task.subject}</td>
+              <td>{task.assignment}</td>
+              <td>{task.priority}</td>
+              <td>{task.status}</td>
               <td style={{ color: getDateColor(task.startDate) }}>{task.startDate}</td>
-                <td style={{ color: getDateColor(task.dueDate) }}>{task.dueDate}</td>
+              <td style={{ color: getDateColor(task.dueDate) }}>{task.dueDate}</td>
               <td>{task.dueTime}</td>
               <td>{task.project}</td>
               <td>
-                <CustomIconButton
-                  aria-label="edit"
-                  onClick={() => handleEditClick(task, index)}
-                >
+                <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task)}>
                   <EditIcon />
                 </CustomIconButton>
               </td>
               <td>
-                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </td>
+                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
+                  <DeleteIcon />
+                </IconButton>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
-  
-          
+    </>
+  );
+};
 
 export default TasksTable;
-
-  
