@@ -27,144 +27,144 @@ const style = {
     p: 4,
 };
 const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
-  const [formValues, setFormValues] = useState(task);
+    const [formValues, setFormValues] = useState(task);
 
-  useEffect(() => {
-      setFormValues({ ...task });
-  }, [task]);
+    useEffect(() => {
+        setFormValues({ ...task });
+    }, [task]);
 
-  const handleChange = (event) => {
-      const { name, value } = event.target;
-      setFormValues({ ...formValues, [name]: value });
-  };
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormValues({ ...formValues, [name]: value });
+    };
 
-  const handleSave = async () => {
-      try {
-          const updatedTaskData = {
-              taskId: formValues.taskId,
-              userId: formValues.userId,
-              subject: formValues.subject,
-              project: formValues.project,
-              assignment: formValues.assignment,
-              priority: formValues.priority,
-              status: formValues.status,
-              startDate: formValues.startDate,
-              dueDate: formValues.dueDate,
-              dueTime: formValues.dueTime,
-          };
-  
-          await editTask(updatedTaskData);
-          onSave(updatedTaskData);
-          console.log('Task has been updated successfully.');
-          onClose();
-      } catch (error) {
-          console.error('Failed to update task:', error);
-      }
-  };
+    const handleSave = async () => {
+        try {
+            const updatedTaskData = {
+                taskId: formValues.taskId,
+                userId: formValues.userId,
+                subject: formValues.subject,
+                project: formValues.project,
+                assignment: formValues.assignment,
+                priority: formValues.priority,
+                status: formValues.status,
+                startDate: formValues.startDate,
+                dueDate: formValues.dueDate,
+                dueTime: formValues.dueTime,
+            };
 
-  
-  
-   return (
-    <Modal open={isOpen} onClose={onClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-      <Box sx={style}>
-        <h2 id="modal-modal-title">Edit Task</h2>
-        <form noValidate autoComplete="off">
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Subject"
-            name="subject"
-            value={formValues.subject}
-            onChange={handleChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Assignment"
-            name="assignment"
-            value={formValues.assignment}
-            onChange={handleChange}
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="priority-label">Priority</InputLabel>
-            <Select
-              labelId="priority-label"
-              id="priority"
-              value={formValues.priority}
-              label="Priority"
-              name="priority"
-              onChange={handleChange}
-            >
-              <MenuItem value="High">High</MenuItem>
-              <MenuItem value="Medium">Medium</MenuItem>
-              <MenuItem value="Low">Low</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="status-label">Status</InputLabel>
-            <Select
-              labelId="status-label"
-              id="status"
-              value={formValues.status}
-              label="Status"
-              name="status"
-              onChange={handleChange}
-            >
-              <MenuItem value="Not Started">Not Started</MenuItem>
-              <MenuItem value="In Progress">In Progress</MenuItem>
-              <MenuItem value="Completed">Completed</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Start Date"
-            name="startDate"
-            type="date"
-            value={formValues.startDate}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Due Date"
-            name="dueDate"
-            type="date"
-            value={formValues.dueDate}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Time Due"
-            name="dueTime"
-            type="time"
-            value={formValues.dueTime}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Project"
-            name="project"
-            value={formValues.project}
-            onChange={handleChange}
-          />
-          <div style={{ marginTop: 16 }}>
-            <Button variant="contained" color="primary" onClick={handleSave}>
-              Save
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={onClose}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Box>
-    </Modal>
-  );
+            await editTask(updatedTaskData);
+            onSave(updatedTaskData);
+            console.log('Task has been updated successfully.');
+            onClose();
+        } catch (error) {
+            console.error('Failed to update task:', error);
+        }
+    };
+
+
+
+    return (
+        <Modal open={isOpen} onClose={onClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+            <Box sx={style}>
+                <h2 id="modal-modal-title">Edit Task</h2>
+                <form noValidate autoComplete="off">
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Subject"
+                        name="subject"
+                        value={formValues.subject}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Assignment"
+                        name="assignment"
+                        value={formValues.assignment}
+                        onChange={handleChange}
+                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="priority-label">Priority</InputLabel>
+                        <Select
+                            labelId="priority-label"
+                            id="priority"
+                            value={formValues.priority}
+                            label="Priority"
+                            name="priority"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="High">High</MenuItem>
+                            <MenuItem value="Medium">Medium</MenuItem>
+                            <MenuItem value="Low">Low</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="status-label">Status</InputLabel>
+                        <Select
+                            labelId="status-label"
+                            id="status"
+                            value={formValues.status}
+                            label="Status"
+                            name="status"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="Not Started">Not Started</MenuItem>
+                            <MenuItem value="In Progress">In Progress</MenuItem>
+                            <MenuItem value="Completed">Completed</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Start Date"
+                        name="startDate"
+                        type="date"
+                        value={formValues.startDate}
+                        onChange={handleChange}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Due Date"
+                        name="dueDate"
+                        type="date"
+                        value={formValues.dueDate}
+                        onChange={handleChange}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Time Due"
+                        name="dueTime"
+                        type="time"
+                        value={formValues.dueTime}
+                        onChange={handleChange}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Project"
+                        name="project"
+                        value={formValues.project}
+                        onChange={handleChange}
+                    />
+                    <div style={{ marginTop: 16 }}>
+                        <Button variant="contained" color="primary" onClick={handleSave}>
+                            Save
+                        </Button>
+                        <Button style={{ marginLeft: 8 }} onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </Box>
+        </Modal>
+    );
 };
 
 
@@ -180,6 +180,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
     const [editedTask, setEditedTask] = useState({});
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [filterCriteria, setFilterCriteria] = useState({
+        searchQuery: '',
         priority: '',
         status: '',
         startDate: '',
@@ -230,6 +231,9 @@ const TasksTable = ({ tasks, refreshTasks }) => {
 
     const getFilteredTasks = (tasks, filterCriteria) => {
         const filteredTasks = tasks.filter((task) => {
+            // Search filter
+            const matchesSearchQuery = filterCriteria.searchQuery === '' || task.assignment.toLowerCase().includes(filterCriteria.searchQuery.toLowerCase());
+
             // Check for priority and status filters
             const matchesPriority = !filterCriteria.priority || task.priority === filterCriteria.priority;
             const matchesStatus = !filterCriteria.status || task.status === filterCriteria.status;
@@ -253,11 +257,8 @@ const TasksTable = ({ tasks, refreshTasks }) => {
             }
 
             // Return true if task matches all criteria
-            return matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
+            return matchesSearchQuery && matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
         });
-
-        // Debugging statement to log the filtered tasks and check if 'id' field is present
-        console.log("Filtered tasks:", filteredTasks.map(task => ({ ...task, hasId: task.hasOwnProperty('id') })));
 
         return filteredTasks;
     };
@@ -266,6 +267,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
 
     const clearFilters = () => {
         setFilterCriteria({
+            searchQuery: '',
             priority: '',
             status: '',
             startDate: '',
@@ -286,157 +288,168 @@ const TasksTable = ({ tasks, refreshTasks }) => {
         console.log(updatedTasks); // Implement your state update logic here
     };
 
-  const handleEditClick = (task, index) => {
-    setIsEditing(index);
-    setEditedTask({...task});
-    setEditModalOpen(true); // Open the edit modal
-  };
-  const handleDeleteClick = async (taskId) => {
-    console.log("Attempting to delete task with ID:", taskId);
-    const confirmation = window.confirm("Are you sure you want to delete this task?");
-    if (confirmation) {
-        try {
-            await deleteTask(taskId);
-            refreshTasks(); // Call this function to refresh the tasks in the parent component
-        } catch (error) {
-            console.error("Error deleting task:", error);
+    const handleEditClick = (task, index) => {
+        setIsEditing(index);
+        setEditedTask({ ...task });
+        setEditModalOpen(true); // Open the edit modal
+    };
+    const handleDeleteClick = async (taskId) => {
+        console.log("Attempting to delete task with ID:", taskId);
+        const confirmation = window.confirm("Are you sure you want to delete this task?");
+        if (confirmation) {
+            try {
+                await deleteTask(taskId);
+                refreshTasks(); // Call this function to refresh the tasks in the parent component
+            } catch (error) {
+                console.error("Error deleting task:", error);
+            }
         }
     }
+
+    return (
+        <>
+            <div className="filter-bar">
+                {/* Search Bar */}
+                <div className="filter-item">
+                    <label htmlFor="searchTask">Search:</label>
+                    <input
+                        id="searchTask"
+                        value={filterCriteria.searchQuery}
+                        type="text"
+                        placeholder="Search tasks..."
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, searchQuery: e.target.value })}
+                    />
+                </div>
+                <div className="filter-item">
+                    <label htmlFor="priorityFilter">Priority:</label>
+                    <select
+                        id="priorityFilter"
+                        value={filterCriteria.priority}
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, priority: e.target.value })}
+                    >
+                        <option value="">Show All</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+
+                <div className="filter-item">
+                    <label htmlFor="statusFilter">Status:</label>
+                    <select
+                        id="statusFilter"
+                        value={filterCriteria.status}
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, status: e.target.value })}
+                    >
+                        <option value="">Show All</option>
+                        <option value="Not Started">Not Started</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div className="filter-item">
+                    <label htmlFor="startDateFilter">Start Date:</label>
+                    <select
+                        id="startDateFilter"
+                        value={filterCriteria.startDateComparison}
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, startDateComparison: e.target.value })}
+                    >
+                        <option value="">Show All</option>
+                        <option value="before">Before</option>
+                        <option value="before-equal">Before or Equal to</option>
+                        <option value="equal">Equal to</option>
+                        <option value="after">After</option>
+                        <option value="after-equal">After or Equal to</option>
+                        <option value="none">None Set</option>
+                    </select>
+                    <input
+                        type="date"
+                        value={filterCriteria.startDate}
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, startDate: e.target.value })}
+                    />
+                </div>
+
+                <div className="filter-item">
+                    <label htmlFor="dueDateFilter">Due Date:</label>
+                    <select
+                        id="dueDateFilter"
+                        value={filterCriteria.dueDateComparison}
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDateComparison: e.target.value })}
+                    >
+                        <option value="">Show All</option>
+                        <option value="before">Before</option>
+                        <option value="before-equal">Before or Equal to</option>
+                        <option value="equal">Equal to</option>
+                        <option value="after">After</option>
+                        <option value="after-equal">After or Equal to</option>
+                        <option value="none">None Set</option>
+                    </select>
+                    <input
+                        type="date"
+                        value={filterCriteria.dueDate}
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDate: e.target.value })}
+                    />
+                </div>
+
+                <button onClick={clearFilters}>Clear Filters</button>
+            </div>
+
+            <TaskEditForm
+                task={editedTask}
+                isOpen={isEditModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                onSave={(updatedTask) => {
+                    const updatedTasks = tasks.map((task) =>
+                        task.taskId === updatedTask.taskId ? updatedTask : task
+                    );
+                    setTasks(updatedTasks);
+                    setEditModalOpen(false);
+                }}
+            />
+
+            <table id="tasksTable">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Assignment</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th>Time Due</th>
+                        <th>Project</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
+                        <tr key={task.id || index}>
+                            <td>{task.subject}</td>
+                            <td>{task.assignment}</td>
+                            <td>{task.priority}</td>
+                            <td>{task.status}</td>
+                            <td style={{ color: getDateColor(task.startDate) }}>{task.startDate}</td>
+                            <td style={{ color: getDateColor(task.dueDate) }}>{task.dueDate}</td>
+                            <td>{task.dueTime}</td>
+                            <td>{task.project}</td>
+                            <td>
+
+                                <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task, index)}>
+                                    <EditIcon />
+                                </CustomIconButton>
+                            </td>
+                            <td>
+                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </>
+    );
 }
-
-return (
-  <>
-    <div className="filter-bar">
-      <div className="filter-item">
-        <label htmlFor="priorityFilter">Priority:</label>
-        <select
-          id="priorityFilter"
-          value={filterCriteria.priority}
-          onChange={(e) => setFilterCriteria({ ...filterCriteria, priority: e.target.value })}
-        >
-          <option value="">Show All</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-      </div>
-
-      <div className="filter-item">
-        <label htmlFor="statusFilter">Status:</label>
-        <select
-          id="statusFilter"
-          value={filterCriteria.status}
-          onChange={(e) => setFilterCriteria({ ...filterCriteria, status: e.target.value })}
-        >
-          <option value="">Show All</option>
-          <option value="Not Started">Not Started</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
-
-      <div className="filter-item">
-        <label htmlFor="startDateFilter">Start Date:</label>
-        <select
-          id="startDateFilter"
-          value={filterCriteria.startDateComparison}
-          onChange={(e) => setFilterCriteria({ ...filterCriteria, startDateComparison: e.target.value })}
-        >
-          <option value="">Show All</option>
-          <option value="before">Before</option>
-          <option value="before-equal">Before or Equal to</option>
-          <option value="equal">Equal to</option>
-          <option value="after">After</option>
-          <option value="after-equal">After or Equal to</option>
-          <option value="none">None Set</option>
-        </select>
-        <input
-          type="date"
-          value={filterCriteria.startDate}
-          onChange={(e) => setFilterCriteria({ ...filterCriteria, startDate: e.target.value })}
-        />
-      </div>
-
-      <div className="filter-item">
-        <label htmlFor="dueDateFilter">Due Date:</label>
-        <select
-          id="dueDateFilter"
-          value={filterCriteria.dueDateComparison}
-          onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDateComparison: e.target.value })}
-        >
-          <option value="">Show All</option>
-          <option value="before">Before</option>
-          <option value="before-equal">Before or Equal to</option>
-          <option value="equal">Equal to</option>
-          <option value="after">After</option>
-          <option value="after-equal">After or Equal to</option>
-          <option value="none">None Set</option>
-        </select>
-        <input
-          type="date"
-          value={filterCriteria.dueDate}
-          onChange={(e) => setFilterCriteria({ ...filterCriteria, dueDate: e.target.value })}
-        />
-      </div>
-
-      <button onClick={clearFilters}>Clear Filters</button>
-    </div>
-
-    <TaskEditForm
-      task={editedTask}
-      isOpen={isEditModalOpen}
-      onClose={() => setEditModalOpen(false)}
-      onSave={(updatedTask) => {
-        const updatedTasks = tasks.map((task) =>
-          task.taskId === updatedTask.taskId ? updatedTask : task
-        );
-        setTasks(updatedTasks);
-        setEditModalOpen(false);
-      }}
-    />
-
-    <table id="tasksTable">
-      <thead>
-        <tr>
-          <th>Subject</th>
-          <th>Assignment</th>
-          <th>Priority</th>
-          <th>Status</th>
-          <th>Start Date</th>
-          <th>Due Date</th>
-          <th>Time Due</th>
-          <th>Project</th>
-          <th>Edit</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
-          <tr key={task.id || index}>
-            <td>{task.subject}</td>
-            <td>{task.assignment}</td>
-            <td>{task.priority}</td>
-            <td>{task.status}</td>
-            <td style={{ color: getDateColor(task.startDate) }}>{task.startDate}</td>
-            <td style={{ color: getDateColor(task.dueDate) }}>{task.dueDate}</td>
-            <td>{task.dueTime}</td>
-            <td>{task.project}</td>
-            <td>
-              
-              <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task, index)}>
-                <EditIcon />
-              </CustomIconButton>
-            </td>
-            <td>
-              <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
-                <DeleteIcon />
-              </IconButton>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </>
-);
-        }
 export default TasksTable;
