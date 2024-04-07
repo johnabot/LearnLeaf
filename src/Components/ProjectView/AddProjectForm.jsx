@@ -4,7 +4,7 @@ import { useUser } from '/src/UserState.jsx';
 import '/src/Components/FormUI.css';
 import '/src/Components/PageFormat.css'
 
-export function AddProjectForm({ closeForm, initialSubject, initialProjectName }) {
+export function AddProjectForm({ closeForm, initialSubject, initialProjectName, refreshProjects }) {
     const { user } = useUser();
     const [projectDetails, setProjectDetails] = useState({
         userId: user.id,
@@ -22,6 +22,7 @@ export function AddProjectForm({ closeForm, initialSubject, initialProjectName }
     const handleSubmit = async (e) => {
         e.preventDefault();
         await addProject(projectDetails);
+        refreshProjects();
         closeForm(); // Assuming closeForm is a function passed via props to close the modal/form
     };
 

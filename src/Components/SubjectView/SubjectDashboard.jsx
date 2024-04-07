@@ -49,7 +49,7 @@ const SubjectsDashboard = () => {
             </div>
             <div className="subjects-grid">
                 {subjects.map(subject => (
-                    <SubjectWidget key={subject.id} subject={subject} />
+                    <SubjectWidget key={subject.id} subject={subject} refreshSubjects={refreshSubjects} />
                 ))}
             </div>
             <button className="fab" onClick={toggleFormVisibility}>

@@ -365,25 +365,20 @@ export async function addSubject({ userId, subjectName, semester }) {
 }
 
 export async function archiveSubject(subjectId) {
-    const db = getFirestore();
+    const db = getFirestore(); // Initialize Firestore
     const subjectRef = doc(db, "subjects", subjectId);
-    const archivedSubjectRef = doc(collection(db, "archivedSubjects"));
 
     try {
-        const subjectDoc = await getDoc(subjectRef);
-        if (subjectDoc.exists()) {
-            // Create a new document in the archivedSubjects collection with the same data
-            await setDoc(archivedSubjectRef, { ...subjectDoc.data(), archivedDate: Timestamp.now() });
-
-            // Delete the original document
-            await deleteDoc(subjectRef);
-
-            console.log("Subject archived successfully");
-        }
+        // Update the status field of the subject to 'Archived'
+        await updateDoc(subjectRef, {
+            status: 'Archived'
+        });
+        console.log("Subject archived successfully");
     } catch (error) {
         console.error("Error archiving subject:", error);
     }
 }
+
 
 export async function fetchProjects(userId) {
     const db = getFirestore();
@@ -457,25 +452,20 @@ export async function addProject({ userId, projectDueDateInput, projectDueTimeIn
 }
 
 export async function archiveProject(projectId) {
-    const db = getFirestore();
+    const db = getFirestore(); // Initialize Firestore
     const projectRef = doc(db, "projects", projectId);
-    const archivedProjectRef = doc(collection(db, "archivedProjects"));
 
     try {
-        const projectDoc = await getDoc(projectRef);
-        if (projectDoc.exists()) {
-            // Create a new document in the archivedProjects collection with the same data
-            await setDoc(archivedProjectRef, { ...projectDoc.data(), archivedDate: Timestamp.now() });
-
-            // Delete the original document
-            await deleteDoc(projectRef);
-
-            console.log("Project archived successfully");
-        }
+        // Update the status field of the project to 'Archived'
+        await updateDoc(projectRef, {
+            status: 'Archived'
+        });
+        console.log("Project archived successfully");
     } catch (error) {
         console.error("Error archiving project:", error);
     }
 }
+
 
 
 
