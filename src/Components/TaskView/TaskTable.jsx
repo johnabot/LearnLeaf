@@ -18,7 +18,6 @@ const CustomIconButton = styled(IconButton)({
 });
 
 const TasksTable = ({ tasks, refreshTasks }) => {
-    console.log("Generating task table");
     const [editedTask, setEditedTask] = useState({});
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [filterCriteria, setFilterCriteria] = useState({
@@ -61,7 +60,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
             case 'before-equal':
                 return taskDate <= filterDate;
             case 'equal':
-                return taskDate.toDateString() === filterDate.toDateString();
+                return taskDate === filterDate;
             case 'after':
                 return taskDate > filterDate;
             case 'after-equal':
@@ -133,7 +132,6 @@ const TasksTable = ({ tasks, refreshTasks }) => {
         setEditModalOpen(true); // Open the edit modal
     };
     const handleDeleteClick = async (taskId) => {
-        console.log("Attempting to delete task with ID:", taskId);
         const confirmation = window.confirm("Are you sure you want to delete this task?");
         if (confirmation) {
             try {
@@ -260,9 +258,9 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                             <td>{task.assignment}</td>
                             <td>{task.priority}</td>
                             <td>{task.status}</td>
-                            <td style={{ color: getDateColor(task.startDate) }}> {task.startDate ? formatDateDisplay(task.startDate) : 'N/A'}</td>
-                            <td style={{ color: getDateColor(task.dueDate) }}> {task.dueDate ? formatDateDisplay(task.dueDate) : 'N/A'}</td>
-                            <td>{task.dueTime ? formatTimeDisplay(task.dueTime) : 'N/A'}</td>
+                            <td style={{ color: getDateColor(task.startDate) }}> {task.startDate ? formatDateDisplay(task.startDate) : ''}</td>
+                            <td style={{ color: getDateColor(task.dueDate) }}> {task.dueDate ? formatDateDisplay(task.dueDate) : ''}</td>
+                            <td>{task.dueTime ? formatTimeDisplay(task.dueTime) : ''}</td>
                             <td>{task.project}</td>
                             <td>
 
