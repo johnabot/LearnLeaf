@@ -147,6 +147,15 @@ const TasksTable = ({ tasks, refreshTasks }) => {
         <>
             <div className="filter-bar">
                 <div className="filter-item">
+                    <label htmlFor="searchTask">Search:</label>
+                    <input
+                        id="searchTask"
+                        type="text"
+                        placeholder="Search tasks..."
+                        onChange={(e) => setFilterCriteria({ ...filterCriteria, searchQuery: e.target.value })}
+                    />
+                </div>
+                <div className="filter-item">
                     <label htmlFor="priorityFilter">Priority:</label>
                     <select
                         id="priorityFilter"
