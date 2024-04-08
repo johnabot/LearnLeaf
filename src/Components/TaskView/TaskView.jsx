@@ -8,7 +8,7 @@ import '/src/Components/FormUI.css';
 
 
 const TaskList = () => {
-    const [showForm, setShowForm] = useState(false);
+    const [isAddTaskFormOpen, setIsAddTaskFormOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const { user } = useUser();
 
@@ -22,16 +22,19 @@ const TaskList = () => {
     }, [user?.id]); // Re-fetch tasks when the user id changes
 
     const toggleFormVisibility = () => {
-        console.log("Current showForm state:", showForm);
-        setShowForm(!showForm);
-        console.log("Toggled showForm state:", !showForm);
+        setIsAddTaskFormOpen(!isAddTaskFormOpen);
     };
 
-
     const refreshTasks = async () => {
-        // Implement the logic to fetch tasks from the database and update state
+        // Fetch tasks from the database and update state
         const updatedTasks = await fetchTasks(user.id);
         setTasks(updatedTasks);
+    };
+
+    // Handler to close the AddTaskForm
+    const handleCloseAddTaskForm = () => {
+        setIsAddTaskFormOpen(false);
+        refreshTasks(); // Optionally refresh tasks upon closing the form to reflect any changes
     };
 
     return (
@@ -49,8 +52,13 @@ const TaskList = () => {
             <button className="fab" onClick={toggleFormVisibility}>
                 +
             </button>
-            {showForm && <AddTaskForm closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
-
+            {isAddTaskFormOpen && (
+                <AddTaskForm
+                    isOpen={isAddTaskFormOpen}
+                    onClose={handleCloseAddTaskForm}
+                    refreshTasks={refreshTasks}
+                />
+            )}
             <div className="task-list">
                 <h1 style={{ color: '#907474' }}>{user.name}'s Upcoming Tasks</h1>
                 <TasksTable tasks={tasks} refreshTasks={refreshTasks} />
