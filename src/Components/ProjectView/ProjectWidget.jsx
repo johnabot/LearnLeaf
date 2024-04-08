@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import { archiveProject } from '/src/LearnLeaf_Functions.jsx';
+import { archiveProject, formatDateDisplay, formatTimeDisplay } from '/src/LearnLeaf_Functions.jsx';
 import './ProjectDashboard.css';
 
 const ProjectWidget = ({ project, refreshProjects }) => {
@@ -31,7 +31,7 @@ const ProjectWidget = ({ project, refreshProjects }) => {
             <div className="subject-info">Subject: {project.subject}</div>
 
             {project.nextTaskName ? (
-                <div className="next-task">Next Task: {project.nextTaskName}<br/>Due: {project.nextTaskDueDate} at {project.nextTaskDueTime}</div>
+                <div className="next-task">Next Task: {project.nextTaskName}<br />Due: {formatDateDisplay(project.nextTaskDueDate)} at {formatTimeDisplay(project.nextTaskDueTime)}</div>
             ) : (
                 <div className="next-task">No Upcoming Tasks</div>
             )}
@@ -56,7 +56,7 @@ const ProjectWidget = ({ project, refreshProjects }) => {
                 </PieChart>
             )}
 
-            <div className="project-due">Project Due: {project.projectDueDate} at {project.projectDueTime}</div>
+            <div className="project-due">Project Due: {formatDateDisplay(project.projectDueDate)} at {formatTimeDisplay(project.projectDueTime)}</div>
             {project.status === "Active" && (
                 <button className="archive-button" onClick={handleArchiveProject}>
                     Archive
