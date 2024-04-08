@@ -10,7 +10,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
 
-
 const CustomIconButton = styled(IconButton)({
     border: '1px solid rgba(0, 0, 0, 0.23)',
     '&:hover': {
@@ -24,6 +23,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
     const [editedTask, setEditedTask] = useState({});
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [filterCriteria, setFilterCriteria] = useState({
+        searchQuery: '',
         priority: '',
         status: '',
         startDate: '',
@@ -74,6 +74,9 @@ const TasksTable = ({ tasks, refreshTasks }) => {
 
     const getFilteredTasks = (tasks, filterCriteria) => {
         const filteredTasks = tasks.filter((task) => {
+            // Search filter
+            const matchesSearchQuery = filterCriteria.searchQuery === '' || task.assignment.toLowerCase().includes(filterCriteria.searchQuery.toLowerCase());
+
             // Check for priority and status filters
             const matchesPriority = !filterCriteria.priority || task.priority === filterCriteria.priority;
             const matchesStatus = !filterCriteria.status || task.status === filterCriteria.status;
@@ -97,11 +100,8 @@ const TasksTable = ({ tasks, refreshTasks }) => {
             }
 
             // Return true if task matches all criteria
-            return matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
+            return matchesSearchQuery && matchesPriority && matchesStatus && matchesStartDate && matchesDueDate;
         });
-
-        // Debugging statement to log the filtered tasks and check if 'id' field is present
-        console.log("Filtered tasks:", filteredTasks.map(task => ({ ...task, hasId: task.hasOwnProperty('id') })));
 
         return filteredTasks;
     };
@@ -110,6 +110,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
 
     const clearFilters = () => {
         setFilterCriteria({
+            searchQuery: '',
             priority: '',
             status: '',
             startDate: '',
@@ -145,7 +146,6 @@ const TasksTable = ({ tasks, refreshTasks }) => {
             console.error("Error deleting task:", error);
         }
     }
-}
 
 return (
   <>
@@ -283,4 +283,5 @@ return (
   </>
 );
         }
+
 export default TasksTable;

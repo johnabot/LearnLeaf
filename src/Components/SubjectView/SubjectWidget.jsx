@@ -1,7 +1,19 @@
 // @flow
+import React from 'react';
+import { archiveSubject } from '/src/LearnLeaf_Functions.jsx';
 import './SubjectDashboard.css';
 
-const SubjectWidget = ({ subject }) => {
+const SubjectWidget = ({ subject, refreshSubjects }) => { // Accept refreshSubjects as a prop
+
+    const handleArchiveSubject = async () => {
+        try {
+            await archiveSubject(subject.id); // Assuming subject.id is available
+            console.log("Subject archived successfully.");
+            refreshSubjects(); // Call refreshSubjects to update the dashboard
+        } catch (error) {
+            console.error("Error archiving subject:", error);
+        }
+    };
 
     return (
         <div key={subject.subjectName} className="subject-widget">
@@ -15,7 +27,7 @@ const SubjectWidget = ({ subject }) => {
             </a>
             <div className="semester">{subject.semester}</div>
             {subject.status === "Active" && (
-                <button className="archive-button" onClick={() => {/* Archive logic here */ }}>
+                <button className="archive-button" onClick={handleArchiveSubject}>
                     Archive
                 </button>
             )}

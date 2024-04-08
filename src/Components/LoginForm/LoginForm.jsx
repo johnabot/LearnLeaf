@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '../../UserState';
 import { Link } from 'react-router-dom';
-import '/src/Components/FormUI.css';
+import '/src/Components/Login_Register_Reset.css';
+
 
 function LoginForm() {
     const [email, setEmail] = useState(''); // State for the email input
@@ -30,27 +31,27 @@ function LoginForm() {
     };
 
   return (
-    <div className="login-form-container"> {/* Changed class name to reflect login form */}
-      <h1>LearnLeaf Organizer</h1> {/* Changed heading to Login */}
-      <h2>Helping you manage your everyday needs!</h2>
+      <div className="login-form-container"> 
+          <div className="top-bar">
+              <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
+          </div>
+          <h1 style={{ color: '#907474' }}>Streamlining success, one task at a time!</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="email">Email:</label>
           <input
             type="email"
             id="email"
             name="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
             name="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

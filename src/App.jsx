@@ -8,6 +8,7 @@ import SubjectDashboard from './Components/SubjectView/SubjectDashboard.jsx';
 import SubjectTasks from './Components/SubjectView/SubjectTasks.jsx';
 import ProjectDashboard from './Components/ProjectView/ProjectDashboard.jsx';
 import ProjectTasks from './Components/ProjectView/ProjectTasks.jsx';
+import UserProfile from './Components/UserProfile/UserProfile_TEMP.jsx'; // Update path upon better implementation
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/subjects/:subjectName" element={<SubjectTasks />} />
                 <Route path="/projects" element={<ProjectDashboard />} />
                 <Route path="/projects/:projectName" element={<ProjectTasks />} />
+                <Route path="/profile" element={<UserProfile />} />
                 {/* Add more routes as needed */}
             </Routes>
         </Router>

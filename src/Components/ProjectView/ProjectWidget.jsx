@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { archiveProject } from '/src/LearnLeaf_Functions.jsx';
 import './ProjectDashboard.css';
 
-const ProjectWidget = ({ project }) => {
-    const colors = ['#355147', '#5B8E9F', '#F3161E']; // Example colors for the chart
+const ProjectWidget = ({ project, refreshProjects }) => {
+    const colors = ['#355147', '#5B8E9F', '#F3161E'];
 
     // Adjusted to use statusCounts from project object
     const data = [
@@ -12,6 +13,15 @@ const ProjectWidget = ({ project }) => {
         { name: 'In Progress', value: project.statusCounts.InProgress },
         { name: 'Not Started', value: project.statusCounts.NotStarted },
     ];
+
+    const handleArchiveProject = async () => {
+        try {
+            await archiveProject(project.projectId);
+            refreshProjects(); // This will trigger the refresh in the parent component
+        } catch (error) {
+            console.error("Error archiving project:", error);
+        }
+    };
 
     return (
         <div key={project.projectId} className="project-widget">
@@ -48,7 +58,7 @@ const ProjectWidget = ({ project }) => {
 
             <div className="project-due">Project Due: {project.projectDueDate} at {project.projectDueTime}</div>
             {project.status === "Active" && (
-                <button className="archive-button">
+                <button className="archive-button" onClick={handleArchiveProject}>
                     Archive
                 </button>
             )}

@@ -88,6 +88,20 @@ export async function loginUser(email, password) {
         });
 }
 
+// logout out of the webpage
+export async function logoutUser() {
+    const successlogout = "You are logged out successfully!";
+    const failedlogout = "Sorry, there was an error logging out:";
+    return signOut(auth) // this removes the user's access and clears their login status.
+        .then(() => {
+            console.log(successlogout);
+        })
+        .catch((error) => {
+            console.error(failedlogout, error);
+            throw error;
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     fetchTasks();
 });
@@ -402,6 +416,22 @@ export async function addSubject({ userId, subjectName, semester }) {
     }
 }
 
+export async function archiveSubject(subjectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const subjectRef = doc(db, "subjects", subjectId);
+
+    try {
+        // Update the status field of the subject to 'Archived'
+        await updateDoc(subjectRef, {
+            status: 'Archived'
+        });
+        console.log("Subject archived successfully");
+    } catch (error) {
+        console.error("Error archiving subject:", error);
+    }
+}
+
+
 export async function fetchProjects(userId) {
     const db = getFirestore();
     console.log("Fetching projects for user:", userId);
@@ -472,6 +502,22 @@ export async function addProject({ userId, projectDueDateInput, projectDueTimeIn
         console.error("Error adding subject:", error);
     }
 }
+
+export async function archiveProject(projectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const projectRef = doc(db, "projects", projectId);
+
+    try {
+        // Update the status field of the project to 'Archived'
+        await updateDoc(projectRef, {
+            status: 'Archived'
+        });
+        console.log("Project archived successfully");
+    } catch (error) {
+        console.error("Error archiving project:", error);
+    }
+}
+
 
 
 

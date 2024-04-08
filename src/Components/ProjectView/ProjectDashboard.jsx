@@ -48,7 +48,7 @@ const ProjectsDashboard = () => {
             </div>
             <div className="projects-grid">
                 {projects.map(project => (
-                    <ProjectWidget key={project.id} project={project} />
+                    <ProjectWidget key={project.id} project={project} refreshProjects={refreshProjects} />
                 ))}
             </div>
         <button className="fab" onClick={toggleFormVisibility}>
