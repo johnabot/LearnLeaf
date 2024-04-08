@@ -138,10 +138,11 @@ function formatDate(input) {
 export function formatDateDisplay(input) {
     let date = input instanceof Date ? input : input.toDate ? input.toDate() : new Date(input);
     let month = (date.getMonth() + 1).toString().padStart(2, '0');
-    let day = date.getDate().toString().padStart(2, '0');
+    let day = (date.getDate() + 1).toString().padStart(2, '0');
     let year = date.getFullYear();
     return `${month}/${day}/${year}`; // Return the formatted date for display
 }
+
 export function formatTimeDisplay(input) {
     if (!input || typeof input !== 'string') return 'N/A'; // Handle null, undefined, or non-string input
 
@@ -170,6 +171,7 @@ export function formatTimeDisplay(input) {
     // Return the formatted time string
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
 }
+
 // Helper function to format Firestore Timestamp to "HH:MM AM/PM"
 function formatTime(input) {
     if (!input) {
@@ -324,7 +326,7 @@ export async function addTask(taskDetails) {
 
     // Assuming tasks are stored in a 'tasks' collection
     try {
-        await setDoc(doc(db, "tasks", `${userId}_${Date.now()}`), taskData); // Consider using Firestore auto-generated IDs instead
+        await setDoc(doc(db, "tasks", `${userId}_${Date.now()}`), taskData);
         console.log("Task added successfully");
     } catch (error) {
         console.error("Error adding task:", error);
@@ -434,7 +436,6 @@ export async function archiveSubject(subjectId) {
 
 export async function fetchProjects(userId) {
     const db = getFirestore();
-    console.log("Fetching projects for user:", userId);
     const projectsRef = collection(db, "projects");
     const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Active"), orderBy("projectDueDate", "asc"), orderBy("projectName", "asc"));
 
@@ -472,7 +473,6 @@ export async function fetchProjects(userId) {
     });
 
     const projectsWithDetails = await Promise.all(projectsPromises);
-    console.log(projectsWithDetails);
 
     return projectsWithDetails;
 }

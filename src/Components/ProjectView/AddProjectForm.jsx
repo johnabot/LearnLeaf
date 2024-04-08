@@ -1,73 +1,117 @@
 import React, { useState } from 'react';
 import { addProject } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '/src/UserState.jsx';
-import '/src/Components/FormUI.css';
-import '/src/Components/PageFormat.css'
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 
-export function AddProjectForm({ closeForm, initialSubject, initialProjectName, refreshProjects }) {
+// Styles
+const boxStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    pt: 2, // Padding top
+    pb: 3, // Padding bottom
+    px: 4, // Padding left and right
+};
+
+const submitButtonStyle = {
+    backgroundColor: '#B6CDC8',
+    color: '#355147',
+    '&:hover': {
+        backgroundColor: '#a8bdb8',
+    },
+};
+
+const cancelButtonStyle = {
+    backgroundColor: 'transparent',
+    color: '#355147',
+    marginLeft: 1,
+    '&:hover': {
+        backgroundColor: '#a8bdb8',
+    },
+};
+
+export function AddProjectForm({ isOpen, onClose, refreshProjects }) {
     const { user } = useUser();
     const [projectDetails, setProjectDetails] = useState({
         userId: user.id,
-        projectName: initialProjectName || '',
-        subject: initialSubject || '',
-        projectDueDate: '',
-        projectDueTime: '',
+        projectName: '',
+        subject: '',
+        projectDueDateInput: '',
+        projectDueTimeInput: '',
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setProjectDetails(prev => ({ ...prev, [name]: value }));
+        setProjectDetails({ ...projectDetails, [name]: value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         await addProject(projectDetails);
-        refreshProjects();
-        closeForm(); // Assuming closeForm is a function passed via props to close the modal/form
+        onClose(); // Close the form
+        await refreshProjects(); // Refresh the subjects list to reflect the new addition
     };
 
     return (
-        <div className="modal">
-            <div className="task-form-container">
+        <Modal open={isOpen} onClose={onClose}>
+            <Box sx={boxStyle}>
+                <h2 style={{ color: "#8E5B9F" }}>Add a New Project</h2>
                 <form onSubmit={handleSubmit}>
-                    <h2 className="form-header">Add a New Project</h2>
-                    <div className="form-control">
-                        <label htmlFor="projectName">Project Name:</label>
-                        <input
-                            type="text"
-                            id="projectName"
-                            name="projectName"
-                            value={projectDetails.projectName}
-                            onChange={handleInputChange}
-                            required
-                        />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Project Name"
+                        name="projectName"
+                        value={projectDetails.projectName}
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Subject"
+                        name="subject"
+                        value={projectDetails.subject}
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Due Date"
+                        name="projectDueDateInput"
+                        type="date"
+                        value={projectDetails.projectDueDateInput}
+                        onChange={handleInputChange}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Time Due"
+                        name="projectDueTimeInput"
+                        type="time"
+                        value={projectDetails.projectDueTimeInput}
+                        onChange={handleInputChange}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <div style={{ marginTop: 16 }}>
+                        <Button sx={submitButtonStyle} type="submit" variant="contained" onClick={handleSubmit}>Add Project</Button>
+                        <Button sx={cancelButtonStyle} onClick={onClose}>Cancel</Button>
                     </div>
-                    <div className="form-control">
-                        <label htmlFor="subject">Subject:</label>
-                        <input
-                            type="text"
-                            id="subject"
-                            name="subject"
-                            value={projectDetails.subject}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-row">
-                        <div className="form-control">
-                            <label htmlFor="projectDueDateInput">Due Date:</label>
-                            <input type="date" id="projectDueDateInput" name="projectDueDateInput" value={projectDetails.projectDueDateInput} onChange={handleInputChange} />
-                        </div>
-
-                        <div className="form-control">
-                            <label htmlFor="projectDueTimeInput">Time Due:</label>
-                            <input type="time" id="projectDueTimeInput" name="projectDueTimeInput" value={projectDetails.projectDueTimeInput} onChange={handleInputChange} />
-                        </div>
-                    </div>
-                    <button type="submit">Add Project</button>
-                    <button type="button" onClick={() => closeForm()}>Cancel</button>
                 </form>
-            </div>
-        </div>
+            </Box>
+        </Modal>
     );
 }

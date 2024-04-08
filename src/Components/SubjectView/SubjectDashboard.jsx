@@ -8,7 +8,7 @@ import './SubjectDashboard.css';
 import '/src/Components/PageFormat.css'
 
 const SubjectsDashboard = () => {
-    const [showForm, setShowForm] = useState(false);
+    const [isOpen, setIsOpen] = useState(false); // Renamed to isOpen for clarity
     const [subjects, setSubjects] = useState([]);
     const { user } = useUser();
 
@@ -20,18 +20,13 @@ const SubjectsDashboard = () => {
         }
     }, [user?.id]);
 
-    const toggleFormVisibility = () => {
-        console.log("Current showForm state:", showForm);
-        setShowForm(!showForm);
-        console.log("Toggled showForm state:", !showForm);
-    };
+    const onClose = () => setIsOpen(false); // Function to close the modal
+    const onOpen = () => setIsOpen(true); // Function to open the modal
 
     const refreshSubjects = async () => {
-        // Implement the logic to fetch tasks from the database and update state
         console.log("Refreshing subjects...");
         const updatedSubjects = await fetchSubjects(user.id);
-        console.log("Sucessfully refreshed subjects");
-
+        console.log("Successfully refreshed subjects");
         setSubjects(updatedSubjects);
     };
 
@@ -39,24 +34,24 @@ const SubjectsDashboard = () => {
         <div className="subjects-dashboard">
             <div className="top-bar">
                 <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
-                    <nav className="nav-links">
-                        <a href="/tasks">All Tasks</a>
-                        <a href="/calendar">Calendar</a>
-                        <a href="/projects">Projects</a>
-                        <a href="/archives">Archives</a>
-                        <a href="/profile">User Profile</a>
-                    </nav>
+                <nav className="nav-links">
+                    <a href="/tasks">All Tasks</a>
+                    <a href="/calendar">Calendar</a>
+                    <a href="/projects">Projects</a>
+                    <a href="/archives">Archives</a>
+                    <a href="/profile">User Profile</a>
+                </nav>
             </div>
             <div className="subjects-grid">
                 {subjects.map(subject => (
                     <SubjectWidget key={subject.id} subject={subject} refreshSubjects={refreshSubjects} />
                 ))}
             </div>
-            <button className="fab" onClick={toggleFormVisibility}>
+            <button className="fab" onClick={onOpen}>
                 +
             </button>
-            {showForm && <AddSubjectForm closeForm={() => setShowForm(false)} refreshSubjects={refreshSubjects} />}
-        </div >
+            {isOpen && <AddSubjectForm isOpen={isOpen} onClose={onClose} refreshSubjects={refreshSubjects} />}
+        </div>
     );
 };
 

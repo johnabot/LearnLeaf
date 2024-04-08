@@ -1,91 +1,115 @@
-// @flow
 import React, { useState } from 'react';
 import { addTask } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '/src/UserState.jsx';
-import '/src/Components/FormUI.css';
-import '/src/Components/PageFormat.css'
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 
-export function AddTaskForm({ initialSubject, initialProject, closeForm, refreshTasks }) {
+const boxStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    height: '90vh', // Sets the height of the box to 90% of the viewport height
+    maxHeight: '90vh', // Ensures the content doesn't exceed this height
+    overflowY: 'auto', // Allows scrolling within the Box if content exceeds its height
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    pt: 2, // Padding top
+    pb: 3, // Padding bottom
+    px: 4, // Padding left and right
+};
+
+const submitButtonStyle = {
+    backgroundColor: '#B6CDC8',
+    color: '#355147',
+    '&:hover': {
+        backgroundColor: '#a8bdb8',
+    },
+};
+
+const cancelButtonStyle = {
+    backgroundColor: 'transparent',
+    color: '#355147',
+    marginLeft: 1,
+    '&:hover': {
+        backgroundColor: '#a8bdb8',
+    },
+};
+
+export function AddTaskForm({ isOpen, onClose, initialSubject, initialProject, refreshTasks }) {
     const { user } = useUser();
-    // Initialize taskDetails with initialSubject if provided
     const [taskDetails, setTaskDetails] = useState({
         userId: user.id,
-        subject: initialSubject || '', // Use initialSubject as the default value, or '' if not provided
+        subject: initialSubject || '',
         assignment: '',
         priority: '',
         status: '',
         startDateInput: '',
         dueDateInput: '',
         dueTimeInput: '',
-        project: initialProject || '', // Use initialProject as the default value, or '' if not provided
+        project: initialProject || '',
     });
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setTaskDetails((prevDetails) => ({
-            ...prevDetails,
-            [name]: value || '', // Ensures inputs remain controlled
-        }));
+        setTaskDetails(prevDetails => ({ ...prevDetails, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         await addTask(taskDetails);
-        closeForm();
+        onClose();
         refreshTasks();
     };
 
     return (
-        <div className="modal">
-            <div className="task-form-container">
-                <form onSubmit={handleSubmit}>
-                    <h2 className="form-header">Add a New Task</h2>
-                    <input type="text" id="subject" name="subject" value={taskDetails.subject} onChange={handleInputChange} placeholder="Subject" />
-                    <input type="text" id="assignment" name="assignment" value={taskDetails.assignment} onChange={handleInputChange} placeholder="Assignment (Required)" required />
+        <Modal open={isOpen} onClose={onClose}>
+            <Box sx={boxStyle}>
+                <h2 style={{ color: "#8E5B9F" }}>Add a New Task</h2>
+                <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+                    <TextField fullWidth margin="normal" label="Subject" name="subject" value={taskDetails.subject} onChange={handleInputChange} />
+                    <TextField fullWidth margin="normal" label="Assignment" name="assignment" value={taskDetails.assignment} onChange={handleInputChange} required />
 
-                    <div className="form-row">
-                        <div className="form-control">
-                            <select id="priority" name="priority" value={taskDetails.priority} onChange={handleInputChange}>
-                                <option value="">Select Priority</option>
-                                <option value="High">High</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Low">Low</option>
-                            </select>
-                        </div>
-                        <div className="form-control">
-                            <select id="status" name="status" value={taskDetails.status} onChange={handleInputChange}>
-                                <option value="">Select Status</option>
-                                <option value="Not Started">Not Started</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-                        </div>
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="priority-label">Priority</InputLabel>
+                        <Select labelId="priority-label" id="priority" value={taskDetails.priority} name="priority" onChange={handleInputChange}>
+                            <MenuItem value="High">High</MenuItem>
+                            <MenuItem value="Medium">Medium</MenuItem>
+                            <MenuItem value="Low">Low</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="status-label">Status</InputLabel>
+                        <Select labelId="status-label" id="status" value={taskDetails.status} name="status" onChange={handleInputChange}>
+                            <MenuItem value="Not Started">Not Started</MenuItem>
+                            <MenuItem value="In Progress">In Progress</MenuItem>
+                            <MenuItem value="Completed">Completed</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <TextField fullWidth margin="normal" label="Start Date" name="startDateInput" type="date" value={taskDetails.startDateInput} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+                    <TextField fullWidth margin="normal" label="Due Date" name="dueDateInput" type="date" value={taskDetails.dueDateInput} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+                    <TextField fullWidth margin="normal" label="Time Due" name="dueTimeInput" type="time" value={taskDetails.dueTimeInput} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
+                    <TextField fullWidth margin="normal" label="Project" name="project" value={taskDetails.project} onChange={handleInputChange} />
+
+                    <div style={{ marginTop: 16 }}>
+                        <Button sx={submitButtonStyle} type="submit">
+                            Add Task
+                        </Button>
+                        <Button sx={cancelButtonStyle} onClick={onClose}>
+                            Cancel
+                        </Button>
                     </div>
-
-                    <div className="form-row">
-                        <div className="form-control">
-                            <label htmlFor="startDateInput">Start Date:</label>
-                            <input type="date" id="startDateInput" name="startDateInput" value={taskDetails.startDateInput} onChange={handleInputChange} />
-                        </div>
-
-                        <div className="form-control">
-                            <label htmlFor="dueDateInput">Due Date:</label>
-                            <input type="date" id="dueDateInput" name="dueDateInput" value={taskDetails.dueDateInput} onChange={handleInputChange} />
-                        </div>
-
-                        <div className="form-control">
-                            <label htmlFor="dueTimeInput">Time Due:</label>
-                            <input type="time" id="dueTimeInput" name="dueTimeInput" value={taskDetails.dueTimeInput} onChange={handleInputChange} />
-                        </div>
-                    </div>
-
-                    <input type="text" id="project" name="project" value={taskDetails.project} onChange={handleInputChange} placeholder="Project Name" />
-
-                    <button type="submit">Add Task</button>
-                    <button type="button" onClick={() => closeForm()}>Cancel</button>
                 </form>
-            </div>
-        </div>
+            </Box>
+        </Modal>
     );
-
-};
+}
