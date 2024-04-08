@@ -88,6 +88,20 @@ export async function loginUser(email, password) {
         });
 }
 
+// logout out of the webpage
+export async function logoutUser() {
+    const successlogout = "You are logged out successfully!";
+    const failedlogout = "Sorry, there was an error logging out:";
+    return signOut(auth) // this removes the user's access and clears their login status.
+        .then(() => {
+            console.log(successlogout);
+        })
+        .catch((error) => {
+            console.error(failedlogout, error);
+            throw error;
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     fetchTasks();
 });
