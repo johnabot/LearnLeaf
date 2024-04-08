@@ -1,4 +1,5 @@
 body {
+    width: auto;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -8,25 +9,42 @@ body {
 }
 
 .login-container {
+    display: flex;
+    width: 100%;
     text-align: center;
-    padding-left: 300px;
-    padding-right: 300px;
+    align-items: center;
+    padding: 0px;
 }
 
 .login-form {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    padding: 0px;
 }
 
-input[type=email], input[type=password], input[type=text] {
-    width: 100%;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-group input[type=email],
+.form-group input[type=password],
+.form-group input[type=text] {
+    width: 40%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
 }
+
 
 button {
     background-color: #B6CDC8;
@@ -107,11 +125,11 @@ button {
     margin-bottom: 10px;
 }
 
-.task-form-container .form-control label {
-    display: block; /* Makes label take the full width and places it above the input/select */
-    margin-bottom: 5px;
-    font-size: 14px; /* Adjust label text size as needed */
-}
+    .task-form-container .form-control label {
+        display: block; /* Makes label take the full width and places it above the input/select */
+        margin-bottom: 5px;
+        font-size: 14px; /* Adjust label text size as needed */
+    }
 
 .task-form-container .form-row {
     padding-left: 50px;
