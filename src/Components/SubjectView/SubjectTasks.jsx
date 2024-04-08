@@ -13,27 +13,31 @@ const SubjectTasks = () => {
     const { subjectName } = useParams(); // Get subjectName from URL
     const { user } = useUser();
     const [tasks, setTasks] = useState([]);
-    const [showForm, setShowForm] = useState(false);
+    const [isAddTaskFormOpen, setIsAddTaskFormOpen] = useState(false);
 
     useEffect(() => {
-        if (user?.id && subjectName) {
+        // Fetch tasks when the component mounts or the user id changes
+        if (user?.id) {
             fetchTasks(user.id, subjectName)
-                .then(fetchedTasks => {
-                    setTasks(fetchedTasks);
-                })
-                .catch(error => console.error("Error fetching tasks for subject:", error));
+                .then(fetchedTasks => setTasks(fetchedTasks))
+                .catch(error => console.error("Error fetching tasks:", error));
         }
-    }, [user?.id, subjectName]); // Add selectedSubject to dependency array
-
+    }, [user?.id]); // Re-fetch tasks when the user id changes
 
     const toggleFormVisibility = () => {
-        setShowForm(!showForm);
+        setIsAddTaskFormOpen(!isAddTaskFormOpen);
     };
 
     const refreshTasks = async () => {
-        // Refetch tasks when a new task is added
+        // Fetch tasks from the database and update state
         const updatedTasks = await fetchTasks(user.id, subjectName);
         setTasks(updatedTasks);
+    };
+
+    // Handler to close the AddTaskForm
+    const handleCloseAddTaskForm = () => {
+        setIsAddTaskFormOpen(false);
+        refreshTasks(); // Optionally refresh tasks upon closing the form to reflect any changes
     };
 
     return (
@@ -54,8 +58,14 @@ const SubjectTasks = () => {
             <button className="fab" onClick={toggleFormVisibility}>
                 +
             </button>
-            {showForm && <AddTaskForm initialSubject={subjectName} closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
-
+            {isAddTaskFormOpen && (
+                <AddTaskForm
+                    initialSubject={subjectName}
+                    isOpen={isAddTaskFormOpen}
+                    onClose={handleCloseAddTaskForm}
+                    refreshTasks={refreshTasks}
+                />
+            )}
             <div>
                 <h1 style={{ color: '#907474' }}>Upcoming Tasks for {subjectName}</h1>
                 <TasksTable tasks={tasks} refreshTasks={refreshTasks} />

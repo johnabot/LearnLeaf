@@ -84,7 +84,6 @@ export function AddProjectForm({ isOpen, onClose, refreshProjects }) {
                         name="subject"
                         value={projectDetails.subject}
                         onChange={handleInputChange}
-                        required
                     />
                     <TextField
                         fullWidth

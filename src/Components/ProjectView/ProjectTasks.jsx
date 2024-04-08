@@ -13,29 +13,31 @@ const ProjectTasks = () => {
     const { projectName } = useParams(); // Get ProjectName from URL
     const { user } = useUser();
     const [tasks, setTasks] = useState([]);
-    const [showForm, setShowForm] = useState(false);
+    const [isAddTaskFormOpen, setIsAddTaskFormOpen] = useState(false);
 
     useEffect(() => {
-        if (user?.id && projectName) {
-            fetchTasks(user.id, null, projectName) // Ensuring subject is null
-                .then(fetchedTasks => {
-                    setTasks(fetchedTasks);
-                })
-                .catch(error => console.error("Error fetching tasks for project:", error));
+        // Fetch tasks when the component mounts or the user id changes
+        if (user?.id) {
+            fetchTasks(user.id, null, projectName)
+                .then(fetchedTasks => setTasks(fetchedTasks))
+                .catch(error => console.error("Error fetching tasks:", error));
         }
-    }, [user?.id, projectName]);
-
+    }, [user?.id]); // Re-fetch tasks when the user id changes
 
     const toggleFormVisibility = () => {
-        console.log("Current showForm state:", showForm);
-        setShowForm(!showForm);
-        console.log("Toggled showForm state:", !showForm);
+        setIsAddTaskFormOpen(!isAddTaskFormOpen);
     };
 
     const refreshTasks = async () => {
-        // Refetch tasks when a new task is added
+        // Fetch tasks from the database and update state
         const updatedTasks = await fetchTasks(user.id, null, projectName);
         setTasks(updatedTasks);
+    };
+
+    // Handler to close the AddTaskForm
+    const handleCloseAddTaskForm = () => {
+        setIsAddTaskFormOpen(false);
+        refreshTasks(); // Optionally refresh tasks upon closing the form to reflect any changes
     };
 
     return (
@@ -56,8 +58,14 @@ const ProjectTasks = () => {
             <button className="fab" onClick={toggleFormVisibility}>
                 +
             </button>
-            {showForm && <AddTaskForm initialProject={projectName} closeForm={() => setShowForm(false)} refreshTasks={refreshTasks} />}
-
+            {isAddTaskFormOpen && (
+                <AddTaskForm
+                    initialProject={projectName}
+                    isOpen={isAddTaskFormOpen}
+                    onClose={handleCloseAddTaskForm}
+                    refreshTasks={refreshTasks}
+                />
+            )}
             <div>
                 <h1 style={{ color: '#907474' }}>Upcoming Tasks for {projectName}</h1>
                 <TasksTable tasks={tasks} refreshTasks={refreshTasks} />
