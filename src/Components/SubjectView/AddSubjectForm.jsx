@@ -59,7 +59,6 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(subjectDetails);
         await addSubject(subjectDetails);
         onClose(); // Close the form
         await refreshSubjects(); // Refresh the subjects list to reflect the new addition
