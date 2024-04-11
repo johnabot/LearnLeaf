@@ -1,7 +1,3 @@
-.subjects-dashboard {
-    width: 100%;
-}
-
 .subjects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* This creates 4 columns, each taking up an equal fraction of the available space */

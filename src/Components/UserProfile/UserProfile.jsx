@@ -59,7 +59,7 @@ export function UserProfilePage() {
     };
 
     return (
-        <div>
+        <div className="view-container">
             <h2>User Profile</h2>
             <div>
                 <h3>Account Information</h3>
