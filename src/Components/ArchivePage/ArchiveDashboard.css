@@ -1,0 +1,39 @@
+.content-container {
+    padding: 20px;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section-content {
+    display: none;
+    border-bottom: solid;
+    border-bottom-width: 2px;
+}
+
+.section-header {
+    color: #8E5B9F;
+    cursor: pointer;
+}
+
+.label {
+    color: #907474;
+    margin-bottom: 10px;
+    border-bottom: solid;
+    border-bottom-width: 4px;
+}
+
+.activate-button {
+    display: block;
+    background-color: #F3161E;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .activate-button:hover {
+        opacity: 0.8;
+    }
