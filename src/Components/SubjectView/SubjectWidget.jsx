@@ -15,8 +15,12 @@ const SubjectWidget = ({ subject, refreshSubjects }) => { // Accept refreshSubje
         }
     };
 
+    const widgetStyle = {
+        border: `3px solid ${subject.subjectColor}`, // Using subject.color for the border
+    };
+
     return (
-        <div key={subject.subjectName} className="subject-widget">
+        <div style={widgetStyle} key={subject.subjectName} className="subject-widget">
             <a
                 href={`/subjects/${subject.subjectName}`}
                 className="subject-name-link"

@@ -5,6 +5,8 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { ChromePicker } from 'react-color'; // Make sure you've installed react-color
+
 
 const boxStyle = {
     position: 'absolute',
@@ -43,6 +45,7 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
         userId: user.id,
         subjectName: '',
         semester: '',
+        subjectColor: '#ffffff',
     });
 
     const handleInputChange = (e) => {
@@ -50,8 +53,13 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
         setSubjectDetails(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleColorChange = (color) => {
+        setSubjectDetails(prev => ({ ...prev, subjectColor: color.hex }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(subjectDetails);
         await addSubject(subjectDetails);
         onClose(); // Close the form
         await refreshSubjects(); // Refresh the subjects list to reflect the new addition
@@ -81,6 +89,12 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
                         value={subjectDetails.semester}
                         onChange={handleInputChange}
                     />
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                        <ChromePicker
+                            color={subjectDetails.subjectColor}
+                            onChangeComplete={handleColorChange}
+                        />
+                    </div>
                     <div style={{ marginTop: 16 }}>
                         <Button sx={submitButtonStyle} type="submit" variant="contained">
                             Add Subject

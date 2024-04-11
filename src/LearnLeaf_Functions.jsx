@@ -400,13 +400,14 @@ export async function fetchSubjects(userId) {
     return subjects;
 }
 
-export async function addSubject({ userId, subjectName, semester }) {
+export async function addSubject({ userId, subjectName, semester, subjectColor }) {
     const db = getFirestore(); // Initialize Firestore
     const subjectData = {
         userId,
         subjectName,
         semester,
         status: 'Active', // Assuming new subjects are active by default
+        subjectColor,
     };
 
     try {
