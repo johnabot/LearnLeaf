@@ -11,6 +11,23 @@
     border-radius: 8px;
 }
 
+.top-navigation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.logout-button {
+    color: #9F6C5B;
+    text-decoration: none;
+    font-style: italic;
+    font-size: 16px;
+    font-weight: 300;
+}
+.logout-button :hover {
+    text-decoration: underline;
+} 
+
 .logo {
     width: 55%;
     will-change: filter;
@@ -42,13 +59,14 @@
 .nav-links {
     display: flex;
     gap: 20px; /* Space between links */
-    padding-right: 10px;
 }
 
     .nav-links a {
         color: #9F6C5B;
         text-decoration: none;
         font-style: italic;
+        font-size: 16px;
+        font-weight: 300;
     }
 
         .nav-links a:hover {
