@@ -412,12 +412,42 @@ export async function addSubject({ userId, subjectName, semester, subjectColor }
 
     try {
         // Assuming 'subjects' is the name of your collection
-        await setDoc(doc(db, "subjects", `${userId}_${subjectName}`), subjectData);
+        await setDoc(doc(db, "subjects", `${userId}_${Date.now()}`), subjectData);
         console.log("Subject added successfully");
     } catch (error) {
         console.error("Error adding subject:", error);
     }
 }
+
+export async function editSubject(subjectDetails) {
+    const { subjectId, userId, subjectName, semester, subjectColor, status } = subjectDetails;
+
+    if (!subjectId) {
+        throw new Error("subjectId is undefined, cannot update subject");
+    }
+
+    const db = getFirestore(); // Initialize Firestore
+
+    // Initialize subjectData with fields that are always present
+    const subjectData = {
+        userId,
+        subjectName,
+        semester,
+        subjectColor,
+        status,
+    };
+
+    // Create a reference to the task document
+    const subjectDocRef = doc(db, "subjects", subjectId);
+
+    // Use updateDoc to update the task document
+    try {
+        await updateDoc(subjectDocRef, subjectData);
+        console.log("Subject updated successfully");
+    } catch (error) {
+        console.error("Error updating subject:", error);
+    }
+};
 
 export async function archiveSubject(subjectId) {
     const db = getFirestore(); // Initialize Firestore
@@ -431,6 +461,19 @@ export async function archiveSubject(subjectId) {
         console.log("Subject archived successfully");
     } catch (error) {
         console.error("Error archiving subject:", error);
+    }
+}
+
+// Function to delete a subject
+export async function deleteSubject(subjectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const subjectDocRef = doc(db, "subjects", subjectId); // Create a reference to the task document
+
+    try {
+        await deleteDoc(subjectDocRef); // Delete the document
+        console.log("Subject deleted successfully");
+    } catch (error) {
+        console.error("Error deleting subject:", error);
     }
 }
 
@@ -497,7 +540,7 @@ export async function addProject({ userId, projectDueDateInput, projectDueTimeIn
 
     try {
         // Assuming 'projects' is the name of your collection
-        await setDoc(doc(db, "projects", `${userId}_${projectName}`), projectData);
+        await setDoc(doc(db, "projects", `${userId}_${Date.now()}`), projectData);
         console.log("Project added successfully");
     } catch (error) {
         console.error("Error adding subject:", error);
