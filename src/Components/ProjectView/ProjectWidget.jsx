@@ -73,7 +73,11 @@ const ProjectWidget = ({ project, refreshProjects }) => {
                 <Link to={`/projects/${project.projectName}`} className="project-name-link">
                     {project.projectName}
                 </Link>
-                <div className="subject-info">Subject: {project.subject}</div>
+                {project.subject ? (
+                    <div className="subject-info">Subject: {project.subject}</div>
+                ) : (
+                    <div className="subject-info"> </div>
+                )}
 
                 {project.nextTaskName ? (
                     <div className="next-task">Next Task: {project.nextTaskName}<br />Due: {formatDateDisplay(project.nextTaskDueDate)} at {formatTimeDisplay(project.nextTaskDueTime)}</div>
@@ -100,8 +104,11 @@ const ProjectWidget = ({ project, refreshProjects }) => {
                         <Legend layout="vertical" verticalAlign="middle" align="right" />
                     </PieChart>
                 )}
-
-                <div className="project-due">Project Due: {project.projectDueDate ? formatDateDisplay(project.projectDueDate) : ''} at {project.projectDueTime ? formatTimeDisplay(project.projectDueTime) : ''}</div>
+                {project.projectDueDate ? (
+                    <div className="project-due">Project Due: {project.projectDueDate ? formatDateDisplay(project.projectDueDate) : ''} at {project.projectDueTime ? formatTimeDisplay(project.projectDueTime) : ''}</div>
+                ) : (
+                    <div className="project-due"> </div>
+                )}
                 <div className="project-buttons">
                     {project.status === "Active" && (
                         <button className="archive-button" onClick={handleArchiveProject}>
