@@ -547,6 +547,44 @@ export async function addProject({ userId, projectDueDateInput, projectDueTimeIn
     }
 }
 
+export async function editProject(projectDetails) {
+    const { projectId, userId, projectName, projectDueDateInput, projectDueTimeInput, status, subject } = projectDetails;
+
+    const db = getFirestore(); // Initialize Firestore
+
+    if (!projectId) {
+        throw new Error("projectId is undefined, cannot update project");
+    }
+
+    // Convert dueDate and dueTime to Timestamps
+    const projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
+    const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
+    const projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
+
+    // Initialize projectData with fields that are always present
+    const projectData = {
+        userId,
+        projectName,
+        projectDueDate,
+        projectDueTime,
+        status,
+        subject,
+    };
+
+    console.log(projectData);
+
+    // Create a reference to the project document
+    const projectDocRef = doc(db, "projects", projectId);
+
+    // Use updateDoc to update the project document
+    try {
+        await updateDoc(projectDocRef, projectData);
+        console.log("Project updated successfully");
+    } catch (error) {
+        console.error("Error updating project:", error);
+    }
+};
+
 export async function archiveProject(projectId) {
     const db = getFirestore(); // Initialize Firestore
     const projectRef = doc(db, "projects", projectId);
@@ -559,6 +597,18 @@ export async function archiveProject(projectId) {
         console.log("Project archived successfully");
     } catch (error) {
         console.error("Error archiving project:", error);
+    }
+}
+
+export async function deleteProject(projectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const projectDocRef = doc(db, "projects", projectId); // Create a reference to the project document
+
+    try {
+        await deleteDoc(projectDocRef); // Delete the document
+        console.log("Project deleted successfully");
+    } catch (error) {
+        console.error("Error deleting project:", error);
     }
 }
 
