@@ -204,34 +204,26 @@ export async function fetchTasks(userId, subject = null, project = null) {
     const db = getFirestore();
     let q;
 
+    // Construct the query based on the presence of subject or project
     if (subject) {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
             where("subject", "==", subject),
-            where("status", "!=", "Completed"),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment","asc")
+            where("status", "!=", "Completed")
         );
     } else if (project) {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
             where("project", "==", project),
-            where("status", "!=", "Completed"),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
+            where("status", "!=", "Completed")
         );
     } else {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
-            where("status", "!=", "Completed"),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
+            where("status", "!=", "Completed")
         );
     }
 
@@ -247,8 +239,26 @@ export async function fetchTasks(userId, subject = null, project = null) {
         };
     });
 
+    // Sort tasks, placing those without a due date at the end
+    tasks.sort((a, b) => {
+        // Convert date strings to Date objects for comparison
+        const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
+        const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
+
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        if (a.dueTime < b.dueTime) return -1;
+        if (a.dueTime > b.dueTime) return 1;
+
+        // Finally, compare assignments
+        return a.assignment.localeCompare(b.assignment);
+    });
+
     return tasks;
 }
+
 
 
 export async function fetchAllTasks(userId, subject = null, project = null) {
@@ -295,17 +305,28 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
         };
     });
 
+    tasksAll.sort((a, b) => {
+        // Convert date strings to Date objects for comparison
+        const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
+        const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
+
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        if (a.dueTime < b.dueTime) return -1;
+        if (a.dueTime > b.dueTime) return 1;
+
+        // Finally, compare assignments
+        return a.assignment.localeCompare(b.assignment);
+    });
+
     return tasksAll;
 }
 
 // Function to create a new task
 export async function addTask(taskDetails) {
     const { userId, subject, project, assignment, priority, status, startDateInput, dueDateInput, dueTimeInput } = taskDetails;
-
-    // Convert dueDate and dueTime to Timestamps
-    const dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
-    const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
-    const dueTime = Timestamp.fromDate(new Date(dateTimeString));
 
     // Initialize taskData with fields that are always present
     const taskData = {
@@ -315,13 +336,20 @@ export async function addTask(taskDetails) {
         assignment,
         priority,
         status,
-        dueDate,
-        dueTime,
     };
 
-    // Conditionally add startDate if provided
+    // Conditionally add dates and times if provided
     if (startDateInput) {
         taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+    }
+
+    if (dueDateInput) {
+        taskData.dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
+    }
+
+    if (dueTimeInput) {
+        const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
+        taskData.dueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
     // Assuming tasks are stored in a 'tasks' collection
@@ -337,11 +365,6 @@ export async function editTask(taskDetails) {
     const { taskId, userId, subject, project, assignment, priority, status, startDateInput, dueDateInput, dueTimeInput } = taskDetails;
     const db = getFirestore(); // Initialize Firestore
 
-    // Convert dueDate and dueTime to Timestamps
-    const dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
-    const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
-    const dueTime = Timestamp.fromDate(new Date(dateTimeString));
-
     // Initialize taskData with fields that are always present
     const taskData = {
         userId,
@@ -350,13 +373,20 @@ export async function editTask(taskDetails) {
         assignment,
         priority,
         status,
-        dueDate,
-        dueTime,
     };
 
-    // Conditionally add startDate if provided
+    // Conditionally add dates and times if provided
     if (startDateInput) {
         taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+    }
+
+    if (dueDateInput) {
+        taskData.dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
+    }
+
+    if (dueTimeInput) {
+        const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
+        taskData.dueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
     // Create a reference to the task document
@@ -389,7 +419,10 @@ export async function deleteTask(taskId) {
 export async function fetchSubjects(userId) {
     const db = getFirestore();
     const subjectsRef = collection(db, "subjects");
-    const q = query(subjectsRef, where("userId", "==", userId), where("status", "==", "Active"), orderBy("subjectName","asc"));
+    const q = query(subjectsRef,
+        where("userId", "==", userId),
+        where("status", "==", "Active"),
+        orderBy("subjectName", "asc"));
 
     const querySnapshot = await getDocs(q);
     const subjects = [];
@@ -481,7 +514,9 @@ export async function deleteSubject(subjectId) {
 export async function fetchProjects(userId) {
     const db = getFirestore();
     const projectsRef = collection(db, "projects");
-    const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Active"), orderBy("projectDueDate", "asc"), orderBy("projectName", "asc"));
+    const q = query(projectsRef,
+        where("userId", "==", userId),
+        where("status", "==", "Active"));
 
     const querySnapshot = await getDocs(q);
     const projectsPromises = querySnapshot.docs.map(async (doc) => {
@@ -518,6 +553,19 @@ export async function fetchProjects(userId) {
 
     const projectsWithDetails = await Promise.all(projectsPromises);
 
+    // Sort projects by due date, placing those without a due date at the end
+    projectsWithDetails.sort((a, b) => {
+        // Handle missing due dates by assigning them a far future date for sorting purposes
+        const dueDateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
+        const dueDateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
+
+        if (dueDateA < dueDateB) return -1;
+        if (dueDateA > dueDateB) return 1;
+
+        // If due dates are the same, then sort by project name
+        return a.projectName.localeCompare(b.projectName);
+    });
+
     return projectsWithDetails;
 }
 
@@ -525,18 +573,22 @@ export async function fetchProjects(userId) {
 export async function addProject({ userId, projectDueDateInput, projectDueTimeInput, projectName, subject }) {
     const db = getFirestore(); // Initialize Firestore
 
-    const projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
-    const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
-    const projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
-
     const projectData = {
         userId,
-        projectDueDate,
-        projectDueTime,
         projectName,
         subject,
         status: 'Active', // Assuming new subjects are active by default
     };
+
+    // Conditionally add dates and times if provided
+    if (projectDueDateInput) {
+        taskData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
+    }
+
+    if (projectDueTimeInput) {
+        const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
+        taskData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
+    }
 
     try {
         // Assuming 'projects' is the name of your collection
@@ -556,22 +608,23 @@ export async function editProject(projectDetails) {
         throw new Error("projectId is undefined, cannot update project");
     }
 
-    // Convert dueDate and dueTime to Timestamps
-    const projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
-    const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
-    const projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
-
     // Initialize projectData with fields that are always present
     const projectData = {
         userId,
         projectName,
-        projectDueDate,
-        projectDueTime,
         status,
         subject,
     };
 
-    console.log(projectData);
+    // Conditionally add dates and times if provided
+    if (projectDueDateInput) {
+        taskData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
+    }
+
+    if (projectDueTimeInput) {
+        const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
+        taskData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
+    }
 
     // Create a reference to the project document
     const projectDocRef = doc(db, "projects", projectId);
