@@ -10,6 +10,7 @@ import ProjectDashboard from './Components/ProjectView/ProjectDashboard.jsx';
 import ProjectTasks from './Components/ProjectView/ProjectTasks.jsx';
 import UserProfile from './Components/UserProfile/UserProfile_TEMP.jsx';
 import ArchiveDashboard from './Components/ArchivePage/ArchiveDashboard';
+import CalendarView from './Components/CalendarPage/CalendarPage.jsx';
 import { ProtectedRoute } from './ProtectedRoutes.jsx';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/projects/:projectName" element={<ProtectedRoute><ProjectTasks /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                 <Route path="/archives" element={<ProtectedRoute><ArchiveDashboard /></ProtectedRoute>} />
+                <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
                 {/* Add more routes as needed */}
             </Routes>
         </Router>
