@@ -73,15 +73,23 @@
     cursor: default;
 }
 
-.project-widget .archive-button {
-    padding: 8px 16px;
-    background-color: #F3161E;
-    color: #020202;
-    opacity: 0.6;
-    border: none;
+.project-widget .project-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    justify-content: center;
+}
+
+.project-buttons .archive-button {
+    margin-top: auto; /* Pushes the button to the bottom of the flex container */
+    margin: 0px 5px 0px 5px;
+    background-color: #ba7e6a;
+    color: black;
+    opacity: 0.8;
+    border: solid;
+    border-width: 1px;
+    border-color: darkgray;
     border-radius: 4px;
     cursor: pointer;
-    margin: auto;
-    width: fit-content;
-    align-self: center;
+    box-shadow: #9F6C5B 2px 2px;
 }
