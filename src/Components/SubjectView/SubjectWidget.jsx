@@ -39,11 +39,11 @@ const SubjectWidget = ({ subject, refreshSubjects }) => {
         setEditedSubject({ ...subject });
         setEditModalOpen(true); // Open the edit modal
     };
-    const handleDeleteClick = async (subjectId) => {
+    const handleDeleteClick = async () => {
         const confirmation = window.confirm("Are you sure you want to delete this subject?");
         if (confirmation) {
             try {
-                await deleteSubject(subjectId);
+                await deleteSubject(subject.id);
                 refreshSubjects(); // Call this function to refresh the subjects in the parent component
             } catch (error) {
                 console.error("Error deleting subject:", error);
