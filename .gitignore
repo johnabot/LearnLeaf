@@ -3,4 +3,5 @@ clear
 dist
 public
 src/assets
-node_modules/
+node_modules
+lib
