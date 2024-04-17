@@ -58,35 +58,35 @@ const SubjectWidget = ({ subject, refreshSubjects }) => {
                 isOpen={isEditModalOpen}
                 onClose={() => setEditModalOpen(false)}
                 onSave={(updatedSubject) => {
-                    refreshSubjects(); // Assuming refreshSubjects will re-fetch the subjects list
+                    refreshSubjects();
                     setEditModalOpen(false);
                 }}
             />
-        <div style={widgetStyle} className="subject-widget">
-            <a
-                href={`/subjects/${subject.subjectName}`}
-                className="subject-name-link"
-                onMouseEnter={() => {/* Tooltip logic here */ }}
-                onMouseLeave={() => {/* Tooltip logic here */ }}
-            >
-                {subject.subjectName}
-            </a>
-            <div className="semester">{subject.semester}</div>
-            <div className="subject-buttons">
-                {subject.status === "Active" && (
-                    <button className="archive-button" onClick={handleArchiveSubject}>
-                        Archive
-                    </button>
-                )}
-                <CustomIconButton aria-label="edit" onClick={() => handleEditClick(subject)}>
-                    <EditIcon />
-                </CustomIconButton>
-                <CustomIconButton aria-label="delete" onClick={() => handleDeleteClick(subject.subjectId)}>
-                    <DeleteIcon />
-                </CustomIconButton>
+            <div style={widgetStyle} className="subject-widget">
+                <a
+                    href={`/subjects/${subject.subjectName}`}
+                    className="subject-name-link"
+                    onMouseEnter={() => {/* Tooltip logic here */ }}
+                    onMouseLeave={() => {/* Tooltip logic here */ }}
+                >
+                    {subject.subjectName}
+                </a>
+                <div className="semester">{subject.semester}</div>
+                <div className="subject-buttons">
+                    {subject.status === "Active" && (
+                        <button className="archive-button" onClick={handleArchiveSubject}>
+                            Archive
+                        </button>
+                    )}
+                    <CustomIconButton aria-label="edit" onClick={() => handleEditClick(subject)}>
+                        <EditIcon />
+                    </CustomIconButton>
+                    <CustomIconButton aria-label="delete" onClick={() => handleDeleteClick(subject.subjectId)}>
+                        <DeleteIcon />
+                    </CustomIconButton>
+                </div>
             </div>
-            </div>
-            </>
+        </>
     );
 
 }
