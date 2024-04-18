@@ -74,7 +74,6 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
 
             await editTask(updatedTaskData);
             onSave(updatedTaskData); // This needs to pass back the original formValues for consistency
-            console.log('Task has been updated successfully.');
             onClose();
         } catch (error) {
             console.error('Failed to update task:', error);
