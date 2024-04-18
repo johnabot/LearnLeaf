@@ -8,6 +8,7 @@ import { enUS } from 'date-fns/locale';
 import { useUser } from '/src/UserState.jsx';
 import { fetchTasks } from '/src/LearnLeaf_Functions.jsx';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './CalendarPage.css'
 
 // Set up the localizer by specifying the Date-Fns localizers and format functions
 const locales = {
@@ -20,6 +21,16 @@ const localizer = dateFnsLocalizer({
     getDay,
     locales,
 });
+
+const CustomAgendaEvent = ({ event }) => {
+    return (
+        <div>
+            <strong>{event.title}</strong> {/* Display event title only */}
+            {/* Optionally add more details here */}
+        </div>
+    );
+};
+
 
 const CalendarUI = () => {
     console.log("CalendarUI component is rendering");
@@ -35,8 +46,9 @@ const CalendarUI = () => {
                 const tasks = await fetchTasks(user.id); // Fetch tasks for the logged in user
                 const tasksWithDueDates = tasks.filter(task => task.dueDate); // Only include tasks that have a dueDate
                 const formattedTasks = tasksWithDueDates.map(task => ({
-                    start: new Date(task.dueDate + 'T23:59:59Z'), // Ensure the date is parsed as UTC midnight
-                    end: new Date(task.dueDate + 'T23:59:59Z'), // Set the end of the event to the end of the day in UTC
+                    allDay: true,
+                    start: new Date(task.dueDate + 'T00:00:00'),
+                    end: new Date(task.dueDate + 'T23:59:59'),
                     title: task.assignment,
                 }));
                 setEvents(formattedTasks);
@@ -53,7 +65,15 @@ const CalendarUI = () => {
                 events={events}
                 startAccessor="start"
                 endAccessor="end"
-                style={{ height: 900 }}
+                components={{
+                    agenda: {
+                        event: CustomAgendaEvent, // Use custom event component for agenda
+                    }
+                }}
+                views={['month', 'week', 'day', 'agenda']}
+                step={1440} // Sets the time slot size to one day
+                timeslots={1} // Only one time slot per day
+                style={{ height: 700 }}
             />
         </div>
     );

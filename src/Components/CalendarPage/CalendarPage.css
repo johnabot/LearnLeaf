@@ -1,0 +1,5 @@
+.rbc-time-header-gutter,
+.rbc-time-content > .rbc-time-gutter,
+.rbc-agenda-time-cell {
+    display: none !important;
+}
