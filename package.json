@@ -1,12 +1,15 @@
 {
+  "homepage": "https://johnabot.github.io/LearnLeaf_3311Team6/",
   "name": "learnleaf",
-  "main": "lib/index.js",
+  "main": "index.html",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "babel src/ -d lib/",
+    "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "prepublish": "npm run build",
     "preview": "vite preview",
     "flow": "flow"
@@ -31,6 +34,7 @@
     "@vitejs/plugin-react": "^3.1.0",
     "babel-plugin-syntax-hermes-parser": "^0.20.1",
     "flow-bin": "^0.231.0",
+    "gh-pages": "^6.1.1",
     "vite": "^4.1.0"
   },
   "flow": {

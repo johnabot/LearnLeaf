@@ -374,7 +374,8 @@ export async function editTask(taskDetails) {
 
 
 // Function to delete a task
-export async function deleteTask(taskId) {
+export async function deleteTask(taskDetails) {
+    const { taskId } = taskDetails;
     const db = getFirestore(); // Initialize Firestore
     const taskDocRef = doc(db, "tasks", taskId); // Create a reference to the task document
 
@@ -398,6 +399,19 @@ export async function fetchSubjects(userId) {
     });
 
     return subjects;
+}
+export async function fetchArchivedSubjects(userId) {
+    const db = getFirestore();
+    const subjectsRef = collection(db, "subjects");
+    const q = query(subjectsRef, where("userId", "==", userId), where("status", "==", "Archived"), orderBy("subjectName", "asc"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedSubjects = [];
+    querySnapshot.forEach((doc) => {
+        archivedSubjects.push({ id: doc.id, ...doc.data() });
+    });
+
+    return archivedSubjects;
 }
 
 export async function addSubject({ userId, subjectName, semester }) {
@@ -432,6 +446,22 @@ export async function archiveSubject(subjectId) {
         console.error("Error archiving subject:", error);
     }
 }
+
+export async function reactivateSubject(subjectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const subjectRef = doc(db, "subjects", subjectId);
+
+    try {
+        // Update the status field of the subject to 'Active'
+        await updateDoc(subjectRef, {
+            status: 'Active'
+        });
+        console.log("Subject reactivated successfully");
+    } catch (error) {
+        console.error("Error reactivating subject:", error);
+    }
+}
+
 
 
 export async function fetchProjects(userId) {
@@ -477,6 +507,19 @@ export async function fetchProjects(userId) {
     return projectsWithDetails;
 }
 
+export async function fetchArchivedProjects(userId) {
+    const db = getFirestore();
+    const projectsRef = collection(db, "projects");
+    const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Archived"), orderBy("projectDueDate", "asc"), orderBy("projectName", "asc"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedProjects = [];
+    querySnapshot.forEach((doc) => {
+        archivedProjects.push({ id: doc.id, ...doc.data() });
+    });
+
+    return archivedProjects;
+}
 
 export async function addProject({ userId, projectDueDateInput, projectDueTimeInput, projectName, subject }) {
     const db = getFirestore(); // Initialize Firestore
@@ -518,6 +561,20 @@ export async function archiveProject(projectId) {
     }
 }
 
+export async function reactivateProject(projectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const projectRef = doc(db, "projects", projectId);
+
+    try {
+        // Update the status field of the project to 'Active'
+        await updateDoc(projectRef, {
+            status: 'Active'
+        });
+        console.log("Project reactivated successfully");
+    } catch (error) {
+        console.error("Error reactivating project:", error);
+    }
+}
 // Function to send task tracking notifications based on user preference
 //____________________________________________________________________________________
 export async function sendTaskNotifications(userId, time) {
@@ -533,7 +590,7 @@ export async function sendTaskNotifications(userId, time) {
     if (time === 'day after tomorrow') {
         pastTarget = new Date(today);
         futureTarget = new Date(today);
-        futureTarget.setDate(today.getDate() + ); // Due in 2 days
+        futureTarget.setDate(today.getDate() + 2); // Due in 2 days
     } else if (time === 'seven day period') {
         pastTarget = new Date(today);
         pastTarget.setDate(today.getDate() - 7); // Past 7 days
