@@ -5,7 +5,6 @@ import { useUser } from '/src/UserState.jsx';
 import { fetchTasks } from '/src/LearnLeaf_Functions.jsx';
 import TasksTable from '/src/Components/TaskView/TaskTable.jsx';
 import { AddTaskForm } from '/src/Components/TaskView/AddTaskForm.jsx';
-import '/src/Components/PageFormat.css'
 import '/src/Components/FormUI.css';
 
 
@@ -41,7 +40,7 @@ const SubjectTasks = () => {
     };
 
     return (
-        <div className="task-view-container">
+        <div className="view-container">
             <div className="top-bar">
                 <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
                 <div className="name-links">
