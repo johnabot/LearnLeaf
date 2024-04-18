@@ -24,7 +24,7 @@ function App() {
                 <Route path="/subjects" element={<ProtectedRoute><SubjectDashboard /></ProtectedRoute>} />
                 <Route path="/subjects/:subjectName" element={<ProtectedRoute><SubjectTasks /></ProtectedRoute>} />
                 <Route path="/projects" element={<ProtectedRoute><ProjectDashboard /></ProtectedRoute>} />
-                <Route path="/projects/:projectName" element={<ProtectedRoute><ProjectTasks /></ProtectedRoute>} />
+                <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectTasks /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                 <Route path="/archives" element={<ProtectedRoute><ArchiveDashboard /></ProtectedRoute>} />
                 <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />

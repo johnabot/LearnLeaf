@@ -511,12 +511,21 @@ export async function deleteSubject(subjectId) {
 }
 
 
-export async function fetchProjects(userId) {
+export async function fetchProjects(userId, projectId = null) {
     const db = getFirestore();
     const projectsRef = collection(db, "projects");
-    const q = query(projectsRef,
-        where("userId", "==", userId),
-        where("status", "==", "Active"));
+    let q;
+
+    if (projectId) {
+        q = query(projectsRef,
+            where("userId", "==", userId),
+            where("__name__", "==", projectId));
+    }
+    else {
+        q = query(projectsRef,
+            where("userId", "==", userId),
+            where("status", "==", "Active"));
+    }
 
     const querySnapshot = await getDocs(q);
     const projectsPromises = querySnapshot.docs.map(async (doc) => {
@@ -582,12 +591,12 @@ export async function addProject({ userId, projectDueDateInput, projectDueTimeIn
 
     // Conditionally add dates and times if provided
     if (projectDueDateInput) {
-        taskData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
+        projectData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
     }
 
     if (projectDueTimeInput) {
         const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
-        taskData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
+        projectData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
     try {

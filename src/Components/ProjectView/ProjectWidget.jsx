@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import { archiveProject, deleteProject, formatDateDisplay, formatTimeDisplay } from '/src/LearnLeaf_Functions.jsx';
+import ProjectTasks from './ProjectTasks.jsx';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
@@ -58,6 +59,13 @@ const ProjectWidget = ({ project, refreshProjects }) => {
         }
     };
 
+    const handleProjectClick = (project) => {
+        ProjectTasks(project);
+
+        // Then navigate
+        navigate(`/projects/${project.projectName}`);
+    };
+
     return (
         <>
             <EditProjectForm
@@ -70,7 +78,7 @@ const ProjectWidget = ({ project, refreshProjects }) => {
                 }}
             />
             <div className="project-widget">
-                <Link to={`/projects/${project.projectName}`} className="project-name-link">
+                <Link to={`/projects/${project.projectId}`} className="project-name-link">
                     {project.projectName}
                 </Link>
                 {project.subject ? (
