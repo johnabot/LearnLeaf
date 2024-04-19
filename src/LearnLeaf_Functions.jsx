@@ -708,15 +708,35 @@ export async function archiveProject(projectId) {
 export async function fetchArchivedProjects(userId) {
     const db = getFirestore();
     const projectsRef = collection(db, "projects");
-    const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Archived"), orderBy("projectDueDate", "asc"), orderBy("projectName", "asc"));
+
+    // Query to fetch only archived projects for the given user ID
+    const q = query(projectsRef,
+        where("userId", "==", userId),
+        where("status", "==", "Archived"));
 
     const querySnapshot = await getDocs(q);
-    const archivedProjects = [];
-    querySnapshot.forEach((doc) => {
-        archivedProjects.push({ id: doc.id, ...doc.data() });
+    const projectsWithDetails = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+
+        return {
+            ...data,
+            projectId: doc.id,
+            projectDueDate: formatDate(data.projectDueDate),
+        };
     });
 
-    return archivedProjects;
+    // Sort projects by due date, placing those without a due date at the end
+    projectsWithDetails.sort((a, b) => {
+        const dueDateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
+        const dueDateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
+
+        if (dueDateA < dueDateB) return -1;
+        if (dueDateA > dueDateB) return 1;
+
+        return a.projectName.localeCompare(b.projectName);
+    });
+
+    return projectsWithDetails;
 }
 
 export async function reactivateProject(projectId) {

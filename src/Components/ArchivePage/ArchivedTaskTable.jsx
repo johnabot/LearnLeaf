@@ -110,29 +110,29 @@ const TasksTable = ({ tasks, refreshTasks }) => {
         <>
             <div className="filter-bar">
                 <div className="filter-item">
-                    <label htmlFor="searchTask">Search:</label>
+                    <label htmlFor="searchTask">Search by Assignment:</label>
                     <input
                         id="searchTask"
                         type="text"
-                        placeholder="Search by task name..."
+                        placeholder="Search..."
                         onChange={(e) => setFilterCriteria({ ...filterCriteria, assignmentQuery: e.target.value })}
                     />
                 </div>
                 <div className="filter-item">
-                    <label htmlFor="searchSubject">Search:</label>
+                    <label htmlFor="searchSubject">Search by Subject:</label>
                     <input
                         id="searchSubject"
                         type="text"
-                        placeholder="Search by subject..."
+                        placeholder="Search..."
                         onChange={(e) => setFilterCriteria({ ...filterCriteria, subjectQuery: e.target.value })}
                     />
                 </div>
                 <div className="filter-item">
-                    <label htmlFor="searchProject">Search:</label>
+                    <label htmlFor="searchProject">Search by Project:</label>
                     <input
                         id="searchProject"
                         type="text"
-                        placeholder="Search by project..."
+                        placeholder="Search..."
                         onChange={(e) => setFilterCriteria({ ...filterCriteria, projectQuery: e.target.value })}
                     />
                 </div>

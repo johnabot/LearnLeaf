@@ -37,6 +37,16 @@ const SubjectWidget = ({ subject, reactivateSubject, refreshSubjects }) => {
         }
     };
 
+    const handleReactivateSubject = async () => {
+        try {
+            await reactivateSubject(subject.id);
+            console.log("Subject reactivated successfully.");
+            refreshSubjects();
+        } catch (error) {
+            console.error("Error archiving subject:", error);
+        }
+    };
+
     return (
         <>
             <EditSubjectForm
@@ -55,7 +65,7 @@ const SubjectWidget = ({ subject, reactivateSubject, refreshSubjects }) => {
                 <div className="semester">{subject.semester}</div>
                 <div className="subject-buttons">
                     {subject.status === "Archived" && (
-                        <button className="archive-button" onClick={reactivateSubject}>
+                        <button className="archive-button" onClick={handleReactivateSubject}>
                             Reactivate
                         </button>
                     )}

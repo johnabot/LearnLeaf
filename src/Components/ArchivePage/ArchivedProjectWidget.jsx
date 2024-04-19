@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { deleteProject, formatDateDisplay, formatTimeDisplay } from '/src/LearnLeaf_Functions.jsx';
+import { deleteProject, formatDateDisplay } from '/src/LearnLeaf_Functions.jsx';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
@@ -37,6 +37,16 @@ const ProjectWidget = ({ project, reactivateProject, refreshProjects }) => {
         }
     };
 
+    const handleReactivateProject = async () => {
+        try {
+            await reactivateProject(project.projectId);
+            console.log("Project reactivated successfully.");
+            refreshProjects();
+        } catch (error) {
+            console.error("Error archiving project:", error);
+        }
+    };
+
     return (
         <>
             <EditProjectForm
@@ -65,7 +75,7 @@ const ProjectWidget = ({ project, reactivateProject, refreshProjects }) => {
                 )}
                 <div className="project-buttons">
                     {project.status === "Archived" && (
-                        <button className="archive-button" onClick={reactivateProject}>
+                        <button className="archive-button" onClick={handleReactivateProject}>
                             Reactivate
                         </button>
                     )}

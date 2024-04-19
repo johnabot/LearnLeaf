@@ -19,6 +19,11 @@
     padding: 10px 0; /* Some vertical padding for touch friendliness */
 }
 
+    .section-header:hover {
+        text-decoration: underline;
+
+    }
+
 .label {
     color: #907474;
     margin-bottom: 10px;
@@ -117,18 +122,18 @@
     padding: 20px; /* Padding around the entire grid */
 }
 
-    .subject-widget, .project-widget {
-        display: flex;
-        flex-direction: column;
-        padding: 15px;
-        background-color: #f3f2f2;
-        border: 1px solid #ddd; /* Light border for definition */
-        border-radius: 8px; /* Rounded corners */
-        justify-content: center;
-        align-items: center;
-        width: 100%; /* Ensures widget takes full width of the column */
-        box-sizing: border-box; /* Includes padding and border in the element's width */
-    }
+.subject-widget, .project-widget {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #f3f2f2;
+    border: 1px solid #ddd; /* Light border for definition */
+    border-radius: 8px; /* Rounded corners */
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensures widget takes full width of the column */
+    box-sizing: border-box; /* Includes padding and border in the element's width */
+}
 
 .subject-name, .project-name {
     color: #355147;

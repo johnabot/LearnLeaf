@@ -39,7 +39,7 @@ const ArchivedItemsPage = () => {
     // Refresh Tasks
     const refreshTasks = async () => {
         const updatedTasks = await fetchArchivedTasks(user.id);
-        archivedTasks(updatedTasks);
+        setArchivedTasks(updatedTasks);
     };
 
     // Fetch archived subjects
@@ -54,7 +54,7 @@ const ArchivedItemsPage = () => {
     // Refresh Subjects
     const refreshSubjects = async () => {
         const updatedSubjects = await fetchArchivedSubjects(user.id);
-        archivedSubjects(updatedSubjects);
+        setArchivedSubjects(updatedSubjects);
     };
 
     // Fetch archived projects
@@ -69,7 +69,7 @@ const ArchivedItemsPage = () => {
     // Refresh Projects
     const refreshProjects = async () => {
         const updatedProjects = await fetchArchivedProjects(user.id);
-        archivedProjects(updatedProjects);
+        setArchivedProjects(updatedProjects);
     };
 
     const handleLogout = async () => {
@@ -118,7 +118,7 @@ const ArchivedItemsPage = () => {
                     <h2 className="section-header" onClick={() => toggleSection('projects-content')}>Projects</h2>
                     <div id="projects-grid" className="section-content" style={{ display: showProjects ? 'grid' : 'none' }}>
                         {archivedProjects.map(project => (
-                            <ArchivedProjectWidget key={project.id} project={project} reactivateProject={reactivateProject} refreshProjects={refreshProjects} />
+                            <ArchivedProjectWidget key={project.projectId} project={project} reactivateProject={reactivateProject} refreshProjects={refreshProjects} />
                         ))}
                     </div>
                 </div>
