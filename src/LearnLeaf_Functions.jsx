@@ -324,6 +324,20 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
     return tasksAll;
 }
 
+export async function fetchArchivedTasks(userId) {
+    const db = getFirestore();
+    const tasksRef = collection(db, "tasks");
+    const q = query(tasksRef, where("userId", "==", userId), where("status", "==", "Completed"), orderBy("dueDate", "asc"), orderBy("assignment", "asc"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedTasks = [];
+    querySnapshot.forEach((doc) => {
+        archivedTasks.push({ id: doc.id, ...doc.data() });
+    });
+
+    return archivedTasks;
+}
+
 // Function to create a new task
 export async function addTask(taskDetails) {
     const { userId, subject, project, assignment, priority, status, startDateInput, dueDateInput, dueTimeInput } = taskDetails;
@@ -497,6 +511,35 @@ export async function archiveSubject(subjectId) {
     }
 }
 
+export async function fetchArchivedSubjects(userId) {
+    const db = getFirestore();
+    const subjectsRef = collection(db, "subjects");
+    const q = query(subjectsRef, where("userId", "==", userId), where("status", "==", "Archived"), orderBy("subjectName", "asc"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedSubjects = [];
+    querySnapshot.forEach((doc) => {
+        archivedSubjects.push({ id: doc.id, ...doc.data() });
+    });
+
+    return archivedSubjects;
+}
+
+export async function reactivateSubject(subjectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const subjectRef = doc(db, "subjects", subjectId);
+
+    try {
+        // Update the status field of the subject to 'Active'
+        await updateDoc(subjectRef, {
+            status: 'Active'
+        });
+        console.log("Subject reactivated successfully");
+    } catch (error) {
+        console.error("Error reactivating subject:", error);
+    }
+}
+
 // Function to delete a subject
 export async function deleteSubject(subjectId) {
     const db = getFirestore(); // Initialize Firestore
@@ -659,6 +702,35 @@ export async function archiveProject(projectId) {
         console.log("Project archived successfully");
     } catch (error) {
         console.error("Error archiving project:", error);
+    }
+}
+
+export async function fetchArchivedProjects(userId) {
+    const db = getFirestore();
+    const projectsRef = collection(db, "projects");
+    const q = query(projectsRef, where("userId", "==", userId), where("status", "==", "Archived"), orderBy("projectDueDate", "asc"), orderBy("projectName", "asc"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedProjects = [];
+    querySnapshot.forEach((doc) => {
+        archivedProjects.push({ id: doc.id, ...doc.data() });
+    });
+
+    return archivedProjects;
+}
+
+export async function reactivateProject(projectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const projectRef = doc(db, "projects", projectId);
+
+    try {
+        // Update the status field of the project to 'Active'
+        await updateDoc(projectRef, {
+            status: 'Active'
+        });
+        console.log("Project reactivated successfully");
+    } catch (error) {
+        console.error("Error reactivating project:", error);
     }
 }
 
