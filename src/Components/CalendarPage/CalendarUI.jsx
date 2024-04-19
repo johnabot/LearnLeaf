@@ -5,10 +5,19 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import { enUS } from 'date-fns/locale';
+import parseISO from 'date-fns/parseISO';
 import { useUser } from '/src/UserState.jsx';
 import { fetchTasks } from '/src/LearnLeaf_Functions.jsx';
+import { AddTaskForm } from '/src/Components/TaskView/AddTaskForm.jsx';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './CalendarPage.css'
+import '/src/Components/FormUI.css';
 
 // Set up the localizer by specifying the Date-Fns localizers and format functions
 const locales = {
@@ -32,31 +41,30 @@ const CustomAgendaEvent = ({ event }) => {
 };
 
 
-const CalendarUI = () => {
-    console.log("CalendarUI component is rendering");
+const CalendarUI = ({events, refreshTasks}) => {
+    const [open, setOpen] = useState(false);
+    const [openAddTask, setOpenAddTask] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
-    const [events, setEvents] = useState([]);
-    const { user, updateUser } = useUser();
+    const handleEventClick = (event) => {
+        setSelectedEvent(event);
+        setOpen(true);
+    };
 
+    const handleSelectSlot = (slotInfo) => {
+        const formattedDate = format(slotInfo.start, 'yyyy-MM-dd'); // Formats the date
+        setSelectedDate(formattedDate); // Assumes slot selection gives start date
+        setOpenAddTask(true); // Open the Add Task Form
+    };
 
-    useEffect(() => {
-        const fetchAndFormatTasks = async () => {
-            if (user && user.id) { // Make sure user is defined and has an id
-                console.log("Fetching tasks for user:", user.id);
-                const tasks = await fetchTasks(user.id); // Fetch tasks for the logged in user
-                const tasksWithDueDates = tasks.filter(task => task.dueDate); // Only include tasks that have a dueDate
-                const formattedTasks = tasksWithDueDates.map(task => ({
-                    allDay: true,
-                    start: new Date(task.dueDate + 'T00:00:00'),
-                    end: new Date(task.dueDate + 'T23:59:59'),
-                    title: task.assignment,
-                }));
-                setEvents(formattedTasks);
-                console.log("Formatted tasks:", formattedTasks);
-            }
-        };
-        fetchAndFormatTasks();
-    }, [user?.id]);
+    const handleCloseAddTask = () => {
+        setOpenAddTask(false);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     return (
         <div style={{ height: 500, paddingTop: '20px' }}>
@@ -74,9 +82,40 @@ const CalendarUI = () => {
                 step={1440} // Sets the time slot size to one day
                 timeslots={1} // Only one time slot per day
                 style={{ height: 700 }}
+                onSelectEvent={handleEventClick}
+                selectable={true}
+                onSelectSlot={handleSelectSlot}
             />
+            {selectedEvent && (
+                <Dialog open={open} onClose={handleClose}>
+                    <DialogTitle style={{ color: "#8E5B9F" }}>Task Details</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            <b>{selectedEvent.task.assignment}</b>
+                            <br />
+                            {selectedEvent.task.subject && <><br />Subject: {selectedEvent.task.subject}</>}
+                            <br/>
+                            Due Date: {selectedEvent.task.dueDate ? format(new Date(selectedEvent.task.dueDate + 'T23:59:59'), 'PPP') : ''}
+                            {selectedEvent.task.dueTime && <><br />Due Time: {selectedEvent.task.dueTime}</>}
+                            {selectedEvent.task.project && <><br />Project: {selectedEvent.task.project}</>}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {openAddTask && (
+                <AddTaskForm
+                    isOpen={openAddTask}
+                    onClose={handleCloseAddTask}
+                    refreshTasks={refreshTasks}
+                    initialDueDate={selectedDate}
+                />
+            )}
         </div>
     );
 };
+
 
 export default CalendarUI;

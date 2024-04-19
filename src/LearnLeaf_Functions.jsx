@@ -377,15 +377,15 @@ export async function editTask(taskDetails) {
 
     // Conditionally add dates and times if provided
     if (startDateInput) {
-        taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
+        taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00Z"));
     }
 
     if (dueDateInput) {
-        taskData.dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
+        taskData.dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00Z"));
     }
 
     if (dueTimeInput) {
-        const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
+        const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00Z";
         taskData.dueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
