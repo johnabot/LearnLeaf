@@ -7,7 +7,8 @@ import getDay from 'date-fns/getDay';
 import { enUS } from 'date-fns/locale';
 import parseISO from 'date-fns/parseISO';
 import { useUser } from '/src/UserState.jsx';
-import { fetchTasks } from '/src/LearnLeaf_Functions.jsx';
+import { fetchTasks, editTask, deleteTask } from '/src/LearnLeaf_Functions.jsx';
+import { TaskEditForm } from '/src/Components/TaskView/EditForm.jsx'
 import { AddTaskForm } from '/src/Components/TaskView/AddTaskForm.jsx';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -46,6 +47,8 @@ const CalendarUI = ({events, refreshTasks}) => {
     const [openAddTask, setOpenAddTask] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [editedTask, setEditedTask] = useState({});
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
 
     const handleEventClick = (event) => {
         setSelectedEvent(event);
@@ -58,13 +61,34 @@ const CalendarUI = ({events, refreshTasks}) => {
         setOpenAddTask(true); // Open the Add Task Form
     };
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const handleCloseAddTask = () => {
         setOpenAddTask(false);
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleEditClick = (event) => {
+        // Set the state with the task details from the clicked event
+        setEditedTask({ ...event.task });
+        setEditModalOpen(true); // Open the edit modal
+        handleClose(); // Close the view dialog to open the edit modal
     };
+
+    const handleDeleteClick = async () => {
+        const confirmation = window.confirm("Are you sure you want to delete this task?");
+        if (confirmation) {
+            try {
+                await deleteTask(selectedEvent.task.taskId); // Use the task ID from the selected event
+                refreshTasks(); // Refresh the tasks to update the calendar
+                handleClose(); // Close the details dialog
+            } catch (error) {
+                console.error("Error deleting task:", error);
+            }
+        }
+    };
+
 
     return (
         <div style={{ height: 500, paddingTop: '20px' }}>
@@ -86,24 +110,43 @@ const CalendarUI = ({events, refreshTasks}) => {
                 selectable={true}
                 onSelectSlot={handleSelectSlot}
             />
-            {selectedEvent && (
+            {open && (
                 <Dialog open={open} onClose={handleClose}>
-                    <DialogTitle style={{ color: "#8E5B9F" }}>Task Details</DialogTitle>
+                    <DialogTitle style={{ color: '#8E5B9F'}}>Task Details</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            <b>{selectedEvent.task.assignment}</b>
+                            <b>
+                                {selectedEvent.title}
+                            </b>
                             <br />
-                            {selectedEvent.task.subject && <><br />Subject: {selectedEvent.task.subject}</>}
-                            <br/>
-                            Due Date: {selectedEvent.task.dueDate ? format(new Date(selectedEvent.task.dueDate + 'T23:59:59'), 'PPP') : ''}
-                            {selectedEvent.task.dueTime && <><br />Due Time: {selectedEvent.task.dueTime}</>}
-                            {selectedEvent.task.project && <><br />Project: {selectedEvent.task.project}</>}
+                            <br />
+                            Subject: {selectedEvent.task.subject}
+                            <br />
+                            Due Date: {format(parseISO(selectedEvent.task.dueDate), 'PPP')}
+                            <br />
+                            Due Time: {selectedEvent.task.dueTime}
+                            <br />
+                            Project: {selectedEvent.task.project}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Close</Button>
+                        <Button style={{ color: '#569fb8'}} onClick={() => handleEditClick(selectedEvent)}>Edit</Button>
+                        <Button style={{ color: '#569fb8' }} onClick={handleDeleteClick}>Delete</Button>
+                        <Button style={{ color: '#569fb8' }} onClick={handleClose}>Close</Button>
                     </DialogActions>
                 </Dialog>
+            )}
+            {isEditModalOpen && (
+                <TaskEditForm
+                    key={editedTask.taskId}
+                    task={editedTask}
+                    isOpen={isEditModalOpen}
+                    onClose={() => setEditModalOpen(false)}
+                    onSave={(updatedTask) => {
+                        refreshTasks();
+                        setEditModalOpen(false);
+                    }}
+                />
             )}
             {openAddTask && (
                 <AddTaskForm
