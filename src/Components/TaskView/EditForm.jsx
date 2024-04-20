@@ -47,7 +47,6 @@ const cancelButtonStyle = {
 
 export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
     const [formValues, setFormValues] = useState(task);
-
     useEffect(() => {
         setFormValues({ ...task });
     }, [task]);
@@ -92,7 +91,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         margin="normal"
                         label="Subject"
                         name="subject"
-                        value={formValues.subject}
+                        value={formValues.subject ? formValues.subject : ''}
                         onChange={handleChange}
                     />
                     <TextField
@@ -100,7 +99,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         margin="normal"
                         label="Assignment"
                         name="assignment"
-                        value={formValues.assignment}
+                        value={formValues.assignment ? formValues.assignment : ''}
                         onChange={handleChange}
                     />
                     <FormControl fullWidth margin="normal">
@@ -108,7 +107,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         <Select
                             labelId="priority-label"
                             id="priority"
-                            value={formValues.priority}
+                            value={formValues.priority? formValues.priority : ''}
                             label="Priority"
                             name="priority"
                             onChange={handleChange}
@@ -123,7 +122,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         <Select
                             labelId="status-label"
                             id="status"
-                            value={formValues.status}
+                            value={formValues.status? formValues.status : ''}
                             label="Status"
                             name="status"
                             onChange={handleChange}
@@ -139,7 +138,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         label="Start Date"
                         name="startDate"
                         type="date"
-                        value={formValues.startDate}
+                        value={formValues.startDate ? formValues.startDate : ''}
                         onChange={handleChange}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -149,7 +148,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         label="Due Date"
                         name="dueDate"
                         type="date"
-                        value={formValues.dueDate}
+                        value={formValues.dueDate ? formValues.dueDate : ''}
                         onChange={handleChange}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -159,7 +158,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         label="Time Due"
                         name="dueTime"
                         type="time"
-                        value={formValues.dueTime}
+                        value={formValues.dueTime ? formValues.dueTime : ''}
                         onChange={handleChange}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -168,7 +167,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         margin="normal"
                         label="Project"
                         name="project"
-                        value={formValues.project}
+                        value={formValues.project ? formValues.project : ''}
                         onChange={handleChange}
                     />
                     <div style={{ marginTop: 16 }}>
