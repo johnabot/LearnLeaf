@@ -35,9 +35,11 @@ export function registerUser(email, password, name) {
 
             await setDoc(doc(db, "users", user.uid), {
                 name: name,
-                email: email
+                email: email,
+                password: password,
+                notifications: false, // Initialize notifications as Disabled
+                notificationsFrequency: [true,false,false,false], //Array to store frequency preferences - [None, Weekly, Daily, None], Initialized as None
             });
-            // Additional user info or redirection can be handled here
         })
         .catch((error) => {
             var errorCode = error.code;
@@ -76,16 +78,29 @@ export async function loginUser(email, password) {
             if (!userDoc.exists()) {
                 throw new Error('User does not exist');
             }
-            // Assuming the user's document contains a name field
             const userName = userDoc.data().name;
-            const userEmail = user.email; // Directly from auth user object
-            return { id: user.uid, name: userName, email: userEmail };
+            const userEmail = userDoc.data().email;
+            const userPassword = userDoc.data().password;
+            const userNotifications = userDoc.data().notifications;
+            const userNotificationFrequency = userDoc.data().notificationsFrequency;
+            return { id: user.uid, name: userName, email: userEmail, password: userPassword, notifcations: userNotifications, notificationFrequency: userNotificationFrequency };
         })
         .catch((error) => {
             // Error handling
             console.error("Login error", error);
             throw error; // Propagate the error
         });
+}
+
+export async function updateUserDetails(userId, userDetails) {
+    const userDocRef = doc(db, "users", userId);
+
+    try {
+        await updateDoc(userDocRef, userDetails);
+        console.log("User updated successfully");
+    } catch (error) {
+        console.error("Error updating user:", error);
+    }
 }
 
 // logout out of the webpage
@@ -440,9 +455,6 @@ export async function editTask(taskDetails) {
     }
 };
 
-
-
-// Function to delete a task
 export async function deleteTask(taskId) {
     const db = getFirestore(); // Initialize Firestore
     const taskDocRef = doc(db, "tasks", taskId); // Create a reference to the task document

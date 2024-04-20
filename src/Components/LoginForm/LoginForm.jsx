@@ -19,7 +19,7 @@ function LoginForm() {
         try {
             // Use the email and password from the component's state
             const userInfo = await loginUser(email, password);
-            updateUser({ id: userInfo.id, name: userInfo.name, email: userInfo.email }); // Update global user state
+            updateUser({ id: userInfo.id, name: userInfo.name, email: userInfo.email, password: userInfo.password, notifications: userInfo.notifcations, notificationFrequency: userInfo.notificationFrequency }); // Update global user state
             navigate('/tasks'); // Navigate to tasks page upon successful login
         } catch (error) {
             alert(`Login Error: ${error.message}`);

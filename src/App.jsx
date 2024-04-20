@@ -8,7 +8,7 @@ import SubjectDashboard from './Components/SubjectView/SubjectDashboard.jsx';
 import SubjectTasks from './Components/SubjectView/SubjectTasks.jsx';
 import ProjectDashboard from './Components/ProjectView/ProjectDashboard.jsx';
 import ProjectTasks from './Components/ProjectView/ProjectTasks.jsx';
-import UserProfile from './Components/UserProfile/UserProfile_TEMP.jsx';
+import UserProfile from './Components/UserProfile/UserProfile.jsx';
 import ArchiveDashboard from './Components/ArchivePage/ArchiveDashboard';
 import CalendarView from './Components/CalendarPage/CalendarPage.jsx';
 import { ProtectedRoute } from './ProtectedRoutes.jsx';
