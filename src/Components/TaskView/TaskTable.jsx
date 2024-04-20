@@ -124,7 +124,6 @@ const TasksTable = ({ tasks, refreshTasks }) => {
 
     // Placeholder for setTasks function
     const setTasks = (updatedTasks) => {
-        console.log(updatedTasks); // Implement your state update logic here
     };
 
     const handleEditClick = (task) => {

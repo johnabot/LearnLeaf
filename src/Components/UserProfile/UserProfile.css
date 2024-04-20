@@ -1,0 +1,78 @@
+.account-info,
+.preferences {
+    border-bottom: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: lightgray;
+    align-items: center;
+}
+
+.user-profile h2 {
+    color: #355147;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.user-profile h3 {
+    color: #5B8E9F;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.user-profile div > div {
+    margin-bottom: 10px;
+}
+
+.user-profile label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.user-profile input[type="text"],
+.user-profile input[type="email"],
+.user-profile input[type="password"],
+.user-profile select {
+    width: 40%;
+    padding: 8px;
+    margin: 5px 0 20px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.user-profile input[type="checkbox"] {
+    margin-top: 5px;
+}
+
+.notification-preferences {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-content: center;
+    justify-content: center;
+}
+
+    .notification-preferences .preference-selection {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .preference-selection label {
+        color: dimgray;
+    }
+
+.deleteAcc-button {
+    width: 40%;
+    background-color: #F3161E;
+    color: white;
+    padding: 14px 20px;
+    margin: 20px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .deleteAcc-button:hover {
+        background-color: #D21412;
+    }

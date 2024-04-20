@@ -5,6 +5,8 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { ChromePicker } from 'react-color'; // Make sure you've installed react-color
+
 
 const boxStyle = {
     position: 'absolute',
@@ -43,11 +45,16 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
         userId: user.id,
         subjectName: '',
         semester: '',
+        subjectColor: '#ffffff',
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setSubjectDetails(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleColorChange = (color) => {
+        setSubjectDetails(prev => ({ ...prev, subjectColor: color.hex }));
     };
 
     const handleSubmit = async (e) => {
@@ -81,6 +88,12 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
                         value={subjectDetails.semester}
                         onChange={handleInputChange}
                     />
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                        <ChromePicker
+                            color={subjectDetails.subjectColor}
+                            onChangeComplete={handleColorChange}
+                        />
+                    </div>
                     <div style={{ marginTop: 16 }}>
                         <Button sx={submitButtonStyle} type="submit" variant="contained">
                             Add Subject

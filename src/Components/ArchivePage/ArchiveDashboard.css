@@ -1,0 +1,182 @@
+.content-container {
+    width: 95%;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section-content {
+    padding: 10px;
+    border-top: 1px solid #ddd; /* Top border for a light separation */
+}
+
+.section-header {
+    color: #8E5B9F;
+    font-weight: bold;
+    font-size: 26px;
+    cursor: pointer; /* Indicates that it's clickable */
+    padding: 10px 0; /* Some vertical padding for touch friendliness */
+}
+
+    .section-header:hover {
+        text-decoration: underline;
+
+    }
+
+.label {
+    color: #907474;
+    margin-bottom: 10px;
+    padding-bottom: 10px; /* Padding instead of margin for better spacing */
+    border-bottom: 4px solid; /* More pronounced bottom border */
+}
+
+#tasksTable {
+    border-collapse: collapse;
+    margin: 10px auto; /* Centered horizontally */
+}
+
+    #tasksTable thead {
+        background-color: #5B8E9F;
+        color: white;
+    }
+
+    #tasksTable th, #tasksTable td {
+        padding: 15px;
+        border: 1px solid #545454;
+        text-align: left;
+    }
+
+    #tasksTable tbody tr:nth-child(even) {
+        background-color: #f3f2f2;
+    }
+
+.filter-bar {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    align-content: center;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+    .filter-bar select {
+        width: fit-content;
+        padding: 8px;
+        margin-top: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .filter-bar input[type="text"] {
+        width: fit-content;
+        padding: 8px;
+        margin-top: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .filter-bar input[type="date"] {
+        padding: 8px;
+        margin-top: 10px;
+        height: 60%;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .filter-bar button {
+        background-color: #B6CDC8;
+        color: #355147;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 25px 0px 30px 0px;
+    }
+
+.clear-filters:hover {
+    background-color: #ff5252;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+    .filter-item label {
+        font-size: 14px;
+        font-weight: bold;
+        color: #355147;
+    }
+
+.filter-summary {
+    padding: 10px 10px;
+    background-color: #e8e8e8;
+    text-align: center;
+}
+
+#subjects-grid, #projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Space between widgets */
+    padding: 20px; /* Padding around the entire grid */
+}
+
+.subject-widget, .project-widget {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #f3f2f2;
+    border: 1px solid #ddd; /* Light border for definition */
+    border-radius: 8px; /* Rounded corners */
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensures widget takes full width of the column */
+    box-sizing: border-box; /* Includes padding and border in the element's width */
+}
+
+.subject-name, .project-name {
+    color: #355147;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-decoration: none;
+    cursor: auto;
+}
+
+.project-due {
+    font-size: 14px;
+    color: #9F6C5B;
+    margin-bottom: 10px;
+    cursor: default;
+    font-weight: bold;
+}
+
+.project-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    width: 100%; /* Takes full width to accommodate all buttons */
+}
+
+.archive-button, .activate-button {
+    background-color: #ba7e6a;
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 2px 2px #9F6C5B;
+}
+
+    .archive-button:hover, .activate-button:hover {
+        background-color: #9F6C5B; /* Darker shade for hover */
+    }
+
+/* Ensuring responsiveness and consistent layout */
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: 1fr; /* Single column layout for smaller screens */
+    }
+}

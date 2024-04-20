@@ -1,0 +1,10 @@
+.rbc-time-header-gutter,
+.rbc-time-content > .rbc-time-gutter,
+.rbc-agenda-time-cell {
+    display: none !important;
+}
+
+.dialog-title {
+    color: #8E5B9F;
+    font-size: 24px;
+}
