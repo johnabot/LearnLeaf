@@ -9,6 +9,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
+import format from 'date-fns/format';
+
 
 const CustomIconButton = styled(IconButton)({
     border: '1px solid rgba(0, 0, 0, 0.23)',
@@ -16,6 +18,25 @@ const CustomIconButton = styled(IconButton)({
         backgroundColor: 'rgba(0, 0, 0, 0.04)',
     },
 });
+
+function formatFormDate(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp.seconds * 1000);
+
+    const utcYear = date.getUTCFullYear(); // Gets the year (4 digits for 4-digit years) in UTC
+    const utcMonth = date.getUTCMonth() + 1; // getUTCMonth returns 0-11; add 1 to make it 1-12
+    const utcDay = date.getUTCDate(); // Gets the day of the month (1-31) in UTC
+
+    // Construct the date string in YYYY-MM-DD format
+    return `${utcYear}-${String(utcMonth).padStart(2, '0')}-${String(utcDay).padStart(2, '0')}`;
+}
+
+function formatFormTime(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp.seconds * 1000);
+    return format(date, 'HH:mm');
+}
+
 
 const TasksTable = ({ tasks, refreshTasks }) => {
     const [editedTask, setEditedTask] = useState({});
@@ -91,9 +112,22 @@ const TasksTable = ({ tasks, refreshTasks }) => {
     };
 
     const handleEditClick = (task) => {
-        setEditedTask({ ...task });
+        // Format the due date and time only if they exist
+        const formattedDueDate = task.dueDate ? formatFormDate(task.dueDate) : '';
+        const formattedDueTime = task.dueTime ? formatFormTime(task.dueTime) : '';
+        const formattedStartDate = task.startDate ? formatFormDate(task.startDate) : '';
+
+        setEditedTask({
+            ...task,
+            dueDate: formattedDueDate,
+            dueTime: formattedDueTime,
+            startDate: formattedStartDate
+        });
+
         setEditModalOpen(true); // Open the edit modal
     };
+
+
     const handleDeleteClick = async (taskId) => {
         const confirmation = window.confirm("Are you sure you want to delete this task?");
         if (confirmation) {
@@ -182,6 +216,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                         <th>Subject</th>
                         <th>Assignment</th>
                         <th>Due Date</th>
+                        <th>Due Time</th>
                         <th>Project</th>
                         <th>Edit</th>
                         <th>Delete</th>
@@ -192,7 +227,8 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                         <tr key={task.id || index}>
                             <td>{task.subject}</td>
                             <td>{task.assignment}</td>
-                            <td> {task.dueDate ? formatDateDisplay(task.dueDate) : ''}</td>
+                            <td> {task.dueDate ? formatDateDisplay(formatFormDate(task.dueDate)) : ''}</td>
+                            <td> {task.dueTime ? formatTimeDisplay(formatFormTime(task.dueTime)) : ''}</td>
                             <td>{task.project}</td>
                             <td>
 
@@ -201,7 +237,7 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                                 </CustomIconButton>
                             </td>
                             <td>
-                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
+                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.id)}>
                                     <DeleteIcon />
                                 </IconButton>
                             </td>

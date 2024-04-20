@@ -245,12 +245,17 @@ export async function fetchTasks(userId, subject = null, project = null) {
         const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
         const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
 
+        // Compare by dueDate first
         if (dateA < dateB) return -1;
         if (dateA > dateB) return 1;
 
         // If due dates are the same, compare due times
-        if (a.dueTime < b.dueTime) return -1;
-        if (a.dueTime > b.dueTime) return 1;
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.dueTime ? a.dueTime : '23:59';
+        const timeB = b.dueTime ? b.dueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         // Finally, compare assignments
         return a.assignment.localeCompare(b.assignment);
@@ -270,26 +275,17 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
             collection(db, "tasks"),
             where("userId", "==", userId),
             where("subject", "==", subject),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
         );
     } else if (project) {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
             where("project", "==", project),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
         );
     } else {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
         );
     }
 
@@ -310,12 +306,17 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
         const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
         const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
 
+        // Compare by dueDate first
         if (dateA < dateB) return -1;
         if (dateA > dateB) return 1;
 
         // If due dates are the same, compare due times
-        if (a.dueTime < b.dueTime) return -1;
-        if (a.dueTime > b.dueTime) return 1;
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.dueTime ? a.dueTime : '23:59';
+        const timeB = b.dueTime ? b.dueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         // Finally, compare assignments
         return a.assignment.localeCompare(b.assignment);
@@ -327,12 +328,36 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
 export async function fetchArchivedTasks(userId) {
     const db = getFirestore();
     const tasksRef = collection(db, "tasks");
-    const q = query(tasksRef, where("userId", "==", userId), where("status", "==", "Completed"), orderBy("dueDate", "asc"), orderBy("assignment", "asc"));
+    const q = query(tasksRef,
+        where("userId", "==", userId),
+        where("status", "==", "Completed"));
 
     const querySnapshot = await getDocs(q);
     const archivedTasks = [];
     querySnapshot.forEach((doc) => {
         archivedTasks.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Sort tasks, placing those without a due date at the end
+    archivedTasks.sort((a, b) => {
+        // Convert date strings to Date objects for comparison
+        const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
+        const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
+
+        // Compare by dueDate first
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.dueTime ? a.dueTime : '23:59';
+        const timeB = b.dueTime ? b.dueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
+
+        // Finally, compare assignments
+        return a.assignment.localeCompare(b.assignment);
     });
 
     return archivedTasks;
@@ -391,15 +416,15 @@ export async function editTask(taskDetails) {
 
     // Conditionally add dates and times if provided
     if (startDateInput) {
-        taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00Z"));
+        taskData.startDate = Timestamp.fromDate(new Date(startDateInput + "T00:00:00"));
     }
 
     if (dueDateInput) {
-        taskData.dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00Z"));
+        taskData.dueDate = Timestamp.fromDate(new Date(dueDateInput + "T00:00:00"));
     }
 
     if (dueTimeInput) {
-        const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00Z";
+        const dateTimeString = dueDateInput + "T" + dueTimeInput + ":00";
         taskData.dueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
@@ -607,12 +632,21 @@ export async function fetchProjects(userId, projectId = null) {
 
     // Sort projects by due date, placing those without a due date at the end
     projectsWithDetails.sort((a, b) => {
-        // Handle missing due dates by assigning them a far future date for sorting purposes
-        const dueDateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
-        const dueDateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
+        // Convert date strings to Date objects for comparison
+        const dateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
+        const dateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
 
-        if (dueDateA < dueDateB) return -1;
-        if (dueDateA > dueDateB) return 1;
+        // Compare by dueDate first
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.projectDueTime ? a.projectDueTime : '23:59';
+        const timeB = b.projectDueTime ? b.projectDueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         // If due dates are the same, then sort by project name
         return a.projectName.localeCompare(b.projectName);
@@ -727,11 +761,21 @@ export async function fetchArchivedProjects(userId) {
 
     // Sort projects by due date, placing those without a due date at the end
     projectsWithDetails.sort((a, b) => {
-        const dueDateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
-        const dueDateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
+        // Convert date strings to Date objects for comparison
+        const dateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
+        const dateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
 
-        if (dueDateA < dueDateB) return -1;
-        if (dueDateA > dueDateB) return 1;
+        // Compare by dueDate first
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.projectDueTime ? a.projectDueTime : '23:59';
+        const timeB = b.projectDueTime ? b.projectDueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         return a.projectName.localeCompare(b.projectName);
     });
