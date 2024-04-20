@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { useNavigate } from 'react-router-dom';
-import { logoutUser, updateUserDetails } from '/src/LearnLeaf_Functions.jsx';
+import { logoutUser, updateUserDetails, deleteUser } from '/src/LearnLeaf_Functions.jsx';
 import '/src/Components/FormUI.css';
 import './UserProfile.css';
 
 const UserProfile = () => {
     const { user, updateUser } = useUser();
+    console.log("user details: ", user);
     const [showPassword, setShowPassword] = useState(false);
     const [name, setName] = useState(user.name || '');
     const [email, setEmail] = useState(user.email || '');
@@ -67,7 +68,19 @@ const UserProfile = () => {
         }
     };
 
-    // Need delete account function
+    const handleDeleteClick = async () => {
+        const confirmation = window.confirm("Are you sure you want to delete your account? This action is not reversible.");
+        if (confirmation) {
+            try {
+                await deleteUser(user.id);
+                console.log("User account and all related data deleted successfully");
+                updateUser(null);
+                navigate('/');
+            } catch (error) {
+                console.error('Account Deletion failed:', error);
+            }
+        }
+    };
 
     return (
         <div className="view-container">
@@ -158,7 +171,7 @@ const UserProfile = () => {
                     <button className="update" onClick={handleUpdateProfile}>Update Preferences</button>
                 </div>
 
-                <button className="deleteAcc-button">Delete Account</button>
+                <button className="deleteAcc-button" onClick={handleDeleteClick}>Delete Account</button>
             </div>
         </div>
     );
