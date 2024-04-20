@@ -38,7 +38,7 @@ export const UserProvider = ({ children }) => {
                         id: firebaseUser.uid,
                         name: userDoc.data().name,
                         email: userDoc.data().email,
-                        password: userDoc.data().passowrd,
+                        password: userDoc.data().password,
                         notifications: userDoc.data().notifications || false,
                         notificationsFrequency: userDoc.data().notificationsFrequency || [true, false, false, false]
                     };

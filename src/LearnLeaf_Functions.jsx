@@ -1,7 +1,7 @@
 // @flow
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
@@ -115,6 +115,37 @@ export async function logoutUser() {
             console.error(failedlogout, error);
             throw error;
         });
+}
+
+export async function deleteUser(userId) {
+    const batch = writeBatch(db);
+
+    // Function to delete all documents in a collection where `userId` matches
+    const deleteCollectionByUserId = async (collectionName) => {
+        const q = query(collection(db, collectionName), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+    };
+
+    // Delete tasks, subjects, and projects
+    await deleteCollectionByUserId("tasks");
+    await deleteCollectionByUserId("subjects");
+    await deleteCollectionByUserId("projects");
+
+    // Delete the user document
+    const userDocRef = doc(db, "users", userId);
+    batch.delete(userDocRef);
+
+    // Commit the batch
+    await batch.commit();
+
+    // Delete the Firebase Authentication user
+    const user = auth.currentUser;
+    if (user && user.uid === userId) {
+        await deleteFirebaseUser(user);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {

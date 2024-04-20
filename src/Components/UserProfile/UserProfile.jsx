@@ -7,7 +7,6 @@ import './UserProfile.css';
 
 const UserProfile = () => {
     const { user, updateUser } = useUser();
-    console.log("user details: ", user);
     const [showPassword, setShowPassword] = useState(false);
     const [name, setName] = useState(user.name || '');
     const [email, setEmail] = useState(user.email || '');
