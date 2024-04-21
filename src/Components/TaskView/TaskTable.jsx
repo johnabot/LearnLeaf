@@ -264,10 +264,10 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                 <tbody>
                     {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
                         <tr key={task.taskId || index}>
-                        <td style={{ backgroundColor: task.subjectColor || 'transparent' }}>
+                        <td style={{ color: task.subjectColor || 'transparent' }}>
                             {task.subject}
                         </td>
-                        <td style={{ backgroundColor: task.subjectColor || 'transparent' }}>
+                        <td style={{ color: task.subjectColor || 'transparent' }}>
                             {task.assignment}
                         </td>
                         <td>{task.priority}</td>
