@@ -40,7 +40,7 @@ const SubjectWidget = ({ subject, refreshSubjects }) => {
         setEditModalOpen(true); // Open the edit modal
     };
     const handleDeleteClick = async () => {
-        const confirmation = window.confirm("Are you sure you want to delete this subject?");
+        const confirmation = window.confirm("Are you sure you want to delete this subject?\n(This will not delete any associated tasks.)");
         if (confirmation) {
             try {
                 await deleteSubject(subject.id);

@@ -39,6 +39,9 @@ export const UserProvider = ({ children }) => {
                         name: userDoc.data().name,
                         email: userDoc.data().email,
                         password: userDoc.data().password,
+                        timeFormat: userDoc.data().timeFormat || '12h',
+                        dateFormat: userDoc.data().dateFormat || 'MM/DD/YYYY',
+                        theme: userDoc.data().theme || 'light',
                         notifications: userDoc.data().notifications || false,
                         notificationsFrequency: userDoc.data().notificationsFrequency || [true, false, false, false]
                     };

@@ -48,7 +48,7 @@ const ProjectWidget = ({ project, refreshProjects }) => {
     };
 
     const handleDeleteClick = async (projectId) => {
-        const confirmation = window.confirm("Are you sure you want to delete this project?");
+        const confirmation = window.confirm("Are you sure you want to delete this project?\n(This will not delete any associated tasks.)");
         if (confirmation) {
             try {
                 await deleteProject(projectId);
@@ -88,10 +88,21 @@ const ProjectWidget = ({ project, refreshProjects }) => {
                 )}
 
                 {project.nextTaskName ? (
-                    <div className="next-task">Next Task: {project.nextTaskName}<br />Due: {formatDateDisplay(project.nextTaskDueDate)} at {formatTimeDisplay(project.nextTaskDueTime)}</div>
+                    <div className="next-task">
+                        Next Task: {project.nextTaskName}
+                        {project.nextTaskDueDate ? (
+                            <React.Fragment>
+                                <br />Due: {formatDateDisplay(project.nextTaskDueDate)}
+                                {project.nextTaskDueTime && ` at ${formatTimeDisplay(project.nextTaskDueTime)}`}
+                            </React.Fragment>
+                        ) : (
+                                <span> <br />No Due Date Set</span> // Display when no due date is provided
+                        )}
+                    </div>
                 ) : (
                     <div className="next-task">No Upcoming Tasks</div>
                 )}
+
 
                 {data.some(entry => entry.value > 0) && (
                     <PieChart width={400} height={200}>
@@ -113,9 +124,12 @@ const ProjectWidget = ({ project, refreshProjects }) => {
                     </PieChart>
                 )}
                 {project.projectDueDate ? (
-                    <div className="project-due">Project Due: {project.projectDueDate ? formatDateDisplay(project.projectDueDate) : ''} at {project.projectDueTime ? formatTimeDisplay(project.projectDueTime) : ''}</div>
+                    <div className="project-due">
+                        Project Due: {formatDateDisplay(project.projectDueDate)}
+                        {project.projectDueTime && ` at ${formatTimeDisplay(project.projectDueTime)}`}
+                    </div>
                 ) : (
-                    <div className="project-due"> </div>
+                    <div className="project-due">No Due Date Set</div>
                 )}
                 <div className="project-buttons">
                     {project.status === "Active" && (
