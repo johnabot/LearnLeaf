@@ -45,7 +45,7 @@ export function AddSubjectForm({ isOpen, onClose, refreshSubjects }) {
         userId: user.id,
         subjectName: '',
         semester: '',
-        subjectColor: '#ffffff',
+        subjectColor: 'black',
     });
 
     const handleInputChange = (e) => {
