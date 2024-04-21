@@ -525,6 +525,8 @@ export async function addSubject({ userId, subjectName, semester, subjectColor }
         subjectColor,
     };
 
+    console.log("Attmepting to add: ", subjectData);
+
     try {
         // Assuming 'subjects' is the name of your collection
         await setDoc(doc(db, "subjects", `${userId}_${Date.now()}`), subjectData);
