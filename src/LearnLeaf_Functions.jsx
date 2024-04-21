@@ -293,15 +293,23 @@ export async function fetchTasks(userId, subject = null, project = null) {
         );
     }
 
+    const subjectColors = {};
+    const subjects = await fetchSubjects(userId);
+    subjects.forEach(subj => {
+        subjectColors[subj.subjectName] = subj.subjectColor;
+    });
+
     const querySnapshot = await getDocs(q);
     const tasks = querySnapshot.docs.map(doc => {
         const data = doc.data();
+        const color = subjectColors[data.subject] || 'defaultColor';
         return {
             ...data,
             taskId: doc.id,
             startDate: formatDate(data.startDate),
             dueDate: formatDate(data.dueDate),
             dueTime: formatTime(data.dueTime),
+            subjectColor: color,
         };
     });
 
