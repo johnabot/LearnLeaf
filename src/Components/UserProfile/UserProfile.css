@@ -3,6 +3,7 @@
     border-bottom: solid;
     border-bottom-width: 1px;
     border-bottom-color: lightgray;
+    align-items: center;
 }
 
 .user-profile h2 {
@@ -29,6 +30,7 @@
 
 .user-profile input[type="text"],
 .user-profile input[type="email"],
+.user-profile input[type="password"],
 .user-profile select {
     width: 40%;
     padding: 8px;
@@ -42,6 +44,23 @@
 .user-profile input[type="checkbox"] {
     margin-top: 5px;
 }
+
+.notification-preferences {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-content: center;
+    justify-content: center;
+}
+
+    .notification-preferences .preference-selection {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .preference-selection label {
+        color: dimgray;
+    }
 
 .deleteAcc-button {
     width: 40%;

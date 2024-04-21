@@ -1,95 +1,178 @@
-// NOTE: This is not an active file YET - it will be used once user preferences are implemented
-
 import React, { useState, useEffect } from 'react';
-import { getUserInfo, updateUserInfo, getUserPreferences, updateUserPreferences } from './UserServices'; // Placeholder for your actual import paths
-import { logoutUser } from '/src/LearnLeaf_Functions.jsx';
 import { useUser } from '/src/UserState.jsx';
+import { useNavigate } from 'react-router-dom';
+import { logoutUser, updateUserDetails, deleteUser } from '/src/LearnLeaf_Functions.jsx';
+import '/src/Components/FormUI.css';
+import './UserProfile.css';
 
-export function UserProfilePage() {
-    const [userInfo, setUserInfo] = useState({ name: '', email: '' });
-    const [userPreferences, setUserPreferences] = useState({
-        timeFormat: '12h',
-        dateFormat: 'MM/DD/YYYY',
-        theme: 'light',
-        notifications: false,
-    });
+const UserProfile = () => {
+    const { user, updateUser } = useUser();
+    const [showPassword, setShowPassword] = useState(false);
+    const [name, setName] = useState(user.name || '');
+    const [email, setEmail] = useState(user.email || '');
+    const [password, setPassword] = useState(user.password || '');
+    const [timeFormat, setTimeFormat] = useState(user.timeFormat || '12-Hour');
+    const [dateFormat, setDateFormat] = useState(user.dateFormat || 'MM/DD/YYYY');
+    const [notificationsEnabled, setNotificationsEnabled] = useState(user.notifications || false);
+    const [notificationFrequencies, setNotificationFrequencies] = useState(user.notificationsFrequency || [true, false, false, false]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch user info and preferences
-        const fetchUserInfo = async () => {
-            const info = await getUserInfo();
-            setUserInfo(info);
+        setName(user.name || '');
+        setEmail(user.email || '');
+        setPassword(user.password || '');
+        setTimeFormat(user.timeFormat || '12h');
+        setDateFormat(user.dateFormat || 'MM/DD/YYYY');
+        setNotificationsEnabled(user.notifications || false);
+        setNotificationFrequencies(user.notificationsFrequency || [true, false, false, false]);
+    }, [user]);
+
+    const handleNotificationChange = (event) => {
+        const enabled = event.target.checked;
+        setNotificationsEnabled(enabled);
+        if (!enabled) {
+            setNotificationFrequencies([true, false, false, false]);
+        } else {
+            setNotificationFrequencies([false, ...notificationFrequencies.slice(1)]);
+        }
+    };
+
+    const handleFrequencyChange = (index) => {
+        const newFrequencies = notificationFrequencies.map((freq, idx) =>
+            idx === index ? !freq : freq
+        );
+        setNotificationFrequencies(newFrequencies);
+    };
+
+    const handleUpdateProfile = async () => {
+        const userDetails = {
+            name,
+            email,
+            password,
+            timeFormat,
+            dateFormat,
+            notifications: notificationsEnabled,
+            notificationsFrequency: notificationFrequencies
         };
-
-        const fetchUserPreferences = async () => {
-            const preferences = await getUserPreferences();
-            setUserPreferences(preferences);
-        };
-
-        fetchUserInfo();
-        fetchUserPreferences();
-    }, []);
-
-    const handleUserInfoChange = (e) => {
-        const { name, value } = e.target;
-        setUserInfo(prevState => ({ ...prevState, [name]: value }));
+        try {
+            await updateUserDetails(user.id, userDetails);
+            alert('Profile updated successfully!');
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+            alert('Failed to update profile.');
+        }
     };
 
-    const handleUserPreferencesChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setUserPreferences(prevState => ({
-            ...prevState,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+    const handleLogout = async () => {
+        try {
+            await logoutUser();
+            updateUser(null);
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
     };
 
-    const saveUserInfo = async () => {
-        await updateUserInfo(userInfo);
-        alert('User info updated successfully!');
-    };
-
-    const saveUserPreferences = async () => {
-        await updateUserPreferences(userPreferences);
-        alert('User preferences updated successfully!');
-    };
-
-    const handleLogout = () => {
-        logoutUser();
-        // Redirect to login page or perform other cleanup
+    const handleDeleteClick = async () => {
+        const confirmation = window.confirm("Are you sure you want to delete your account? This action is not reversible.");
+        if (confirmation) {
+            try {
+                await deleteUser(user.id);
+                console.log("User account and all related data deleted successfully");
+                updateUser(null);
+                navigate('/');
+            } catch (error) {
+                console.error('Account Deletion failed:', error);
+            }
+        }
     };
 
     return (
         <div className="view-container">
-            <h2>User Profile</h2>
-            <div>
-                <h3>Account Information</h3>
-                <input type="text" name="name" value={userInfo.name} onChange={handleUserInfoChange} placeholder="Name" />
-                <input type="email" name="email" value={userInfo.email} onChange={handleUserInfoChange} placeholder="Email" />
-                <button onClick={saveUserInfo}>Save</button>
-            </div>
+            <div className="user-profile">
+                <div className="top-bar">
+                    <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
+                    <div className="top-navigation">
+                        <nav className="nav-links">
+                            <a href="/tasks">Tasks</a>
+                            <a href="/calendar">Calendar</a>
+                            <a href="/subjects">Subjects</a>
+                            <a href="/projects">Projects</a>
+                            <a href="/archives">Archives</a>
+                            <a href="/profile">User Profile</a>
+                        </nav>
+                        <button className="logout-button" onClick={handleLogout}>Logout</button>
+                    </div>
+                </div>
+                <div className="account-info">
+                    <h3>Account Information</h3>
+                    <div>
+                        <label htmlFor="name">Name:</label>
+                        <input type="text" id="name" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+                    </div>
+                    <div>
+                        <label htmlFor="email">Email:</label>
+                        <input type="text" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div>
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <div>
+                            <label htmlFor="showPassword">Show Password:</label>
+                            <input type="checkbox" id="showPassword" onClick={() => setShowPassword(!showPassword)} />
+                        </div>
+                    </div>
+                    <button className="update" onClick={handleUpdateProfile}>Update Details</button>
+                </div>
+                <div className="preferences">
+                    <h3>Preferences</h3>
+                    <div>
+                        <label htmlFor="timeFormat">Time Format:</label>
+                        <select id="timeFormat" value={timeFormat} onChange={(e) => setTimeFormat(e.target.value)}>
+                            <option value="12h">12-Hour</option>
+                            <option value="24h">24-Hour</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="dateFormat">Date Format:</label>
+                        <select id="dateFormat" value={dateFormat} onChange={(e) => setDateFormat(e.target.value)}>
+                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="notifications">Enable Notifications:</label>
+                        <input type="checkbox" id="notifications" checked={notificationsEnabled} onChange={handleNotificationChange} />
+                    </div>
+                    {notificationsEnabled && (
+                        <div className="notification-preferences">
+                            <div className="preference-selection">
+                                <label htmlFor="weekly" title="Receive updates once a week.">Weekly:</label>
+                                <input type="checkbox" id="weekly" name="weekly" checked={notificationFrequencies[1]} onChange={() => handleFrequencyChange(1)} />
+                            </div>
+                            <div className="preference-selection">
+                                <label htmlFor="daily" title="Receive updates once a day.">Daily:</label>
+                                <input type="checkbox" id="daily" name="daily" checked={notificationFrequencies[2]} onChange={() => handleFrequencyChange(2)} />
+                            </div>
+                            <div className="preference-selection">
+                                <label htmlFor="urgent" title="Receive updates of tasks due today.">Urgent:</label>
+                                <input type="checkbox" id="urgent" name="urgent" checked={notificationFrequencies[3]} onChange={() => handleFrequencyChange(3)} />
+                            </div>
+                        </div>
+                    )}
+                    <button className="update" onClick={handleUpdateProfile}>Update Preferences</button>
+                </div>
 
-            <div>
-                <h3>Preferences</h3>
-                <select name="timeFormat" value={userPreferences.timeFormat} onChange={handleUserPreferencesChange}>
-                    <option value="12h">12 hours</option>
-                    <option value="24h">24 hours</option>
-                </select>
-                <select name="dateFormat" value={userPreferences.dateFormat} onChange={handleUserPreferencesChange}>
-                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                </select>
-                <select name="theme" value={userPreferences.theme} onChange={handleUserPreferencesChange}>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                </select>
-                <label>
-                    <input type="checkbox" name="notifications" checked={userPreferences.notifications} onChange={handleUserPreferencesChange} />
-                    Enable Notifications
-                </label>
-                <button onClick={saveUserPreferences}>Save</button>
+                <button className="deleteAcc-button" onClick={handleDeleteClick}>Delete Account</button>
             </div>
-
-            <button onClick={handleLogout}>Logout</button>
         </div>
     );
 }
+
+export default UserProfile;

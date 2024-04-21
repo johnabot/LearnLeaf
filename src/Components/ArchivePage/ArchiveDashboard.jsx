@@ -1,32 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '/src/UserState.jsx';
-import { logoutUser } from '/src/LearnLeaf_Functions.jsx';
+import { logoutUser, fetchArchivedTasks, fetchArchivedSubjects, reactivateSubject, fetchArchivedProjects, reactivateProject } from '/src/LearnLeaf_Functions.jsx';
 import { useNavigate } from 'react-router-dom';
-// import { TaskTable, SubjectWidget, ProjectWidget } from '/src/components'; // Assume these are your component imports
-import './ArchiveDashboard.css'
+import TasksTable from './ArchivedTaskTable.jsx';
+import ArchivedSubjectWidget from './ArchivedSubjectWidget.jsx';
+import ArchivedProjectWidget from './ArchivedProjectWidget.jsx';
+import './ArchiveDashboard.css';
 
 const ArchivedItemsPage = () => {
     const { user, updateUser } = useUser();
     const navigate = useNavigate();
-
-
-    // Example hooks to fetch archived items; replace with your actual data fetching logic
     const [archivedTasks, setArchivedTasks] = useState([]);
     const [archivedSubjects, setArchivedSubjects] = useState([]);
     const [archivedProjects, setArchivedProjects] = useState([]);
+    const [showTasks, setShowTasks] = useState(false);
+    const [showSubjects, setShowSubjects] = useState(false);
+    const [showProjects, setShowProjects] = useState(false);
 
-    useEffect(() => {
-        // Fetch archived items here and set state
-    }, []);
-
-    function toggleSection(sectionId) {
-        var content = document.getElementById(sectionId);
-        if (content.style.display === "none" || content.style.display === '') {
-            content.style.display = "block";
-        } else {
-            content.style.display = "none";
+    const toggleSection = (section) => {
+        if (section === 'tasks-content') {
+            setShowTasks(!showTasks);
+        } else if (section === 'subjects-content') {
+            setShowSubjects(!showSubjects);
+        } else if (section === 'projects-content') {
+            setShowProjects(!showProjects);
         }
-    }
+    };
+
+    // Fetch archived tasks
+    useEffect(() => {
+        if (user?.id) {
+            fetchArchivedTasks(user.id)
+                .then(setArchivedTasks)
+                .catch(error => console.error("Error fetching archived tasks:", error));
+        }
+    }, [user?.id]);
+
+    // Refresh Tasks
+    const refreshTasks = async () => {
+        const updatedTasks = await fetchArchivedTasks(user.id);
+        setArchivedTasks(updatedTasks);
+    };
+
+    // Fetch archived subjects
+    useEffect(() => {
+        if (user?.id) {
+            fetchArchivedSubjects(user.id)
+                .then(setArchivedSubjects)
+                .catch(error => console.error("Error fetching archived subjects:", error));
+        }
+    }, [user?.id]);
+
+    // Refresh Subjects
+    const refreshSubjects = async () => {
+        const updatedSubjects = await fetchArchivedSubjects(user.id);
+        setArchivedSubjects(updatedSubjects);
+    };
+
+    // Fetch archived projects
+    useEffect(() => {
+        if (user?.id) {
+            fetchArchivedProjects(user.id)
+                .then(setArchivedProjects)
+                .catch(error => console.error("Error fetching archived projects:", error));
+        }
+    }, [user?.id]);
+
+    // Refresh Projects
+    const refreshProjects = async () => {
+        const updatedProjects = await fetchArchivedProjects(user.id);
+        setArchivedProjects(updatedProjects);
+    };
 
     const handleLogout = async () => {
         try {
@@ -38,10 +82,9 @@ const ArchivedItemsPage = () => {
         }
     };
 
-
     return (
         <>
-            <div className="view-container">
+            <div className="content-container">
                 <div className="top-bar">
                     <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
                     <div className="top-navigation">
@@ -56,33 +99,33 @@ const ArchivedItemsPage = () => {
                         <button className="logout-button" onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
-
-
-                <h1 class="label">{user.name}'s Archives</h1>
-
-                <div class="section">
-                    <h2 class="section-header" onclick="toggleSection('tasks-content')">Tasks</h2>
-                    <div class="section-content" id="tasks-content">
-                        {/* Placeholder for TaskTable component */}
+                <h1 className="label">{user.name}'s Archives</h1>
+                <div className="section"> 
+                    <div className="section-header" onClick={() => toggleSection('tasks-content')}>Tasks</div>
+                    <div id="tasks-content" className="section-content" style={{ display: showTasks ? 'block' : 'none' }}>
+                        <TasksTable tasks={archivedTasks} refreshTasks={refreshTasks} />
                     </div>
                 </div>
-
-                <div class="section">
-                    <h2 class="section-header" onclick="toggleSection('subjects-content')">Subjects</h2>
-                    <div class="section-content" id="subjects-content">
-                        {/* Example: <div><span>Subject Name</span><button class="activate-button">Activate</button></div> */}
+                <div className="section">
+                    <h2 className="section-header" onClick={() => toggleSection('subjects-content')}>Subjects</h2>
+                    <div id="subjects-grid" className="section-content" style={{ display: showSubjects ? 'grid' : 'none' }}>
+                        {archivedSubjects.map(subject => (
+                            <ArchivedSubjectWidget key={subject.id} subject={subject} reactivateSubject={reactivateSubject} refreshSubjects={refreshSubjects} />
+                        ))}
                     </div>
                 </div>
-
-                <div class="section">
-                    <h2 class="section-header" onclick="toggleSection('projects-content')">Projects</h2>
-                    <div class="section-content" id="projects-content">
-                        {/* Example: <div><span>Project Name</span><button class="activate-button">Activate</button></div> */}
+                <div className="section">
+                    <h2 className="section-header" onClick={() => toggleSection('projects-content')}>Projects</h2>
+                    <div id="projects-grid" className="section-content" style={{ display: showProjects ? 'grid' : 'none' }}>
+                        {archivedProjects.map(project => (
+                            <ArchivedProjectWidget key={project.projectId} project={project} reactivateProject={reactivateProject} refreshProjects={refreshProjects} />
+                        ))}
                     </div>
                 </div>
             </div>
         </>
     );
+
 };
 
 export default ArchivedItemsPage;

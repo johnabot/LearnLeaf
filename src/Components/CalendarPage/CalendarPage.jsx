@@ -7,6 +7,27 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 
 const CalendarView = () => {
+    const { user, updateUser } = useUser();
+    const [events, setEvents] = useState([]);
+
+    const refreshTasks = async () => {
+        if (user && user.id) {
+            const tasks = await fetchTasks(user.id);
+            const tasksWithDueDates = tasks.filter(task => task.dueDate);
+            const formattedTasks = tasksWithDueDates.map(task => ({
+                allDay: true,
+                start: new Date(task.dueDate + 'T00:00:00'),
+                end: new Date(task.dueDate + 'T23:59:59'),
+                title: task.assignment,
+                task: task
+            }));
+            setEvents(formattedTasks);
+        }
+    };
+
+    useEffect(() => {
+        refreshTasks();
+    }, [user?.id]);
 
     const handleLogout = async () => {
         try {
@@ -34,7 +55,7 @@ const CalendarView = () => {
                     <button className="logout-button" onClick={handleLogout}>Logout</button>
                 </div>
             </div>
-            <CalendarUI />
+            <CalendarUI events={events} refreshTasks={refreshTasks}/>
         </div>
     );
 }

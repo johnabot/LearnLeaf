@@ -1,8 +1,10 @@
 // @flow
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
+import { useUser } from '/src/UserState.jsx';
+
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -35,9 +37,13 @@ export function registerUser(email, password, name) {
 
             await setDoc(doc(db, "users", user.uid), {
                 name: name,
-                email: email
+                email: email,
+                password: password,
+                timeFormat: '12h', // Initialize time format as 12 Hour
+                dateFormat: 'MM/DD/YYYY', // Initialize date format as MM/DD/YYYY
+                notifications: false, // Initialize notifications as Disabled
+                notificationsFrequency: [true,false,false,false], //Array to store frequency preferences - [None, Weekly, Daily, None], Initialized as None
             });
-            // Additional user info or redirection can be handled here
         })
         .catch((error) => {
             var errorCode = error.code;
@@ -76,16 +82,31 @@ export async function loginUser(email, password) {
             if (!userDoc.exists()) {
                 throw new Error('User does not exist');
             }
-            // Assuming the user's document contains a name field
             const userName = userDoc.data().name;
-            const userEmail = user.email; // Directly from auth user object
-            return { id: user.uid, name: userName, email: userEmail };
+            const userEmail = userDoc.data().email;
+            const userPassword = userDoc.data().password;
+            const userTimeFormat = userDoc.data().timeFormat;
+            const userDateFormat = userDoc.data().dateFormat;
+            const userNotifications = userDoc.data().notifications;
+            const userNotificationFrequency = userDoc.data().notificationsFrequency;
+            return { id: user.uid, name: userName, email: userEmail, password: userPassword, timeFormat: userTimeFormat, dateFormat: userDateFormat, notifcations: userNotifications, notificationFrequency: userNotificationFrequency };
         })
         .catch((error) => {
             // Error handling
             console.error("Login error", error);
             throw error; // Propagate the error
         });
+}
+
+export async function updateUserDetails(userId, userDetails) {
+    const userDocRef = doc(db, "users", userId);
+
+    try {
+        await updateDoc(userDocRef, userDetails);
+        console.log("User updated successfully");
+    } catch (error) {
+        console.error("Error updating user:", error);
+    }
 }
 
 // logout out of the webpage
@@ -100,6 +121,37 @@ export async function logoutUser() {
             console.error(failedlogout, error);
             throw error;
         });
+}
+
+export async function deleteUser(userId) {
+    const batch = writeBatch(db);
+
+    // Function to delete all documents in a collection where `userId` matches
+    const deleteCollectionByUserId = async (collectionName) => {
+        const q = query(collection(db, collectionName), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+    };
+
+    // Delete tasks, subjects, and projects
+    await deleteCollectionByUserId("tasks");
+    await deleteCollectionByUserId("subjects");
+    await deleteCollectionByUserId("projects");
+
+    // Delete the user document
+    const userDocRef = doc(db, "users", userId);
+    batch.delete(userDocRef);
+
+    // Commit the batch
+    await batch.commit();
+
+    // Delete the Firebase Authentication user
+    const user = auth.currentUser;
+    if (user && user.uid === userId) {
+        await deleteFirebaseUser(user);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -136,14 +188,26 @@ function formatDate(input) {
 }
 
 export function formatDateDisplay(input) {
+    const { user } = useUser();
+    const dateFormat = user.dateFormat;
+
     let date = input instanceof Date ? input : input.toDate ? input.toDate() : new Date(input);
     let month = (date.getMonth() + 1).toString().padStart(2, '0');
     let day = (date.getDate() + 1).toString().padStart(2, '0');
     let year = date.getFullYear();
-    return `${month}/${day}/${year}`; // Return the formatted date for display
+
+    if (dateFormat === 'DD/MM/YYYY') {
+        return `${day}/${month}/${year}`;
+    }
+    else {
+        return `${month}/${day}/${year}`;
+    }
 }
 
 export function formatTimeDisplay(input) {
+    const { user } = useUser();
+    const timeFormat = user.timeFormat;
+
     if (!input || typeof input !== 'string') return 'N/A'; // Handle null, undefined, or non-string input
 
     // Split the input string by the colon to get hours and minutes
@@ -152,6 +216,7 @@ export function formatTimeDisplay(input) {
     // Parse the hours and minutes into numbers
     let hours = parseInt(strHours, 10);
     let minutes = parseInt(strMinutes, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
 
     // Validate the hours and minutes
     if (isNaN(hours) || isNaN(minutes) || hours > 23 || minutes > 59) {
@@ -159,17 +224,18 @@ export function formatTimeDisplay(input) {
         return 'Invalid Time'; // The input was not a valid time string
     }
 
-    // Convert hours from 24-hour to 12-hour format
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours || 12; // the hour '0' should be '12'
-    
+    if (timeFormat === '12h') {
+        // Convert hours from 24-hour to 12-hour format for AM/PM notation
+        hours = hours % 12;
+        hours = hours || 12; // the hour '0' should be '12'
+    }
+
     // Format hours and minutes with leading zeros
     const formattedHours = hours.toString().padStart(2, '0');
     const formattedMinutes = minutes.toString().padStart(2, '0');
 
-    // Return the formatted time string
-    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    // Return the formatted time string depending on the format
+    return timeFormat === '12h' ? `${formattedHours}:${formattedMinutes} ${ampm}` : `${formattedHours}:${formattedMinutes}`;
 }
 
 // Helper function to format Firestore Timestamp to "HH:MM AM/PM"
@@ -253,12 +319,17 @@ export async function fetchTasks(userId, subject = null, project = null) {
         const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
         const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
 
+        // Compare by dueDate first
         if (dateA < dateB) return -1;
         if (dateA > dateB) return 1;
 
         // If due dates are the same, compare due times
-        if (a.dueTime < b.dueTime) return -1;
-        if (a.dueTime > b.dueTime) return 1;
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.dueTime ? a.dueTime : '23:59';
+        const timeB = b.dueTime ? b.dueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         // Finally, compare assignments
         return a.assignment.localeCompare(b.assignment);
@@ -266,8 +337,6 @@ export async function fetchTasks(userId, subject = null, project = null) {
 
     return tasks;
 }
-
-
 
 export async function fetchAllTasks(userId, subject = null, project = null) {
     const db = getFirestore();
@@ -278,26 +347,17 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
             collection(db, "tasks"),
             where("userId", "==", userId),
             where("subject", "==", subject),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
         );
     } else if (project) {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
             where("project", "==", project),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
         );
     } else {
         q = query(
             collection(db, "tasks"),
             where("userId", "==", userId),
-            orderBy("dueDate", "asc"),
-            orderBy("dueTime", "asc"),
-            orderBy("assignment", "asc")
         );
     }
 
@@ -318,18 +378,61 @@ export async function fetchAllTasks(userId, subject = null, project = null) {
         const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
         const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
 
+        // Compare by dueDate first
         if (dateA < dateB) return -1;
         if (dateA > dateB) return 1;
 
         // If due dates are the same, compare due times
-        if (a.dueTime < b.dueTime) return -1;
-        if (a.dueTime > b.dueTime) return 1;
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.dueTime ? a.dueTime : '23:59';
+        const timeB = b.dueTime ? b.dueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         // Finally, compare assignments
         return a.assignment.localeCompare(b.assignment);
     });
 
     return tasksAll;
+}
+
+export async function fetchArchivedTasks(userId) {
+    const db = getFirestore();
+    const tasksRef = collection(db, "tasks");
+    const q = query(tasksRef,
+        where("userId", "==", userId),
+        where("status", "==", "Completed"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedTasks = [];
+    querySnapshot.forEach((doc) => {
+        archivedTasks.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Sort tasks, placing those without a due date at the end
+    archivedTasks.sort((a, b) => {
+        // Convert date strings to Date objects for comparison
+        const dateA = a.dueDate ? new Date(a.dueDate) : new Date('9999-12-31');
+        const dateB = b.dueDate ? new Date(b.dueDate) : new Date('9999-12-31');
+
+        // Compare by dueDate first
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.dueTime ? a.dueTime : '23:59';
+        const timeB = b.dueTime ? b.dueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
+
+        // Finally, compare assignments
+        return a.assignment.localeCompare(b.assignment);
+    });
+
+    return archivedTasks;
 }
 
 // Function to create a new task
@@ -409,9 +512,6 @@ export async function editTask(taskDetails) {
     }
 };
 
-
-
-// Function to delete a task
 export async function deleteTask(taskId) {
     const db = getFirestore(); // Initialize Firestore
     const taskDocRef = doc(db, "tasks", taskId); // Create a reference to the task document
@@ -450,6 +550,8 @@ export async function addSubject({ userId, subjectName, semester, subjectColor }
         status: 'Active', // Assuming new subjects are active by default
         subjectColor,
     };
+
+    console.log("Attmepting to add: ", subjectData);
 
     try {
         // Assuming 'subjects' is the name of your collection
@@ -505,6 +607,35 @@ export async function archiveSubject(subjectId) {
     }
 }
 
+export async function fetchArchivedSubjects(userId) {
+    const db = getFirestore();
+    const subjectsRef = collection(db, "subjects");
+    const q = query(subjectsRef, where("userId", "==", userId), where("status", "==", "Archived"), orderBy("subjectName", "asc"));
+
+    const querySnapshot = await getDocs(q);
+    const archivedSubjects = [];
+    querySnapshot.forEach((doc) => {
+        archivedSubjects.push({ id: doc.id, ...doc.data() });
+    });
+
+    return archivedSubjects;
+}
+
+export async function reactivateSubject(subjectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const subjectRef = doc(db, "subjects", subjectId);
+
+    try {
+        // Update the status field of the subject to 'Active'
+        await updateDoc(subjectRef, {
+            status: 'Active'
+        });
+        console.log("Subject reactivated successfully");
+    } catch (error) {
+        console.error("Error reactivating subject:", error);
+    }
+}
+
 // Function to delete a subject
 export async function deleteSubject(subjectId) {
     const db = getFirestore(); // Initialize Firestore
@@ -519,12 +650,21 @@ export async function deleteSubject(subjectId) {
 }
 
 
-export async function fetchProjects(userId) {
+export async function fetchProjects(userId, projectId = null) {
     const db = getFirestore();
     const projectsRef = collection(db, "projects");
-    const q = query(projectsRef,
-        where("userId", "==", userId),
-        where("status", "==", "Active"));
+    let q;
+
+    if (projectId) {
+        q = query(projectsRef,
+            where("userId", "==", userId),
+            where("__name__", "==", projectId));
+    }
+    else {
+        q = query(projectsRef,
+            where("userId", "==", userId),
+            where("status", "==", "Active"));
+    }
 
     const querySnapshot = await getDocs(q);
     const projectsPromises = querySnapshot.docs.map(async (doc) => {
@@ -563,12 +703,21 @@ export async function fetchProjects(userId) {
 
     // Sort projects by due date, placing those without a due date at the end
     projectsWithDetails.sort((a, b) => {
-        // Handle missing due dates by assigning them a far future date for sorting purposes
-        const dueDateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
-        const dueDateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
+        // Convert date strings to Date objects for comparison
+        const dateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
+        const dateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
 
-        if (dueDateA < dueDateB) return -1;
-        if (dueDateA > dueDateB) return 1;
+        // Compare by dueDate first
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.projectDueTime ? a.projectDueTime : '23:59';
+        const timeB = b.projectDueTime ? b.projectDueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
 
         // If due dates are the same, then sort by project name
         return a.projectName.localeCompare(b.projectName);
@@ -590,12 +739,12 @@ export async function addProject({ userId, projectDueDateInput, projectDueTimeIn
 
     // Conditionally add dates and times if provided
     if (projectDueDateInput) {
-        taskData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
+        projectData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
     }
 
     if (projectDueTimeInput) {
         const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
-        taskData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
+        projectData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
     try {
@@ -661,6 +810,65 @@ export async function archiveProject(projectId) {
     }
 }
 
+export async function fetchArchivedProjects(userId) {
+    const db = getFirestore();
+    const projectsRef = collection(db, "projects");
+
+    // Query to fetch only archived projects for the given user ID
+    const q = query(projectsRef,
+        where("userId", "==", userId),
+        where("status", "==", "Archived"));
+
+    const querySnapshot = await getDocs(q);
+    const projectsWithDetails = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+
+        return {
+            ...data,
+            projectId: doc.id,
+            projectDueDate: formatDate(data.projectDueDate),
+        };
+    });
+
+    // Sort projects by due date, placing those without a due date at the end
+    projectsWithDetails.sort((a, b) => {
+        // Convert date strings to Date objects for comparison
+        const dateA = a.projectDueDate ? new Date(a.projectDueDate) : new Date('9999-12-31');
+        const dateB = b.projectDueDate ? new Date(b.projectDueDate) : new Date('9999-12-31');
+
+        // Compare by dueDate first
+        if (dateA < dateB) return -1;
+        if (dateA > dateB) return 1;
+
+        // If due dates are the same, compare due times
+        // Ensure dueTime is not null; default to "23:59" if null to put them at the end of the day
+        const timeA = a.projectDueTime ? a.projectDueTime : '23:59';
+        const timeB = b.projectDueTime ? b.projectDueTime : '23:59';
+
+        if (timeA < timeB) return -1;
+        if (timeA > timeB) return 1;
+
+        return a.projectName.localeCompare(b.projectName);
+    });
+
+    return projectsWithDetails;
+}
+
+export async function reactivateProject(projectId) {
+    const db = getFirestore(); // Initialize Firestore
+    const projectRef = doc(db, "projects", projectId);
+
+    try {
+        // Update the status field of the project to 'Active'
+        await updateDoc(projectRef, {
+            status: 'Active'
+        });
+        console.log("Project reactivated successfully");
+    } catch (error) {
+        console.error("Error reactivating project:", error);
+    }
+}
+
 export async function deleteProject(projectId) {
     const db = getFirestore(); // Initialize Firestore
     const projectDocRef = doc(db, "projects", projectId); // Create a reference to the project document
@@ -674,6 +882,54 @@ export async function deleteProject(projectId) {
 }
 
 
+
+// Function to send task tracking notifications based on user preference
+//____________________________________________________________________________________
+export async function sendTaskNotifications(userId, time) {
+    const tasks = await fetchAllTasks(userId); // Fetch all tasks for the user
+
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Define the time range
+    let pastTarget;
+    let futureTarget;
+    if (time === 'day after tomorrow') {
+        pastTarget = new Date(today);
+        futureTarget = new Date(today);
+        futureTarget.setDate(today.getDate() + 2); // Due in 2 days
+    } else if (time === 'seven day period') {
+        pastTarget = new Date(today);
+        pastTarget.setDate(today.getDate() - 7); // Past 7 days
+        futureTarget = new Date(today);
+        futureTarget.setDate(today.getDate() + 7); // Next 7 days
+    } else if (time === 'Tomorrow') {
+        pastTarget = new Date(today);
+        futureTarget = new Date(today);
+        futureTarget.setDate(today.getDate() + 1); // Due tomorrow
+    } else {
+        console.error('Invalid time');
+        return;
+    }
+
+    const specificTask = tasks.filter(task => {
+        const targetDate = new Date(task.targetDate);
+        return targetDate >= targetDate && targetDate <= futureTarget;
+    });
+
+    // Logic to send email notifications for specificTask
+    specificTask.forEach(task => {
+        // Send email notification for each task
+        sendEmailNotification(task);
+    });
+}
+
+// Placeholder function to send email notification for a task
+function sendEmailNotification(task) {
+    // Implement email sending logic here
+    console.log(`Sending email notification for task: ${task.assignment}`);
+}
 
 
 // Event listeners for form submissions and button clicks
