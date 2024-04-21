@@ -11,6 +11,8 @@ const UserProfile = () => {
     const [name, setName] = useState(user.name || '');
     const [email, setEmail] = useState(user.email || '');
     const [password, setPassword] = useState(user.password || '');
+    const [timeFormat, setTimeFormat] = useState(user.timeFormat || '12-Hour');
+    const [dateFormat, setDateFormat] = useState(user.dateFormat || 'MM/DD/YYYY');
     const [notificationsEnabled, setNotificationsEnabled] = useState(user.notifications || false);
     const [notificationFrequencies, setNotificationFrequencies] = useState(user.notificationsFrequency || [true, false, false, false]);
     const navigate = useNavigate();
@@ -19,6 +21,8 @@ const UserProfile = () => {
         setName(user.name || '');
         setEmail(user.email || '');
         setPassword(user.password || '');
+        setTimeFormat(user.timeFormat || '12h');
+        setDateFormat(user.dateFormat || 'MM/DD/YYYY');
         setNotificationsEnabled(user.notifications || false);
         setNotificationFrequencies(user.notificationsFrequency || [true, false, false, false]);
     }, [user]);
@@ -45,6 +49,8 @@ const UserProfile = () => {
             name,
             email,
             password,
+            timeFormat,
+            dateFormat,
             notifications: notificationsEnabled,
             notificationsFrequency: notificationFrequencies
         };
@@ -128,23 +134,16 @@ const UserProfile = () => {
                     <h3>Preferences</h3>
                     <div>
                         <label htmlFor="timeFormat">Time Format:</label>
-                        <select id="timeFormat" disabled>
-                            <option value="12h">12 hours</option>
-                            <option value="24h">24 hours</option>
+                        <select id="timeFormat" value={timeFormat} onChange={(e) => setTimeFormat(e.target.value)}>
+                            <option value="12h">12-Hour</option>
+                            <option value="24h">24-Hour</option>
                         </select>
                     </div>
                     <div>
                         <label htmlFor="dateFormat">Date Format:</label>
-                        <select id="dateFormat" disabled>
+                        <select id="dateFormat" value={dateFormat} onChange={(e) => setDateFormat(e.target.value)}>
                             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="theme">Theme:</label>
-                        <select id="theme" disabled>
-                            <option value="light">Light</option>
-                            <option value="dark">Dark</option>
                         </select>
                     </div>
                     <div>

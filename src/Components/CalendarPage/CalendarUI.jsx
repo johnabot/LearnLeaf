@@ -7,7 +7,7 @@ import getDay from 'date-fns/getDay';
 import { enUS } from 'date-fns/locale';
 import parseISO from 'date-fns/parseISO';
 import { useUser } from '/src/UserState.jsx';
-import { fetchTasks, editTask, deleteTask } from '/src/LearnLeaf_Functions.jsx';
+import { fetchTasks, editTask, deleteTask, formatDateDisplay, formatTimeDisplay } from '/src/LearnLeaf_Functions.jsx';
 import { TaskEditForm } from '/src/Components/TaskView/EditForm.jsx'
 import { AddTaskForm } from '/src/Components/TaskView/AddTaskForm.jsx';
 import Dialog from '@mui/material/Dialog';
@@ -124,7 +124,7 @@ const CalendarUI = ({events, refreshTasks}) => {
                             <br />
                             Due Date: {format(parseISO(selectedEvent.task.dueDate), 'PPP')}
                             <br />
-                            Due Time: {selectedEvent.task.dueTime}
+                            Due Time: {formatTimeDisplay(selectedEvent.task.dueTime)}
                             <br />
                             Project: {selectedEvent.task.project}
                         </DialogContentText>

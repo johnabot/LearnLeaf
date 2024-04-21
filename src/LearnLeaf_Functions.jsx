@@ -3,6 +3,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
+import { useUser } from '/src/UserState.jsx';
+
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -37,6 +39,8 @@ export function registerUser(email, password, name) {
                 name: name,
                 email: email,
                 password: password,
+                timeFormat: '12h', // Initialize time format as 12 Hour
+                dateFormat: 'MM/DD/YYYY', // Initialize date format as MM/DD/YYYY
                 notifications: false, // Initialize notifications as Disabled
                 notificationsFrequency: [true,false,false,false], //Array to store frequency preferences - [None, Weekly, Daily, None], Initialized as None
             });
@@ -81,9 +85,11 @@ export async function loginUser(email, password) {
             const userName = userDoc.data().name;
             const userEmail = userDoc.data().email;
             const userPassword = userDoc.data().password;
+            const userTimeFormat = userDoc.data().timeFormat;
+            const userDateFormat = userDoc.data().dateFormat;
             const userNotifications = userDoc.data().notifications;
             const userNotificationFrequency = userDoc.data().notificationsFrequency;
-            return { id: user.uid, name: userName, email: userEmail, password: userPassword, notifcations: userNotifications, notificationFrequency: userNotificationFrequency };
+            return { id: user.uid, name: userName, email: userEmail, password: userPassword, timeFormat: userTimeFormat, dateFormat: userDateFormat, notifcations: userNotifications, notificationFrequency: userNotificationFrequency };
         })
         .catch((error) => {
             // Error handling
@@ -182,14 +188,26 @@ function formatDate(input) {
 }
 
 export function formatDateDisplay(input) {
+    const { user } = useUser();
+    const dateFormat = user.dateFormat;
+
     let date = input instanceof Date ? input : input.toDate ? input.toDate() : new Date(input);
     let month = (date.getMonth() + 1).toString().padStart(2, '0');
     let day = (date.getDate() + 1).toString().padStart(2, '0');
     let year = date.getFullYear();
-    return `${month}/${day}/${year}`; // Return the formatted date for display
+
+    if (dateFormat === 'DD/MM/YYYY') {
+        return `${day}/${month}/${year}`;
+    }
+    else {
+        return `${month}/${day}/${year}`;
+    }
 }
 
 export function formatTimeDisplay(input) {
+    const { user } = useUser();
+    const timeFormat = user.timeFormat;
+
     if (!input || typeof input !== 'string') return 'N/A'; // Handle null, undefined, or non-string input
 
     // Split the input string by the colon to get hours and minutes
@@ -198,6 +216,7 @@ export function formatTimeDisplay(input) {
     // Parse the hours and minutes into numbers
     let hours = parseInt(strHours, 10);
     let minutes = parseInt(strMinutes, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
 
     // Validate the hours and minutes
     if (isNaN(hours) || isNaN(minutes) || hours > 23 || minutes > 59) {
@@ -205,17 +224,18 @@ export function formatTimeDisplay(input) {
         return 'Invalid Time'; // The input was not a valid time string
     }
 
-    // Convert hours from 24-hour to 12-hour format
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours || 12; // the hour '0' should be '12'
-    
+    if (timeFormat === '12h') {
+        // Convert hours from 24-hour to 12-hour format for AM/PM notation
+        hours = hours % 12;
+        hours = hours || 12; // the hour '0' should be '12'
+    }
+
     // Format hours and minutes with leading zeros
     const formattedHours = hours.toString().padStart(2, '0');
     const formattedMinutes = minutes.toString().padStart(2, '0');
 
-    // Return the formatted time string
-    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    // Return the formatted time string depending on the format
+    return timeFormat === '12h' ? `${formattedHours}:${formattedMinutes} ${ampm}` : `${formattedHours}:${formattedMinutes}`;
 }
 
 // Helper function to format Firestore Timestamp to "HH:MM AM/PM"
@@ -309,8 +329,6 @@ export async function fetchTasks(userId, subject = null, project = null) {
 
     return tasks;
 }
-
-
 
 export async function fetchAllTasks(userId, subject = null, project = null) {
     const db = getFirestore();
