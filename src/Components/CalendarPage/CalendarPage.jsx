@@ -19,7 +19,8 @@ const CalendarView = () => {
                 start: new Date(task.dueDate + 'T00:00:00'),
                 end: new Date(task.dueDate + 'T23:59:59'),
                 title: task.assignment,
-                task: task
+                task: task,
+                style: { backgroundColor: task.subjectColor },
             }));
             setEvents(formattedTasks);
         }

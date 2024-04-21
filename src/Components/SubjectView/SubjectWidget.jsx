@@ -14,28 +14,6 @@ const CustomIconButton = styled(IconButton)({
     },
 });
 
-
-
-const handleSubjectSave = (updatedSubjectData) => {
-    const newSubjects = subjects.map(sub => {
-        if (sub.subjectId === updatedSubjectData.subjectId) {
-            return { ...sub, ...updatedSubjectData };
-        }
-        return sub;
-    });
-    setSubjects(newSubjects);
-};
-const handleSaveAndClose = async (updatedSubject) => {
-    // Update local state with the new subject details
-    handleSubjectSave(updatedSubject);
-
-    // Refresh the list of subjects from the backend
-    await refreshSubjects();
-
-    // Close the modal
-    setEditModalOpen(false);
-};
-
 const SubjectWidget = ({ subject, refreshSubjects }) => {
     const [editedSubject, setEditedSubject] = useState({
         subjectId: subject.id,
@@ -76,10 +54,14 @@ const SubjectWidget = ({ subject, refreshSubjects }) => {
     return (
         <>
             <EditSubjectForm
+                key={editedSubject.subjectId}
                 subject={editedSubject}
                 isOpen={isEditModalOpen}
                 onClose={() => setEditModalOpen(false)}
-                onSave={handleSaveAndClose}
+                onSave={() => {
+                    setEditModalOpen(false);
+                    refreshSubjects();
+                }}
             />
             <div style={widgetStyle} className="subject-widget">
                 <a

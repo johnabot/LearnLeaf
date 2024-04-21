@@ -50,6 +50,15 @@ const CalendarUI = ({events, refreshTasks}) => {
     const [editedTask, setEditedTask] = useState({});
     const [isEditModalOpen, setEditModalOpen] = useState(false);
 
+    const eventPropGetter = (event) => {
+        return {
+            style: {
+                backgroundColor: event.style?.backgroundColor || '#3174ad', // Default color if none specified
+                color: 'white', // Ensures text is readable on any background color
+            }
+        };
+    };
+
     const handleEventClick = (event) => {
         setSelectedEvent(event);
         setOpen(true);
@@ -106,6 +115,7 @@ const CalendarUI = ({events, refreshTasks}) => {
                 step={1440} // Sets the time slot size to one day
                 timeslots={1} // Only one time slot per day
                 style={{ height: 700 }}
+                eventPropGetter={eventPropGetter}
                 onSelectEvent={handleEventClick}
                 selectable={true}
                 onSelectSlot={handleSelectSlot}
