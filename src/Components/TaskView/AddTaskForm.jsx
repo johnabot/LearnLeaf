@@ -82,48 +82,57 @@ export function AddTaskForm({ isOpen, onClose, initialSubject, initialProject, i
     const handleInputChange = (event) => {
         const { name, value } = event.target;
 
+        const isNewItemSelected = value === "newSubject" || value === "newProject";
+
         if (name === "subject") {
-            if (value === "newSubject") {
-                setIsNewSubject(true); // Show the new subject input field
-                setTaskDetails(prevDetails => ({ ...prevDetails, subject: '' })); // Clear any previously selected subject
+            if (isNewItemSelected) {
+                setIsNewSubject(value === "newSubject");
+                setTaskDetails(prevDetails => ({ ...prevDetails, subject: '' }));
             } else {
-                setIsNewSubject(false); // Hide the new subject input field
-                setTaskDetails(prevDetails => ({ ...prevDetails, subject: value })); // Update the subject from the dropdown
+                setIsNewSubject(false);
+                setTaskDetails(prevDetails => ({ ...prevDetails, subject: value }));
             }
-        } else if (isNewSubject && name === "newSubjectName") {
-            setTaskDetails(prevDetails => ({ ...prevDetails, subject: value })); // Update the subject with the new subject name
-        } else {
-            setTaskDetails(prevDetails => ({ ...prevDetails, [name]: value }));
+        } else if (name === "newSubjectName" && isNewSubject) {
+            setTaskDetails(prevDetails => ({ ...prevDetails, subject: value }));
         }
 
         if (name === "project") {
-            if (value === "newProject") {
-                setIsNewProject(true);
-                setTaskDetails(prevDetails => ({ ...prevDetails, project: '', projectDueDateInput: '', projectDueTimeInput: '' }));
+            if (isNewItemSelected) {
+                setIsNewProject(value === "newProject");
+                setTaskDetails(prevDetails => ({ ...prevDetails, project: '' }));
             } else {
                 setIsNewProject(false);
                 setTaskDetails(prevDetails => ({ ...prevDetails, project: value }));
             }
-        } else if (isNewProject && name === "newProjectName") {
+        } else if (name === "newProjectName" && isNewProject) {
             setTaskDetails(prevDetails => ({ ...prevDetails, project: value }));
-        } else {
+        }
+
+        // Handle all other inputs normally
+        if (!["subject", "project", "newSubjectName", "newProjectName"].includes(name)) {
             setTaskDetails(prevDetails => ({ ...prevDetails, [name]: value }));
         }
     };
-
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         let updatedTaskDetails = { ...taskDetails };
 
+        // Check if "None" was selected for subject or project and replace with an empty string
+        if (updatedTaskDetails.subject === "None") {
+            updatedTaskDetails.subject = '';
+        }
+        if (updatedTaskDetails.project === "None") {
+            updatedTaskDetails.project = '';
+        }
+
         if (isNewSubject && newSubjectName) {
             const newSubjectDetails = {
                 userId: user.id,
                 subjectName: newSubjectName,
                 semester: '',
-                subjectColor: '#ffffff' // Default color
+                subjectColor: 'black' // Default color
             };
             await addSubject(newSubjectDetails);
             updatedTaskDetails.subject = newSubjectName;
@@ -159,7 +168,9 @@ export function AddTaskForm({ isOpen, onClose, initialSubject, initialProject, i
                             name="subject"
                             value={isNewSubject ? 'newSubject' : taskDetails.subject}
                             onChange={handleInputChange}
+                            required
                         >
+                            <MenuItem value="None">None</MenuItem>
                             {subjects.map((subject) => (
                                 <MenuItem key={subject.subjectName} value={subject.subjectName}>{subject.subjectName}</MenuItem>
                             ))}
@@ -208,8 +219,9 @@ export function AddTaskForm({ isOpen, onClose, initialSubject, initialProject, i
                             name="project"
                             value={isNewProject ? "newProject" : taskDetails.project}
                             onChange={handleInputChange}
-                            displayEmpty
+                            required
                         >
+                            <MenuItem value="None">None</MenuItem>
                             {projects.map((project) => (
                                 <MenuItem key={project.projectName} value={project.projectName}>{project.projectName}</MenuItem>
                             ))}

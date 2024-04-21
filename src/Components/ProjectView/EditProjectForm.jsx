@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { editProject } from '/src/LearnLeaf_Functions.jsx'; // Ensure you have this function defined similarly to addProject
+import { editProject, fetchSubjects, addSubject } from '/src/LearnLeaf_Functions.jsx'; // Ensure you have this function defined similarly to addProject
 import { useUser } from '/src/UserState.jsx';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 
 // Styles
 const boxStyle = {
@@ -38,49 +42,62 @@ const cancelButtonStyle = {
 };
 
 export const EditProjectForm = ({ project, isOpen, onClose, onSave }) => {
-    const [formValues, setFormValues] = useState({
-        projectId: project.id,
-        ...project,
-    });
+    const { user } = useUser();
+    const [subjects, setSubjects] = useState([]);
+    const [isNewSubject, setIsNewSubject] = useState(false);
+    const [newSubjectName, setNewSubjectName] = useState('');
+    const [formValues, setFormValues] = useState(project);
 
     useEffect(() => {
         setFormValues({ ...project });
-    }, [project]);
+        async function loadSelections() {
+            const fetchedSubjects = await fetchSubjects(user.id);
+            setSubjects(fetchedSubjects);
+        }
+        loadSelections();
+    }, [project, user.id]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormValues({ ...formValues, [name]: value });
+        if (name === "subject" && value === "newSubject") {
+            setIsNewSubject(true);
+            setFormValues({ ...formValues, subject: '' });
+        } else if (name === "newSubjectName") {
+            setNewSubjectName(value);
+            setFormValues({ ...formValues, subject: value });
+        } else {
+            setIsNewSubject(false);
+            setFormValues({ ...formValues, [name]: value });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const updatedProjectData = {
-                projectId: formValues.projectId,
-                userId: formValues.userId,
-                projectName: formValues.projectName,
-                subject: formValues.subject,
-                status: project.status,
-                projectDueDateInput: formValues.projectDueDate,
-                projectDueTimeInput: formValues.projectDueTime,
-            };
-            console.log(updatedProjectData);
-
-            await editProject(updatedProjectData);
-            onSave(updatedProjectData); // Callback to update the parent component's state with the new project data
-            console.log('Project has been updated successfully.');
-            onClose(); // Close the modal after saving
-        } catch (error) {
-            console.error('Failed to update project:', error);
+        if (formValues.subject === "None") {
+            formValues.subject = '';
         }
 
+        if (isNewSubject && newSubjectName) {
+            const newSubjectDetails = {
+                userId: user.id,
+                subjectName: newSubjectName,
+                semester: '',
+                subjectColor: 'black' // Default color
+            };
+            await addSubject(newSubjectDetails);
+            formValues.subject = newSubjectName;
+        }
+
+        await editProject(formValues);
+        onSave(formValues); 
+        onClose();
     };
 
     return (
         <Modal open={isOpen} onClose={onClose}>
             <Box sx={boxStyle}>
-                <h2 style={{ color: "#8E5B9F" }}>Edit Project</h2>
-                <form onSubmit={handleSubmit}>
+                <h2 style={{ color: "#8E5B9F" }}>Add a New Project</h2>
+                <form noValidate autoComplete="off" onSubmit={handleSubmit}>
                     <TextField
                         fullWidth
                         margin="normal"
@@ -90,21 +107,40 @@ export const EditProjectForm = ({ project, isOpen, onClose, onSave }) => {
                         onChange={handleInputChange}
                         required
                     />
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Subject"
-                        name="subject"
-                        value={formValues.subject}
-                        onChange={handleInputChange}
-                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="subject-select-label">Subject</InputLabel>
+                        <Select
+                            labelId="subject-select-label"
+                            id="subject-select"
+                            name="subject"
+                            value={isNewSubject ? "newSubject" : formValues.subject}
+                            onChange={handleInputChange}
+                        >
+                            <MenuItem value="None">None</MenuItem>
+                            {subjects.map(subject => (
+                                <MenuItem key={subject.subjectName} value={subject.subjectName}>{subject.subjectName}</MenuItem>
+                            ))}
+                            <MenuItem value="newSubject">Add New Subject...</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {isNewSubject && (
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="New Subject Name"
+                            name="newSubjectName"
+                            value={newSubjectName}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    )}
                     <TextField
                         fullWidth
                         margin="normal"
                         label="Due Date"
-                        name="projectDueDate"
+                        name="projectDueDateInput"
                         type="date"
-                        value={formValues.projectDueDate}
+                        value={formValues.projectDueDateInput}
                         onChange={handleInputChange}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -112,15 +148,19 @@ export const EditProjectForm = ({ project, isOpen, onClose, onSave }) => {
                         fullWidth
                         margin="normal"
                         label="Time Due"
-                        name="projectDueTime"
+                        name="projectDueTimeInput"
                         type="time"
-                        value={formValues.projectDueTime}
+                        value={formValues.projectDueTimeInput}
                         onChange={handleInputChange}
                         InputLabelProps={{ shrink: true }}
                     />
                     <div style={{ marginTop: 16 }}>
-                        <Button sx={submitButtonStyle} type="submit" variant="contained">Save Changes</Button>
-                        <Button sx={cancelButtonStyle} onClick={onClose}>Cancel</Button>
+                        <Button sx={submitButtonStyle} type="submit">
+                            Add Project
+                        </Button>
+                        <Button sx={cancelButtonStyle} onClick={onClose}>
+                            Cancel
+                        </Button>
                     </div>
                 </form>
             </Box>

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { editTask } from '/src/LearnLeaf_Functions.jsx';
+import { editTask, fetchSubjects, addSubject, fetchProjects, addProject } from '/src/LearnLeaf_Functions.jsx';
+import { useUser } from '/src/UserState.jsx';
 import './TaskView.css';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
@@ -46,19 +47,64 @@ const cancelButtonStyle = {
 };
 
 export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
+    const { user } = useUser();
     const [formValues, setFormValues] = useState(task);
+    const [subjects, setSubjects] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [isNewSubject, setIsNewSubject] = useState(false);
+    const [isNewProject, setIsNewProject] = useState(false);
+    const [newSubjectName, setNewSubjectName] = useState('');
+    const [newProjectName, setNewProjectName] = useState('');
+
     useEffect(() => {
         setFormValues({ ...task });
-    }, [task]);
+        async function loadSelections() {
+            const fetchedSubjects = await fetchSubjects(user.id);
+            setSubjects(fetchedSubjects);
+            const fetchedProjects = await fetchProjects(user.id);
+            setProjects(fetchedProjects);
+        }
+        loadSelections();
+    }, [task, user.id]);
 
-    const handleChange = (event) => {
+    const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setFormValues({ ...formValues, [name]: value });
+
+        const isNewItemSelected = value === "newSubject" || value === "newProject";
+
+        if (name === "subject") {
+            if (isNewItemSelected) {
+                setIsNewSubject(value === "newSubject");
+                setFormValues(prevDetails => ({ ...prevDetails, subject: '' }));
+            } else {
+                setIsNewSubject(false);
+                setFormValues(prevDetails => ({ ...prevDetails, subject: value }));
+            }
+        } else if (name === "newSubjectName" && isNewSubject) {
+            setFormValues(prevDetails => ({ ...prevDetails, subject: value }));
+        }
+
+        if (name === "project") {
+            if (isNewItemSelected) {
+                setIsNewProject(value === "newProject");
+                setFormValues(prevDetails => ({ ...prevDetails, project: '' }));
+            } else {
+                setIsNewProject(false);
+                setFormValues(prevDetails => ({ ...prevDetails, project: value }));
+            }
+        } else if (name === "newProjectName" && isNewProject) {
+            setFormValues(prevDetails => ({ ...prevDetails, project: value }));
+        }
+
+        // Handle all other inputs normally
+        if (!["subject", "project", "newSubjectName", "newProjectName"].includes(name)) {
+            setFormValues(prevDetails => ({ ...prevDetails, [name]: value }));
+        }
     };
 
     const handleSave = async () => {
         try {
-            const updatedTaskData = {
+            const updatedTaskDetails = {
                 taskId: formValues.taskId,
                 userId: formValues.userId,
                 subject: formValues.subject,
@@ -71,8 +117,37 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                 dueTimeInput: formValues.dueTime,     // Align this with editTask expectations
             };
 
-            await editTask(updatedTaskData);
-            onSave(updatedTaskData); // This needs to pass back the original formValues for consistency
+            // Check if "None" was selected for subject or project and replace with an empty string
+            if (updatedTaskDetails.subject === "None") {
+                updatedTaskDetails.subject = '';
+            }
+            if (updatedTaskDetails.project === "None") {
+                updatedTaskDetails.project = '';
+            }
+
+            if (isNewSubject && newSubjectName) {
+                const newSubjectDetails = {
+                    userId: user.id,
+                    subjectName: newSubjectName,
+                    semester: '',
+                    subjectColor: 'black' // Default color
+                };
+                await addSubject(newSubjectDetails);
+                updatedTaskDetails.subject = newSubjectName;
+            }
+
+            if (isNewProject && newProjectName) {
+                const newProjectDetails = {
+                    userId: user.id,
+                    projectName: newProjectName,
+                    subject: ''
+                };
+                await addProject(newProjectDetails);
+                updatedTaskDetails.project = newProjectName;
+            }
+
+            await editTask(updatedTaskDetails);
+            onSave(updatedTaskDetails); // This needs to pass back the original formValues for consistency
             onClose();
         } catch (error) {
             console.error('Failed to update task:', error);
@@ -80,27 +155,46 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
     };
 
 
-
     return (
         <Modal open={isOpen} onClose={onClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             <Box sx={boxStyle}>
                 <h2 id="modal-modal-title" style={{ color: "#8E5B9F" }}>Edit Task</h2>
                 <form noValidate autoComplete="off">
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Subject"
-                        name="subject"
-                        value={formValues.subject ? formValues.subject : ''}
-                        onChange={handleChange}
-                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="subject-label">Subject</InputLabel>
+                        <Select
+                            labelId="subject-label"
+                            id="subject"
+                            name="subject"
+                            value={isNewSubject ? 'newSubject' : formValues.subject}
+                            onChange={handleInputChange}
+                            required
+                        >
+                            <MenuItem value="None">None</MenuItem>
+                            {subjects.map(subject => (
+                                <MenuItem key={subject.subjectName} value={subject.subjectName}>{subject.subjectName}</MenuItem>
+                            ))}
+                            <MenuItem value="newSubject">Add New Subject...</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {isNewSubject && (
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="New Subject Name"
+                            name="newSubjectName"
+                            value={newSubjectName}
+                            onChange={(e) => setNewSubjectName(e.target.value)}
+                            required
+                        />
+                    )}
                     <TextField
                         fullWidth
                         margin="normal"
                         label="Assignment"
                         name="assignment"
                         value={formValues.assignment ? formValues.assignment : ''}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                     />
                     <FormControl fullWidth margin="normal">
                         <InputLabel id="priority-label">Priority</InputLabel>
@@ -110,7 +204,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                             value={formValues.priority? formValues.priority : ''}
                             label="Priority"
                             name="priority"
-                            onChange={handleChange}
+                            onChange={handleInputChange}
                         >
                             <MenuItem value="High">High</MenuItem>
                             <MenuItem value="Medium">Medium</MenuItem>
@@ -125,7 +219,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                             value={formValues.status? formValues.status : ''}
                             label="Status"
                             name="status"
-                            onChange={handleChange}
+                            onChange={handleInputChange}
                         >
                             <MenuItem value="Not Started">Not Started</MenuItem>
                             <MenuItem value="In Progress">In Progress</MenuItem>
@@ -139,7 +233,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         name="startDate"
                         type="date"
                         value={formValues.startDate ? formValues.startDate : ''}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         InputLabelProps={{ shrink: true }}
                     />
                     <TextField
@@ -149,7 +243,7 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         name="dueDate"
                         type="date"
                         value={formValues.dueDate ? formValues.dueDate : ''}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         InputLabelProps={{ shrink: true }}
                     />
                     <TextField
@@ -159,17 +253,37 @@ export const TaskEditForm = ({ task, isOpen, onClose, onSave }) => {
                         name="dueTime"
                         type="time"
                         value={formValues.dueTime ? formValues.dueTime : ''}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         InputLabelProps={{ shrink: true }}
                     />
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Project"
-                        name="project"
-                        value={formValues.project ? formValues.project : ''}
-                        onChange={handleChange}
-                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="project-label">Project</InputLabel>
+                        <Select
+                            labelId="project-label"
+                            id="project"
+                            name="project"
+                            value={isNewProject ? 'newProject' : formValues.project}
+                            onChange={handleInputChange}
+                            required
+                        >
+                            <MenuItem value="None">None</MenuItem>
+                            {projects.map(project => (
+                                <MenuItem key={project.projectName} value={project.projectName}>{project.projectName}</MenuItem>
+                            ))}
+                            <MenuItem value="newProject">Add New Project...</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {isNewProject && (
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="New Project Name"
+                            name="newProjectName"
+                            value={newProjectName}
+                            onChange={(e) => setNewProjectName(e.target.value)}
+                            required
+                        />
+                    )}
                     <div style={{ marginTop: 16 }}>
                         <Button sx={submitButtonStyle} onClick={handleSave}>
                             Save
