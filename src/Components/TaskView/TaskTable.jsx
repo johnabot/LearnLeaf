@@ -17,6 +17,8 @@ const CustomIconButton = styled(IconButton)({
     },
 });
 
+
+
 const TasksTable = ({ tasks, refreshTasks }) => {
     const [editedTask, setEditedTask] = useState({});
     const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -261,29 +263,36 @@ const TasksTable = ({ tasks, refreshTasks }) => {
                 </thead>
                 <tbody>
                     {getFilteredTasks(tasks, filterCriteria).map((task, index) => (
-                        <tr key={task.id || index}>
-                            <td>{task.subject}</td>
-                            <td>{task.assignment}</td>
-                            <td>{task.priority}</td>
-                            <td>{task.status}</td>
-                            <td style={{ color: getDateColor(task.startDate) }}> {task.startDate ? formatDateDisplay(task.startDate) : ''}</td>
-                            <td style={{ color: getDateColor(task.dueDate) }}> {task.dueDate ? formatDateDisplay(task.dueDate) : ''}</td>
-                            <td>{task.dueTime ? formatTimeDisplay(task.dueTime) : ''}</td>
-                            <td>{task.project}</td>
-                            <td>
-
-                                <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task, index)}>
-                                    <EditIcon />
-                                </CustomIconButton>
-                            </td>
-                            <td>
-                                <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </td>
+                        <tr key={task.taskId || index}>
+                        <td style={{ color: task.subjectColor || 'transparent' }}>
+                            {task.subject}
+                        </td>
+                        <td style={{ color: task.subjectColor || 'transparent' }}>
+                            {task.assignment}
+                        </td>
+                        <td>{task.priority}</td>
+                        <td>{task.status}</td>
+                        <td style={{ color: getDateColor(task.startDate) }}>
+                            {task.startDate ? formatDateDisplay(task.startDate) : '--/--/----'}
+                        </td>
+                        <td style={{ color: getDateColor(task.dueDate) }}>
+                            {task.dueDate ? formatDateDisplay(task.dueDate) : '--/--/----'}
+                        </td>
+                        <td>{task.dueTime ? formatTimeDisplay(task.dueTime) : '--:--'}</td>
+                        <td>{task.project}</td>
+                        <td>
+                            <CustomIconButton aria-label="edit" onClick={() => handleEditClick(task)}>
+                            <EditIcon />
+                            </CustomIconButton>
+                        </td>
+                        <td>
+                            <IconButton aria-label="delete" onClick={() => handleDeleteClick(task.taskId)}>
+                            <DeleteIcon />
+                            </IconButton>
+                        </td>
                         </tr>
                     ))}
-                </tbody>
+                    </tbody>
             </table>
         </>
     );
