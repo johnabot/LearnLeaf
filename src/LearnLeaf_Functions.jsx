@@ -926,9 +926,43 @@ export async function sendTaskNotifications(userId, time) {
 }
 
 // Placeholder function to send email notification for a task
-function sendEmailNotification(task) {
+async function sendEmailNotification(task, userEmail) {
     // Implement email sending logic here
-    console.log(`Sending email notification for task: ${task.assignment}`);
+    //console.log(`Sending email notification for task: ${task.assignment}`);
+
+    const  nodemailer = require('nodemailer');
+
+    const transporter =  nodemailer.createTransport({
+    service: 'gmail',
+    host:'smtp.gmail.com',
+    port: 587,
+    secure: false, 
+    auth: {
+        user: '',
+        pass: '',
+    },
+});
+
+    const mailOptions = {
+        from: {
+            name: 'LearnLeaf Organizer',
+            address: ''
+        },
+        to: userEmail,
+        subject: `Reminder for task: ${task.assignment}`,
+        text: `This is a reminder that your task "${task.assignment}" is due on ${task.targetDate}.`,
+    };
+
+    const sendMail = async (transporter, mailOptions) => {
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log(`Email sent succesfully to ${userEmail} for task ${task.assignment}`);
+        } catch (error) {
+            console.error(`Could not send email: ${error}`);
+        }
+    }
+
+    sendMail(transporter, mailOptions);
 }
 
 
