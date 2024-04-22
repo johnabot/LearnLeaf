@@ -105,7 +105,7 @@ const sendEmail = async (email, tasks, type) => {
 };
 
 
-exports.sendDailyAndUrgentEmails = functions.pubsub.schedule('50 14 * * *') // Everyday at 8 AM
+exports.sendDailyAndUrgentEmails = functions.pubsub.schedule('0 8 * * *') // Everyday at 8 AM
     .timeZone('America/Chicago')
     .onRun(async (context) => {
         functions.logger.info("Triggered sendDailyAndUrgentEmails function");
