@@ -6,7 +6,7 @@ admin.initializeApp();
 
 const db = admin.firestore(); // Initialize Firestore outside the function scope to use in sendEmail
 
-sgMail.setApiKey('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');
+sgMail.setApiKey(functions.config().sendgrid.key);
 
 function formatDate(input) {
     if (!input) {
