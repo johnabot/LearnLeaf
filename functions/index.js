@@ -6,7 +6,7 @@ admin.initializeApp();
 
 const db = admin.firestore(); // Initialize Firestore outside the function scope to use in sendEmail
 
-sgMail.setApiKey(functions.config().sendgrid.key);
+sgMail.setApiKey("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");
 
 function formatDate(input) {
     if (!input) {
@@ -105,7 +105,7 @@ const sendEmail = async (email, tasks, type) => {
 };
 
 
-exports.sendDailyAndUrgentEmails = functions.pubsub.schedule('0 8 * * *') // Everyday at 8 AM
+exports.sendDailyAndUrgentEmails = functions.pubsub.schedule('50 14 * * *') // Everyday at 8 AM
     .timeZone('America/Chicago')
     .onRun(async (context) => {
         functions.logger.info("Triggered sendDailyAndUrgentEmails function");
