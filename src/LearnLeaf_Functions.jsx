@@ -1,10 +1,8 @@
 // @flow
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } 
-from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } from "firebase/auth";
 
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } 
-from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } from "firebase/firestore";
 
 import { getAnalytics } from "firebase/analytics";
 import { useUser } from '/src/UserState.jsx';
