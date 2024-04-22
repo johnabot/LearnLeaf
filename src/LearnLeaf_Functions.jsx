@@ -881,57 +881,6 @@ export async function deleteProject(projectId) {
     }
 }
 
-
-
-// Function to send task tracking notifications based on user preference
-//____________________________________________________________________________________
-export async function sendTaskNotifications(userId, time) {
-    const tasks = await fetchAllTasks(userId); // Fetch all tasks for the user
-
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
-    // Define the time range
-    let pastTarget;
-    let futureTarget;
-    if (time === 'day after tomorrow') {
-        pastTarget = new Date(today);
-        futureTarget = new Date(today);
-        futureTarget.setDate(today.getDate() + 2); // Due in 2 days
-    } else if (time === 'seven day period') {
-        pastTarget = new Date(today);
-        pastTarget.setDate(today.getDate() - 7); // Past 7 days
-        futureTarget = new Date(today);
-        futureTarget.setDate(today.getDate() + 7); // Next 7 days
-    } else if (time === 'Tomorrow') {
-        pastTarget = new Date(today);
-        futureTarget = new Date(today);
-        futureTarget.setDate(today.getDate() + 1); // Due tomorrow
-    } else {
-        console.error('Invalid time');
-        return;
-    }
-
-    const specificTask = tasks.filter(task => {
-        const targetDate = new Date(task.targetDate);
-        return targetDate >= targetDate && targetDate <= futureTarget;
-    });
-
-    // Logic to send email notifications for specificTask
-    specificTask.forEach(task => {
-        // Send email notification for each task
-        sendEmailNotification(task);
-    });
-}
-
-// Placeholder function to send email notification for a task
-function sendEmailNotification(task) {
-    // Implement email sending logic here
-    console.log(`Sending email notification for task: ${task.assignment}`);
-}
-
-
 // Event listeners for form submissions and button clicks
 // Example: document.getElementById('register-form').addEventListener('submit', registerUser);
 // Monitor auth state
