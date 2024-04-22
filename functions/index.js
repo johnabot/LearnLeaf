@@ -84,14 +84,14 @@ const handleEmails = async (type) => {
 };
 
 const sendEmail = async (email, tasks, type) => {
-    const messageBody = tasks.map(task => `Task: ${task.assignment}, Due: ${formatDate(task.dueDate).toLocaleDateString()}`).join('\n');
+    const messageBody = tasks.map(task => `Task: ${task.assignment}\n\tDue: ${formatDate(task.dueDate).toLocaleDateString()}\n\n`).join('\n');
     const msg = {
         subject: `Your ${type} Tasks Reminder`,
         to: email,
         from: 'learnleaforganizer@gmail.com', // Verified SendGrid sender
         templateId: 'd-09f88e35060d476ba8ea14133c788db7', // SendGrid template ID
         dynamic_template_data: {
-            subject: `Your ${type} Tasks Reminder`,
+            subject: `Your ${type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()} Tasks Reminder`,
             text: messageBody
         }
     };
