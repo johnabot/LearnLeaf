@@ -1,7 +1,11 @@
 // @flow
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser as deleteFirebaseUser } 
+from "firebase/auth";
+
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, where, query, orderBy, Timestamp, deleteDoc, updateDoc, writeBatch } 
+from "firebase/firestore";
+
 import { getAnalytics } from "firebase/analytics";
 import { useUser } from '/src/UserState.jsx';
 
@@ -885,7 +889,7 @@ export async function deleteProject(projectId) {
 
 // Function to send task tracking notifications based on user preference
 //____________________________________________________________________________________
-export async function sendTaskNotifications(userId, time) {
+export async function sendTaskNotifications(userId, time, userEmail) {
     const tasks = await fetchAllTasks(userId); // Fetch all tasks for the user
 
     const today = new Date();
@@ -918,51 +922,38 @@ export async function sendTaskNotifications(userId, time) {
         return targetDate >= targetDate && targetDate <= futureTarget;
     });
 
+    for (const task of specificTask) {
+        await sendEmailNotification(task, userEmail);
+    }
+
     // Logic to send email notifications for specificTask
-    specificTask.forEach(task => {
+    /*specificTask.forEach(task => {
         // Send email notification for each task
         sendEmailNotification(task);
-    });
+    });*/
 }
+
+const sendgridMail = require('@sendgrid/mail');
+sendgridMail.setApiKey('');
+
 
 // Placeholder function to send email notification for a task
 async function sendEmailNotification(task, userEmail) {
     // Implement email sending logic here
-    //console.log(`Sending email notification for task: ${task.assignment}`);
-
-    const  nodemailer = require('nodemailer');
-
-    const transporter =  nodemailer.createTransport({
-    service: 'gmail',
-    host:'smtp.gmail.com',
-    port: 587,
-    secure: false, 
-    auth: {
-        user: '',
-        pass: '',
-    },
-});
-
-    const mailOptions = {
-        from: {
-            name: 'LearnLeaf Organizer',
-            address: ''
-        },
+    console.log(`Sending email notification for task: ${task.assignment}`);
+    const msg = {
         to: userEmail,
-        subject: `Reminder for task: ${task.assignment}`,
-        text: `This is a reminder that your task "${task.assignment}" is due on ${task.targetDate}.`,
+        from: '',
+        subject: `Reminder: Upcoming Task Due - ${task.assignment}`,
+        text: `This is a reminder that your task "${task.assignment}" is due on ${task.targetDate.toDateString()}.`
     };
 
-    const sendMail = async (transporter, mailOptions) => {
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log(`Email sent succesfully to ${userEmail} for task ${task.assignment}`);
-        } catch (error) {
-            console.error(`Could not send email: ${error}`);
-        }
+    try {
+        await sendgridMail.send(msg);
+        console.log(`Email sent successfully to ${userEmail} for task ${task.assignment}`);
+    } catch(error) {
+        console.error(`Could not send email: ${error}`);
     }
-
-    sendMail(transporter, mailOptions);
 }
 
 
