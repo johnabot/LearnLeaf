@@ -96,7 +96,7 @@ export const EditProjectForm = ({ project, isOpen, onClose, onSave }) => {
     return (
         <Modal open={isOpen} onClose={onClose}>
             <Box sx={boxStyle}>
-                <h2 style={{ color: "#8E5B9F" }}>Add a New Project</h2>
+                <h2 style={{ color: "#8E5B9F" }}>Edit Project</h2>
                 <form noValidate autoComplete="off" onSubmit={handleSubmit}>
                     <TextField
                         fullWidth
