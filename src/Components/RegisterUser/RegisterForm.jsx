@@ -35,7 +35,7 @@ function RegistrationForm() {
     return (
         <div className="login-form-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
+                <img src="/src/LearnLeaf_Name_Logo_Wide.png" alt="LearnLeaf_name_logo" className="logo" />
             </div>
             <h2 style={{ color: '#907474' }}>Register Here!</h2>
             <form className="form-group" onSubmit={handleSubmit}>

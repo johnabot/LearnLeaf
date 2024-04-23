@@ -42,7 +42,7 @@ const SubjectTasks = () => {
     return (
         <div className="view-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
+                <img src="/src/LearnLeaf_Name_Logo_Wide.png" alt="LearnLeaf_name_logo" className="logo" />
                 <div className="name-links">
                     <nav className="nav-links">
                         <a href="/tasks">All Tasks</a>

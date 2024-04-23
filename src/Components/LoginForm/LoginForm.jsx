@@ -33,7 +33,7 @@ function LoginForm() {
     return (
         <div className="login-form-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Name_Logo_Wide.svg" alt="LearnLeaf_name_logo" className="logo" />
+                <img src="/src/LearnLeaf_Name_Logo_Wide.png" alt="LearnLeaf_name_logo" className="logo" />
             </div>
             <h1 style={{ color: '#907474' }}>Streamlining success, one task at a time!</h1>
             <form className="form-group" onSubmit={handleSubmit}>
