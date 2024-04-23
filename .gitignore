@@ -1,7 +1,3 @@
 clear
 .vs
-dist
-public
-src/assets
-node_modules
 lib

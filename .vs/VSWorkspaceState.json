@@ -1,7 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\functions",
+    "\\src\\Components",
+    "\\src\\Components\\CalendarPage",
+    "\\src\\Components\\ProjectView",
+    "\\src\\Components\\UserProfile"
   ],
-  "SelectedNode": "\\C:\\Users\\stock\\OneDrive\\Semesters\\2024 Spring\\CSE-3311 Object-Oriented Software Engineering\\LearnLeaf_Organizer\\LearnLeaf_Code",
+  "SelectedNode": "\\functions\\package-lock.json",
   "PreviewInSolutionExplorer": false
 }
