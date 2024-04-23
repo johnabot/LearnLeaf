@@ -11,6 +11,10 @@
     border-radius: 8px;
 }
 
+    .top-bar img {
+        width: 55%;
+    }
+
 .top-navigation {
     display: flex;
     flex-direction: row;

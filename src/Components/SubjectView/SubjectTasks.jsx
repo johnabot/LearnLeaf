@@ -1,4 +1,4 @@
-// @flow
+import logo from '/src/LearnLeaf_Name_Logo_Wide.png';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '/src/UserState.jsx';
@@ -42,7 +42,7 @@ const SubjectTasks = () => {
     return (
         <div className="view-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Name_Logo_Wide.png" alt="LearnLeaf_name_logo" className="logo" />
+                <img src={logo} alt="LearnLeaf_name_logo"/>
                 <div className="name-links">
                     <nav className="nav-links">
                         <a href="/tasks">All Tasks</a>

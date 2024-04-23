@@ -1,4 +1,4 @@
-// @flow
+import logo from '/src/LearnLeaf_Name_Logo_Wide.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '/src/LearnLeaf_Functions.jsx';
@@ -33,7 +33,7 @@ function LoginForm() {
     return (
         <div className="login-form-container">
             <div className="top-bar">
-                <img src="/src/LearnLeaf_Name_Logo_Wide.png" alt="LearnLeaf_name_logo" className="logo" />
+                <img src={logo} alt="LearnLeaf_name_logo"/>
             </div>
             <h1 style={{ color: '#907474' }}>Streamlining success, one task at a time!</h1>
             <form className="form-group" onSubmit={handleSubmit}>
