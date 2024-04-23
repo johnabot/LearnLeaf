@@ -156,7 +156,7 @@ export const EditProjectForm = ({ project, isOpen, onClose, onSave }) => {
                     />
                     <div style={{ marginTop: 16 }}>
                         <Button sx={submitButtonStyle} type="submit">
-                            Add Project
+                            Submit
                         </Button>
                         <Button sx={cancelButtonStyle} onClick={onClose}>
                             Cancel

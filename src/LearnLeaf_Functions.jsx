@@ -775,12 +775,12 @@ export async function editProject(projectDetails) {
 
     // Conditionally add dates and times if provided
     if (projectDueDateInput) {
-        taskData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
+        projectData.projectDueDate = Timestamp.fromDate(new Date(projectDueDateInput + "T00:00:00"));
     }
 
     if (projectDueTimeInput) {
         const dateTimeString = projectDueDateInput + "T" + projectDueTimeInput + ":00";
-        taskData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
+        projectData.projectDueTime = Timestamp.fromDate(new Date(dateTimeString));
     }
 
     // Create a reference to the project document
