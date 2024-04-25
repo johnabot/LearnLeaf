@@ -1,4 +1,3 @@
-import logo from '/src/LearnLeaf_Name_Logo_Wide.png';
 import React, { useState, useEffect } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { logoutUser, fetchArchivedTasks, fetchArchivedSubjects, reactivateSubject, fetchArchivedProjects, reactivateProject } from '/src/LearnLeaf_Functions.jsx';

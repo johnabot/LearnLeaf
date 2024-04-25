@@ -1,4 +1,3 @@
-import logo from '/src/LearnLeaf_Name_Logo_Wide.png';
 import React, { useEffect, useState } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { useNavigate } from 'react-router-dom';
