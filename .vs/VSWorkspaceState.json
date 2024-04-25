@@ -2,11 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\functions",
-    "\\src\\Components",
-    "\\src\\Components\\CalendarPage",
-    "\\src\\Components\\ProjectView",
-    "\\src\\Components\\UserProfile"
+    "\\src",
+    "\\src\\Components"
   ],
-  "SelectedNode": "\\functions\\package-lock.json",
+  "SelectedNode": "\\src\\Components\\UserProfile",
   "PreviewInSolutionExplorer": false
 }
