@@ -1,3 +1,4 @@
+import logo from '/src/LearnLeaf_Name_Logo_Wide.png';
 import React, { useState, useEffect } from 'react';
 import CalendarUI from './CalendarUI';
 import { fetchTasks, logoutUser } from '/src/LearnLeaf_Functions.jsx'
