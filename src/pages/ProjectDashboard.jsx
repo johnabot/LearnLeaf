@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { useNavigate } from 'react-router-dom';
 import { fetchProjects, logoutUser } from '/src/LearnLeaf_Functions.jsx';
-import { AddProjectForm } from './AddProjectForm.jsx';
-import ProjectWidget from './ProjectWidget.jsx';
-import './ProjectDashboard.css';
+import { AddProjectForm } from '/src/Components/ProjectView/AddProjectForm.jsx';
+import ProjectWidget from '/src/Components/ProjectView/ProjectWidget.jsx';
+import '/src/Components/ProjectView/ProjectDashboard.css';
 import '/src/Components/PageFormat.css';
 
 const ProjectsDashboard = () => {

@@ -1,12 +1,12 @@
 import logo from '/src/LearnLeaf_Name_Logo_Wide.png';
 import React, { useState, useEffect } from 'react';
-import TasksTable from './TaskTable';
+import TasksTable from '/src/Components/TaskView/TaskTable.jsx';
 import { useUser } from '/src/UserState.jsx';
 import { useNavigate } from 'react-router-dom';
 import { fetchTasks, logoutUser } from '/src/LearnLeaf_Functions.jsx'
-import { AddTaskForm } from './AddTaskForm.jsx';
+import { AddTaskForm } from '/src/Components/TaskView/AddTaskForm.jsx';
 import '/src/Components/FormUI.css';
-import './TaskView.css';
+import '/src/Components/TaskView/TaskView.css';
 
 
 const TaskList = () => {

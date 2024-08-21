@@ -1,16 +1,16 @@
 // @flow
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginForm from './Components/LoginForm/LoginForm.jsx';
-import RegistrationForm from './Components/RegisterUser/RegisterForm.jsx';
-import ResetPassword from './Components/ResetPassword/ResetPassword';
-import TaskList from './Components/TaskView/TaskView';
-import SubjectDashboard from './Components/SubjectView/SubjectDashboard.jsx';
-import SubjectTasks from './Components/SubjectView/SubjectTasks.jsx';
-import ProjectDashboard from './Components/ProjectView/ProjectDashboard.jsx';
-import ProjectTasks from './Components/ProjectView/ProjectTasks.jsx';
-import UserProfile from './Components/UserProfile/UserProfile.jsx';
-import ArchiveDashboard from './Components/ArchivePage/ArchiveDashboard';
-import CalendarView from './Components/CalendarPage/CalendarPage.jsx';
+import LoginForm from './pages/LoginForm.jsx';
+import RegistrationForm from './pages/RegisterForm.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
+import TaskList from './pages/TaskView.jsx';
+import SubjectDashboard from './pages/SubjectDashboard.jsx';
+import SubjectTasks from './pages/SubjectTasks.jsx';
+import ProjectDashboard from './pages/ProjectDashboard.jsx';
+import ProjectTasks from './pages/ProjectTasks.jsx';
+import UserProfile from './pages/UserProfile.jsx';
+import ArchiveDashboard from './pages/ArchiveDashboard';
+import CalendarView from './pages/CalendarPage.jsx';
 import { ProtectedRoute } from './ProtectedRoutes.jsx';
 
 function App() {

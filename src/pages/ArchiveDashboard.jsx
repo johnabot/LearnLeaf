@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { logoutUser, fetchArchivedTasks, fetchArchivedSubjects, reactivateSubject, fetchArchivedProjects, reactivateProject } from '/src/LearnLeaf_Functions.jsx';
 import { useNavigate } from 'react-router-dom';
-import TasksTable from './ArchivedTaskTable.jsx';
-import ArchivedSubjectWidget from './ArchivedSubjectWidget.jsx';
-import ArchivedProjectWidget from './ArchivedProjectWidget.jsx';
-import './ArchiveDashboard.css';
+import TasksTable from '/src/Components/ArchivePage/ArchivedTaskTable.jsx';
+import ArchivedSubjectWidget from '/src/Components/ArchivePage/ArchivedSubjectWidget.jsx';
+import ArchivedProjectWidget from '/src/Components/ArchivePage/ArchivedProjectWidget.jsx';
+import '/src/Components/ArchivePage/ArchiveDashboard.css';
 
 const ArchivedItemsPage = () => {
     const { user, updateUser } = useUser();

@@ -1,10 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\functions",
+    "\\public",
     "\\src",
-    "\\src\\Components"
+    "\\src\\Components",
+    "\\src\\Components\\CalendarPage",
+    "\\src\\Components\\TaskView",
+    "\\src\\Components\\UserProfile"
   ],
-  "SelectedNode": "\\src\\Components\\UserProfile",
   "PreviewInSolutionExplorer": false
 }

@@ -4,7 +4,7 @@ import { useUser } from '/src/UserState.jsx';
 import { useNavigate } from 'react-router-dom';
 import { logoutUser, updateUserDetails, deleteUser } from '/src/LearnLeaf_Functions.jsx';
 import '/src/Components/FormUI.css';
-import './UserProfile.css';
+import '/src/Components/UserProfile/UserProfile.css';
 
 const UserProfile = () => {
     const { user, updateUser } = useUser();

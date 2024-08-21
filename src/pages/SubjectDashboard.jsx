@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '/src/UserState.jsx';
 import { useNavigate } from 'react-router-dom';
 import { fetchSubjects, logoutUser } from '/src/LearnLeaf_Functions.jsx';
-import { AddSubjectForm } from './AddSubjectForm.jsx';
-import SubjectWidget from './SubjectWidget.jsx';
-import './SubjectDashboard.css';
+import { AddSubjectForm } from '/src/Components/SubjectView/AddSubjectForm.jsx';
+import SubjectWidget from '/src/Components/SubjectView/SubjectWidget.jsx';
+import '/src/Components/SubjectView/SubjectDashboard.css';
 import '/src/Components/PageFormat.css'
 
 const SubjectsDashboard = () => {
