@@ -2,5 +2,4 @@ clear
 .vs
 lib
 node_modules
-.github
 .firebase
