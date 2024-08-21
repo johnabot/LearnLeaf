@@ -34,7 +34,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-//   { basename: "/LearnLeaf" }
+  { basename: "/LearnLeaf" }
 );
 
 ReactDOM.createRoot(document.getElementById('root')).render(
